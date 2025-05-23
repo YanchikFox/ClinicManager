@@ -27,7 +27,7 @@ public class Account {
 
     public String passwordHash() {
         return passwordHash;
-    } // ← ВОТ ЭТО ДОБАВЬ
+    }
 
     public Role role() {
         return role;

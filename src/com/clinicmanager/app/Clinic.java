@@ -8,15 +8,12 @@ import com.clinicmanager.model.enums.Role;
 import com.clinicmanager.repository.DatabaseManager;
 import com.clinicmanager.service.AccountManager;
 import com.clinicmanager.service.NotificationManager;
-import com.clinicmanager.model.actors.Account;
 import com.clinicmanager.controller.BaseControlPanel;
-import com.clinicmanager.model.actors.Account;
-
 public class Clinic {
     AccountManager accountManager;
     NotificationManager notificationManager;
     DatabaseManager dbManager;
-
+ 
     BaseControlPanel login(String email, String password) {
         Account account = accountManager.login(email, password);
         if (account == null) {
@@ -26,12 +23,13 @@ public class Clinic {
         String token = accountManager.generateAccessToken(account);
 
         // Выбор панели в зависимости от роли
+        /* TODO: add Controlpanel implemetnatatoins */
         if (account.role() == Role.DOCTOR) {
             return new DoctorControlPanel(account.ownerId(), token, accountManager);
         } else if (account.role() == Role.PATIENT) {
             return new PatientControlPanel(account.ownerId(), token, accountManager);
         }
-
+account.email()
         throw new IllegalStateException("Unsupported role");
     }
 }
