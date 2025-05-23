@@ -1,4 +1,4 @@
 package com.clinicmanager.app;
 
-public class Clinic {
+public class  Clinic {
 }

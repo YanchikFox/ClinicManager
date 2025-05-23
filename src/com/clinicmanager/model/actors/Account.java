@@ -1,6 +1,5 @@
 package com.clinicmanager.model.actors;
 
-
 import com.clinicmanager.model.enums.Role;
 
 public class Account {
@@ -18,11 +17,25 @@ public class Account {
         this.ownerId = ownerId;
     }
 
-    public int id() { return id; }
-    public String email() { return email; }
-    public String passwordHash() { return passwordHash; }  // ← ВОТ ЭТО ДОБАВЬ
-    public Role role() { return role; }
-    public int ownerId() { return ownerId; }
+    public int id() {
+        return id;
+    }
+
+    public String email() {
+        return email;
+    }
+
+    public String passwordHash() {
+        return passwordHash;
+    } // ← ВОТ ЭТО ДОБАВЬ
+
+    public Role role() {
+        return role;
+    }
+
+    public int ownerId() {
+        return ownerId;
+    }
 
     public boolean validatePassword(String inputPassword) {
         // TODO: заменить на нормальную проверку хеша

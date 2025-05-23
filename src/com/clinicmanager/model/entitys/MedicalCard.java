@@ -9,6 +9,11 @@ public class MedicalCard {
         this.patientId = patientId;
     }
 
-    public int id() { return id; }
-    public int patientId() { return patientId; }
+    public int id() {
+        return id;
+    }
+
+    public int patientId() {
+        return patientId;
+    }
 }
