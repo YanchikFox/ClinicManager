@@ -2,6 +2,7 @@ package com.clinicmanager.model.actors;
 
 
 import com.clinicmanager.model.enums.Role;
+import com.clinicmanager.security.HashUtil;
 
 public class Account {
     private final int id;
@@ -10,22 +11,28 @@ public class Account {
     private final Role role;
     private final int ownerId;
 
-    public Account(int id, String email, String passwordHash, Role role, int ownerId) {
+    public Account(int id, String email, String rawPassword, Role role, int ownerId) {
         this.id = id;
         this.email = email;
-        this.passwordHash = passwordHash;
+        this.passwordHash = HashUtil.sha256(rawPassword);
+        this.role = role;
+        this.ownerId = ownerId;
+    }
+    public Account(int id, String email, String passwordOrHash, Role role, int ownerId, boolean hashed) {
+        this.id = id;
+        this.email = email;
+        this.passwordHash = hashed ? passwordOrHash : HashUtil.sha256(passwordOrHash);
         this.role = role;
         this.ownerId = ownerId;
     }
 
+    public boolean validatePassword(String rawPassword) {
+        return HashUtil.sha256(rawPassword).equals(this.passwordHash);
+    }
+
     public int id() { return id; }
     public String email() { return email; }
-    public String passwordHash() { return passwordHash; }  // ← ВОТ ЭТО ДОБАВЬ
+    public String passwordHash() { return passwordHash; }
     public Role role() { return role; }
     public int ownerId() { return ownerId; }
-
-    public boolean validatePassword(String inputPassword) {
-        // TODO: заменить на нормальную проверку хеша
-        return inputPassword.equals(passwordHash);
-    }
 }

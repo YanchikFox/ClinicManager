@@ -17,4 +17,8 @@ public abstract class BaseControlPanel {
             throw new InvalidTokenException("Access denied: invalid token");
         }
     }
+    public void demoAction() {
+        requireValidToken();
+        System.out.println("Токен действителен — доступ к функции разрешён.");
+    }
 }
