@@ -4,7 +4,7 @@ import com.clinicmanager.model.actors.Account;
 import com.clinicmanager.security.TokenService;
 import com.clinicmanager.repository.AccountRepository;
 public class AccountManager {
-    AccountRepository accountRepository;
+    final AccountRepository accountRepository;
     public AccountManager(AccountRepository accountRepository) {
     this.accountRepository = accountRepository;
 }
