@@ -25,5 +25,9 @@ public class Notification {
     public boolean read() { return read; }
 
     public void markAsRead() { this.read = true; }
+
+    public boolean isRead() {
+        return false;
+    }
 }
 
