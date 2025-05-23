@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.clinicmanager'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.xerial:sqlite-jdbc:3.43.2.1'
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.13'
+}
+
+application {
+    mainClass = 'com.clinicmanager.app.Main' // Путь к твоему main-классу
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17 // или твоя версия
+    targetCompatibility = JavaVersion.VERSION_17
+}
