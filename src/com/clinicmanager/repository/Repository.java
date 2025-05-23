@@ -1,4 +1,12 @@
 package com.clinicmanager.repository;
 
-public class Repository {
+import java.util.List;
+
+public interface Repository<T> {
+    void save(T entity);
+    void delete(T entity);
+    void update(T entity);
+    T findById(int id);
+    List<T> findAll();
+    T findByEmail(String email); // можно возвращать null, если не используется
 }

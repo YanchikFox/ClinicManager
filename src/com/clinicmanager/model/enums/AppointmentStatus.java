@@ -1,4 +1,8 @@
 package com.clinicmanager.model.enums;
 
-public class AppointmentStatus {
+
+public enum AppointmentStatus {
+    CONFIRMED,
+    PENDING,
+    CANCELLED
 }

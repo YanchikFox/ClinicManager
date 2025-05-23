@@ -1,4 +1,7 @@
 package com.clinicmanager.model.enums;
 
-public class Role {
+
+public enum Role {
+    PATIENT,
+    DOCTOR
 }
