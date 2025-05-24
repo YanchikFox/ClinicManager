@@ -77,4 +77,20 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
     public Schedule findByEmail(String email) {
         return null;
     }
+
+
+    public List<Schedule> findByDoctorId(int doctorId) {
+    List<Schedule> schedules = new ArrayList<>();
+    try (PreparedStatement stmt = conn.prepareStatement(
+            "SELECT * FROM schedules WHERE doctor_id = ?")) {
+        stmt.setInt(1, doctorId);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            schedules.add(new Schedule(rs.getInt("id"), rs.getInt("doctor_id")));
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
+    return schedules;
+}
 }

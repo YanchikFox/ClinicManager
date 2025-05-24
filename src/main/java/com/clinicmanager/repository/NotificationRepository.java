@@ -72,6 +72,7 @@ public class NotificationRepository extends AbstractDatabaseManager<Notification
         return null;
     }
 
+    // fetches list of all notifications for all persons
     @Override
     public List<Notification> findAll() {
         List<Notification> list = new ArrayList<>();
