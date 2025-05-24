@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.clinicmanager.gui.DoctorPanelController"
+      spacing="10" alignment="CENTER" style="-fx-padding: 20">
+
+    <Label text="👨‍⚕️ Doctor Panel" style="-fx-font-size: 18"/>
+
+    <Button text="Моё расписание" fx:id="viewScheduleBtn"/>
+    <Button text="Редактировать расписание" fx:id="editScheduleBtn"/>
+    <Button text="Мои приёмы" fx:id="viewAppointmentsBtn"/>
+    <Button text="Открыть медкарту пациента" fx:id="viewMedicalCardBtn"/>
+    <Button text="Добавить запись в медкарту" fx:id="addRecordBtn"/>
+    <Button text="Выйти" fx:id="logoutBtn"/>
+
+</VBox>

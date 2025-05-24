@@ -1,6 +1,7 @@
 plugins {
-    id 'java'
     id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.14'
+    id 'java'
 }
 
 group = 'com.clinicmanager'
@@ -17,10 +18,15 @@ dependencies {
 }
 
 application {
-    mainClass = 'com.clinicmanager.app.Main' // Путь к твоему main-классу
+    mainClass = 'com.clinicmanager.gui.MainFX'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17 // или твоя версия
+    sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+javafx {
+    version = "21.0.1"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
