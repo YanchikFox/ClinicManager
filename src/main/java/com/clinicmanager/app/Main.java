@@ -19,8 +19,9 @@ public class Main {
         DatabaseInitializer.initialize(dbUrl, "src/main/resources/schema.sql");
         RepositoryManager repos = new RepositoryManager(dbUrl);
         AccountManager accountManager = new AccountManager(repos.accounts, new TokenService());
+        NotificationManager notificationManager = new NotificationManager(repos.notifications);
         RegistrationService registrationService = new RegistrationService(repos.accounts, repos.doctors, repos.patients);
-        Clinic clinic = new Clinic(accountManager);
+        Clinic clinic = new Clinic(accountManager, notificationManager);
 
 
 
