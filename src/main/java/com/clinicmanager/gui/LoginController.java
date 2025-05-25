@@ -12,7 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-
+import com.clinicmanager.service.NotificationManager;
 public class LoginController {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
@@ -23,6 +23,7 @@ public class LoginController {
     public LoginController() {
         RepositoryManager repos = AppContext.getRepositories();
         AccountManager manager = new AccountManager(repos.accounts, new TokenService());
+        NotificationManager notificationManager = new NotificationManager(repos.notifications);
         this.clinic = new Clinic(manager);
     }
 

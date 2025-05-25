@@ -15,7 +15,7 @@ public class Notification {
         this.personId = personId;
         this.message = message;
         this.timestamp = timestamp;
-        this.read = read;
+        this.read = false;
     }
 
     public int id() { return id; }
@@ -27,7 +27,7 @@ public class Notification {
     public void markAsRead() { this.read = true; }
 
     public boolean isRead() {
-        return false;
+        return this.read;
     }
 }
 

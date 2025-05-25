@@ -97,4 +97,47 @@ public class NotificationRepository extends AbstractDatabaseManager<Notification
     public Notification findByEmail(String email) {
         return null;
     }
+
+    public List<Notification> findByPersonId(int personId) {
+    List<Notification> list = new ArrayList<>();
+    try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM notifications WHERE person_id = ?")) {
+        stmt.setInt(1, personId);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            list.add(new Notification(
+                rs.getInt("id"),
+                rs.getInt("person_id"),
+                rs.getString("message"),
+                LocalDateTime.parse(rs.getString("timestamp")),
+                rs.getBoolean("read")
+            ));
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
+    return list;
+}
+
+    public List<Notification> findUnreadByPersonId(int personId) {
+    List<Notification> result = new ArrayList<>();
+    try (PreparedStatement stmt = conn.prepareStatement(
+            "SELECT * FROM notifications WHERE person_id = ? AND read = 0")) {
+        stmt.setInt(1, personId);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            result.add(new Notification(
+                rs.getInt("id"),
+                rs.getInt("person_id"),
+                rs.getString("message"),
+                LocalDateTime.parse(rs.getString("timestamp")),
+                rs.getBoolean("read")
+            ));
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
+    return result;
+}
+
+
 }

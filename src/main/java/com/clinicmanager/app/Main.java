@@ -6,6 +6,7 @@ import com.clinicmanager.exception.RegistrationException;
 import com.clinicmanager.repository.*;
 import com.clinicmanager.security.TokenService;
 import com.clinicmanager.service.AccountManager;
+import com.clinicmanager.service.NotificationManager;
 import com.clinicmanager.service.RegistrationService;
 
 import java.util.Scanner;
@@ -20,6 +21,9 @@ public class Main {
         AccountManager accountManager = new AccountManager(repos.accounts, new TokenService());
         RegistrationService registrationService = new RegistrationService(repos.accounts, repos.doctors, repos.patients);
         Clinic clinic = new Clinic(accountManager);
+
+
+
 
         Scanner scanner = new Scanner(System.in);
 
