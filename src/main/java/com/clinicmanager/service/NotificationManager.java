@@ -13,7 +13,7 @@ public class NotificationManager {
         this.repo = repo;
     }
 
-    public void notify(int personId, String message) {
+    public Notification createNotification(int personId, String message) {
         Notification n = new Notification(
                 0, // autoincrement id
                 personId,
@@ -22,6 +22,7 @@ public class NotificationManager {
                 false
         );
         repo.save(n);
+        return n;
     }
 
     public void markAsRead(Notification n) {
@@ -29,7 +30,7 @@ public class NotificationManager {
         repo.update(n);
     }
 
-    public List<Notification> getNotificationsByPersonId(int personId) {
+    public List<Notification> getAllNotificationsByPersonId(int personId) {
         return repo.findByPersonId(personId);
     }
 
