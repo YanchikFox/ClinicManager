@@ -24,7 +24,7 @@ public class LoginController {
         RepositoryManager repos = AppContext.getRepositories();
         AccountManager manager = new AccountManager(repos.accounts, new TokenService());
         NotificationManager notificationManager = new NotificationManager(repos.notifications);
-        this.clinic = new Clinic(manager);
+        this.clinic = new Clinic(manager, notificationManager);
     }
 
     @FXML

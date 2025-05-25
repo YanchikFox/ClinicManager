@@ -102,4 +102,6 @@ public class SlotRepository extends AbstractDatabaseManager<Slot> {
     public Slot findByEmail(String email) {
         return null;
     }
+
+
 }
