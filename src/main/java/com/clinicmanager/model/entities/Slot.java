@@ -1,7 +1,9 @@
 package com.clinicmanager.model.entities;
 
 import com.clinicmanager.gui.AppContext;
+import com.clinicmanager.repository.AppointmentRepository;
 import com.clinicmanager.repository.SlotRepository;
+import com.clinicmanager.repository.AppointmentRepository;
 
 import java.time.LocalDate;
 
@@ -11,6 +13,9 @@ public class Slot {
     private final LocalDate date;
     private final TimeRange timeRange;
     private final SlotRepository slotRepository;
+    private final AppointmentRepository appointmentRepository;
+    private Appointment appointment;
+
 
     public Slot(int id, int scheduleId, LocalDate date, TimeRange timeRange) {
         this.id = id;
@@ -18,6 +23,7 @@ public class Slot {
         this.date = date;
         this.timeRange = timeRange;
         this.slotRepository = AppContext.getInstance().getRepositories().slots;
+        this.appointmentRepository = AppContext.getInstance().getRepositories().appointments;
     }
 
     public Slot(int scheduleId, LocalDate date, TimeRange timeRange) {
