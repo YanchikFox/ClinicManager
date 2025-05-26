@@ -69,8 +69,7 @@ public class MedicalRecordRepository extends AbstractDatabaseManager<MedicalReco
                         rs.getInt("medical_card_id"),
                         rs.getInt("doctor_id"),
                         LocalDate.parse(rs.getString("date")),
-                        rs.getString("description")
-                );
+                        rs.getString("description"));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -89,8 +88,7 @@ public class MedicalRecordRepository extends AbstractDatabaseManager<MedicalReco
                         rs.getInt("medical_card_id"),
                         rs.getInt("doctor_id"),
                         LocalDate.parse(rs.getString("date")),
-                        rs.getString("description")
-                ));
+                        rs.getString("description")));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -101,5 +99,25 @@ public class MedicalRecordRepository extends AbstractDatabaseManager<MedicalReco
     @Override
     public MedicalRecord findByEmail(String email) {
         return null;
+    }
+
+    public List<MedicalRecord> findByMedicalCardId(int medicalCardId) {
+        List<MedicalRecord> records = new ArrayList<>();
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM medical_records WHERE medical_card_id = ?")) {
+            stmt.setInt(1, medicalCardId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                records.add(new MedicalRecord(
+                        rs.getInt("id"),
+                        rs.getInt("medical_card_id"),
+                        rs.getInt("doctor_id"),
+                        LocalDate.parse(rs.getString("date")),
+                        rs.getString("description")));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return records;
     }
 }
