@@ -4,18 +4,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
 public class PatientPanelController {
-    private boolean doctorSelected = false;
 
     @FXML private Button searchDoctorsBtn;
-    @FXML private Button makeAppointmentBtn;
     @FXML private Button viewAppointmentsBtn;
     @FXML private Button viewMedicalCardBtn;
     @FXML private Button logoutBtn;
 
     @FXML
     private void initialize() {
-        makeAppointmentBtn.setDisable(true);
-
         searchDoctorsBtn.setOnAction(e -> {
             try {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_search.fxml"));
@@ -29,12 +25,17 @@ public class PatientPanelController {
             }
         });
 
-        makeAppointmentBtn.setOnAction(e -> {
-            System.out.println("📅 Запись к врачу выполнена");
-        });
-
         viewAppointmentsBtn.setOnAction(e -> {
-            System.out.println("📄 Мои приёмы");
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/patient_appointments.fxml"));
+                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
+                javafx.stage.Stage stage = new javafx.stage.Stage();
+                stage.setTitle("Мои приёмы");
+                stage.setScene(scene);
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
 
         viewMedicalCardBtn.setOnAction(e -> {
@@ -51,7 +52,19 @@ public class PatientPanelController {
         });
 
         logoutBtn.setOnAction(e -> {
-            System.out.println("🚪 Выход");
+            try {
+                // revoke токен при выходе
+                var panel = com.clinicmanager.gui.AppContext.getPanel();
+                if (panel != null) {
+                    panel.revokeToken();
+                }
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
+                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
+                javafx.stage.Stage stage = (javafx.stage.Stage) logoutBtn.getScene().getWindow();
+                stage.setScene(scene);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
     }
 }

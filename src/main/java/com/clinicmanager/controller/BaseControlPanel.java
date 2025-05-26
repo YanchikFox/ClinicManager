@@ -34,5 +34,9 @@ public abstract class BaseControlPanel {
         return notificationManager.getAllNotificationsByPersonId(accountId);
     }
 
+    public void revokeToken() {
+        accountManager.revokeToken(token);
+    }
+
     public abstract Object currentPerson();
 }

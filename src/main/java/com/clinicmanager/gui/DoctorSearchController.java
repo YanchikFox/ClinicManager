@@ -43,7 +43,22 @@ public class DoctorSearchController {
         makeAppointmentBtn.setOnAction(e -> handleMakeAppointment());
         makeAppointmentBtn.setDisable(true);
         scheduleListView.getSelectionModel().selectedItemProperty().addListener((obs, old, val) -> {
-            makeAppointmentBtn.setDisable(val == null);
+            if (val != null && selectedDoctor != null) {
+                // Найти выбранный слот по строке
+                List<Slot> slots = repos.slots.findAll();
+                List<Slot> doctorSlots = slots.stream().filter(s -> s.scheduleId() == selectedDoctor.scheduleId() && s.isAvailable()).toList();
+                int idx = scheduleListView.getSelectionModel().getSelectedIndex();
+                if (idx >= 0 && idx < doctorSlots.size()) {
+                    selectedSlot = doctorSlots.get(idx);
+                    makeAppointmentBtn.setDisable(false);
+                } else {
+                    selectedSlot = null;
+                    makeAppointmentBtn.setDisable(true);
+                }
+            } else {
+                selectedSlot = null;
+                makeAppointmentBtn.setDisable(true);
+            }
         });
     }
 
@@ -55,20 +70,42 @@ public class DoctorSearchController {
             return;
         }
         doctorInfoLabel.setText("Имя: " + doc.name() + "\nТелефон: " + doc.phoneNumber());
-        // Получаем расписание (все слоты)
+        // Получаем расписание (только свободные слоты)
         List<Slot> slots = repos.slots.findAll();
-        List<Slot> doctorSlots = slots.stream().filter(s -> s.scheduleId() == doc.scheduleId()).toList();
+        List<Slot> doctorSlots = slots.stream().filter(s -> s.scheduleId() == doc.scheduleId() && s.isAvailable()).toList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         scheduleListView.setItems(FXCollections.observableArrayList(
             doctorSlots.stream().map(s -> s.date().toString() + " " + s.timeRange().start() + "-" + s.timeRange().end()).toList()
         ));
+        // Сохраняем список слотов для выбора
+        scheduleListView.getSelectionModel().clearSelection();
         makeAppointmentBtn.setDisable(true);
     }
 
     private void handleMakeAppointment() {
-        // TODO: Реализовать создание Appointment для выбранного слота и пациента
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Запись на приём оформлена!", ButtonType.OK);
-        alert.showAndWait();
+        if (selectedDoctor == null || selectedSlot == null) return;
+        // Получаем текущего пациента
+        var panel = AppContext.getPanel();
+        if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
+            new Alert(Alert.AlertType.ERROR, "Ошибка: не найден текущий пациент", ButtonType.OK).showAndWait();
+            return;
+        }
+        // Проверка: нельзя записаться к одному врачу более 1 раза в день
+        if (!repos.appointments.canPatientBookSlot(patient.id(), selectedDoctor.id(), selectedSlot.date())) {
+            new Alert(Alert.AlertType.WARNING, "Вы уже записаны к этому врачу на выбранный день!", ButtonType.OK).showAndWait();
+            return;
+        }
+        // Создаём Appointment
+        var appointment = new com.clinicmanager.model.entities.Appointment(
+                -1,
+                patient.id(),
+                selectedDoctor.id(),
+                selectedSlot.id(),
+                com.clinicmanager.model.enums.AppointmentStatus.PENDING
+        );
+        repos.appointments.save(appointment);
+        // Обновляем список слотов
+        showDoctorInfo(selectedDoctor);
+        new Alert(Alert.AlertType.INFORMATION, "Запись на приём оформлена!", ButtonType.OK).showAndWait();
     }
 }
-

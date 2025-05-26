@@ -48,7 +48,19 @@ public class DoctorPanelController {
         });
 
         logoutBtn.setOnAction(e -> {
-            System.out.println("🚪 Выход");
+            try {
+                // revoke токен при выходе
+                var panel = com.clinicmanager.gui.AppContext.getPanel();
+                if (panel != null) {
+                    panel.revokeToken();
+                }
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
+                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
+                javafx.stage.Stage stage = (javafx.stage.Stage) logoutBtn.getScene().getWindow();
+                stage.setScene(scene);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
     }
 }

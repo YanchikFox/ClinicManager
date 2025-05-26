@@ -7,6 +7,7 @@ import com.clinicmanager.gui.AppContext;
 import com.clinicmanager.repository.DoctorRepository;
 import com.clinicmanager.repository.PatientRepository;
 import com.clinicmanager.repository.SlotRepository;
+import com.clinicmanager.repository.AppointmentRepository;
 
 public class Appointment {
     private final int id;
@@ -35,6 +36,28 @@ public class Appointment {
     public void reschedule(int newSlotId) {
         this.slotId = newSlotId;
         this.status = AppointmentStatus.PENDING;
+    }
+
+    // Методы для отмены, переноса и подтверждения записи
+    public void cancel(AppointmentRepository repo) {
+        this.status = AppointmentStatus.CANCELLED;
+        repo.update(this);
+    }
+
+    public void reschedule(int newSlotId, AppointmentRepository repo) {
+        this.slotId = newSlotId;
+        this.status = AppointmentStatus.PENDING;
+        repo.update(this);
+    }
+
+    public void confirm(AppointmentRepository repo) {
+        this.status = AppointmentStatus.CONFIRMED;
+        repo.update(this);
+    }
+
+    public void end(AppointmentRepository repo) {
+        this.status = AppointmentStatus.ENDED;
+        repo.update(this);
     }
 
     // Методы для получения связанных объектов (по id)

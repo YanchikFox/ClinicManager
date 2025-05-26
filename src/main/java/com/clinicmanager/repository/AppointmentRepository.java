@@ -89,5 +89,19 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
         return null;
     }
 
+    public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
+        // Проверяем, есть ли уже запись у этого пациента к этому врачу на эту дату
+        return findAll().stream().noneMatch(a ->
+                a.patientId() == patientId &&
+                a.doctorId() == doctorId &&
+                getSlotDateSafe(a) != null &&
+                getSlotDateSafe(a).equals(date) &&
+                !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED)
+        );
+    }
 
+    private java.time.LocalDate getSlotDateSafe(com.clinicmanager.model.entities.Appointment a) {
+        var slot = a.getSlot();
+        return slot != null ? slot.date() : null;
+    }
 }

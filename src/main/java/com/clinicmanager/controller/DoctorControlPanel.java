@@ -21,16 +21,45 @@ public class DoctorControlPanel extends BaseControlPanel {
 
     @Override
     public Object currentPerson() {
+        requireValidToken();
+        requireDoctorRole();
         return doctor;
     }
 
-
-    Schedule viewMySchedule() {
+    public Schedule viewMySchedule() {
         requireValidToken();
-        // Получаем расписание доктора
+        requireDoctorRole();
         RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         return repos.schedules.findByDoctorId(doctor.id());
     }
+
+    // Пример защищённого метода: получить список пациентов
+    public java.util.List<Integer> getPatientsList() {
+        requireValidToken();
+        requireDoctorRole();
+        return doctor.getPatientsList();
+    }
+
+    // Пример защищённого метода: добавить слот
+    public void addAvailableSlot(com.clinicmanager.model.entities.Slot slot) {
+        requireValidToken();
+        requireDoctorRole();
+        doctor.addAvailableSlot(slot);
+    }
+
+    // Пример защищённого метода: завершить приём
+    public void endAppointment(com.clinicmanager.model.entities.Appointment appointment) {
+        requireValidToken();
+        requireDoctorRole();
+        appointment.end(com.clinicmanager.gui.AppContext.getRepositories().appointments);
+    }
+
+    private void requireDoctorRole() {
+        if (!(accountManager.getAccountByToken(token).role().name().equals("DOCTOR"))) {
+            throw new com.clinicmanager.exception.InvalidTokenException("Access denied: not a doctor");
+        }
+    }
+
     // ...другие методы
 }
 
