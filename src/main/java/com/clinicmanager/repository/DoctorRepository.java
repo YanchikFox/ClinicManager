@@ -9,10 +9,12 @@ import java.util.*;
 
 public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
     private final PatientRepository patientRepository;
+    private final SlotRepository slotRepository;
 
-    public DoctorRepository(String dbUrl, PatientRepository patientRepository) {
+    public DoctorRepository(String dbUrl, PatientRepository patientRepository, SlotRepository slotRepository) {
         super(dbUrl);
         this.patientRepository = patientRepository;
+        this.slotRepository = slotRepository;
     }
 
     @Override
@@ -65,7 +67,8 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
                         rs.getString("date_of_birth"),
                         rs.getString("phone_number"),
                         rs.getInt("schedule_id"),
-                        patientRepository
+                        patientRepository,
+                        slotRepository
                 );
             }
         } catch (SQLException e) { throw new RuntimeException(e); }
@@ -84,7 +87,8 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
                         rs.getString("date_of_birth"),
                         rs.getString("phone_number"),
                         rs.getInt("schedule_id"),
-                        patientRepository
+                        patientRepository,
+                        slotRepository
                 ));
             }
         } catch (SQLException e) { throw new RuntimeException(e); }
