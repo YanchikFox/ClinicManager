@@ -15,7 +15,7 @@ public class RepositoryManager {
         this.patients = new PatientRepository(dbUrl);
         this.accounts = new AccountRepository(dbUrl);
         this.slots = new SlotRepository(dbUrl);
-        this.doctors = new DoctorRepository(dbUrl, this.patients, this.slots);
+        this.doctors = new DoctorRepository(dbUrl);
         this.appointments = new AppointmentRepository(dbUrl);
         this.schedules = new ScheduleRepository(dbUrl);
         this.cards = new MedicalCardRepository(dbUrl);

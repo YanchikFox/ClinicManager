@@ -33,7 +33,6 @@ public class MedicalCard {
     }
 
 
-    // Przykład przyszłej metody
     public List<MedicalRecord> getRecords() {
         return medicalRecordRepository.findByMedicalCardId(id);
     }

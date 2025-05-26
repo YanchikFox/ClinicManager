@@ -1,20 +1,15 @@
 package com.clinicmanager.repository;
 
 import com.clinicmanager.model.actors.Doctor;
-import com.clinicmanager.model.actors.Patient;
-import com.clinicmanager.repository.PatientRepository;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
-    private final PatientRepository patientRepository;
-    private final SlotRepository slotRepository;
 
-    public DoctorRepository(String dbUrl, PatientRepository patientRepository, SlotRepository slotRepository) {
+    public DoctorRepository(String dbUrl) {
         super(dbUrl);
-        this.patientRepository = patientRepository;
-        this.slotRepository = slotRepository;
     }
 
     @Override
@@ -31,7 +26,9 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
                 if (rs2.next()) return rs2.getInt(1);
             }
             throw new RuntimeException("No ID returned for doctor");
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -39,7 +36,9 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
         try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM doctors WHERE id = ?")) {
             stmt.setInt(1, d.id());
             stmt.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -52,7 +51,9 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
             stmt.setInt(4, d.scheduleId());
             stmt.setInt(5, d.id());
             stmt.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -66,12 +67,12 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
                         rs.getString("name"),
                         rs.getString("date_of_birth"),
                         rs.getString("phone_number"),
-                        rs.getInt("schedule_id"),
-                        patientRepository,
-                        slotRepository
+                        rs.getInt("schedule_id")
                 );
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
@@ -86,17 +87,17 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
                         rs.getString("name"),
                         rs.getString("date_of_birth"),
                         rs.getString("phone_number"),
-                        rs.getInt("schedule_id"),
-                        patientRepository,
-                        slotRepository
+                        rs.getInt("schedule_id")
                 ));
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return list;
     }
 
     @Override
-    public Doctor findByEmail(String email) { return null; }
-
+    public Doctor findByEmail(String email) {
+        return null; // Not implemented
+    }
 }
-
