@@ -26,11 +26,11 @@ public class Schedule {
         return doctorId;
     }
 
-
-    // TODO: Anton shis should not be hardcoded, but rather injected or passed as a parameter
+    // TODO: Anton shis should not be hardcoded, but rather injected or passed as a
+    // parameter
     public List<Slot> getSlots(LocalDate date) {
         return ScheduleRepository.getDoctorSlots(doctorId, date);
-//                slots.getSlots(doctorId, date);
+        // slots.getSlots(doctorId, date);
     }
     // TODO: getUpgoningSlots should be implemented
 }
