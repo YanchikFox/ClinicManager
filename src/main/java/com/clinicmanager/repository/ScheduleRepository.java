@@ -102,7 +102,7 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
     }
 
 
-    public List<Slot> getDoctorSlots(int doctorId, LocalDate date) {
+    public static List<Slot> getDoctorSlots(int doctorId, LocalDate date) {
         List<Slot> slots = new ArrayList<>();
         String sql = "SELECT * FROM slots WHERE doctor_id = ? AND date = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
