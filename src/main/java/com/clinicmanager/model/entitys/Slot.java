@@ -15,8 +15,26 @@ public class Slot {
         this.timeRange = timeRange;
     }
 
-    public int id() { return id; }
-    public int scheduleId() { return scheduleId; }
-    public LocalDate date() { return date; }
-    public TimeRange timeRange() { return timeRange; }
+    public Slot(int scheduleId, LocalDate date, TimeRange timeRange) {
+        this.id = -1; // will autocincrement in database
+        this.scheduleId = scheduleId;
+        this.date = date;
+        this.timeRange = timeRange;
+    }
+
+    public int id() {
+        return id;
+    }
+
+    public int scheduleId() {
+        return scheduleId;
+    }
+
+    public LocalDate date() {
+        return date;
+    }
+
+    public TimeRange timeRange() {
+        return timeRange;
+    }
 }

@@ -29,4 +29,9 @@ public class AccountManager {
     public Account getAccountByToken(String token) {
         return tokenService.getAccount(token);
     }
+//    public  String getPersonIdByToken(String token)
+//    {
+//        return tokenService.getAccount
+//    }
+
 }

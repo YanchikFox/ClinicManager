@@ -82,4 +82,6 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
     public Appointment findByEmail(String email) {
         return null;
     }
+
+
 }

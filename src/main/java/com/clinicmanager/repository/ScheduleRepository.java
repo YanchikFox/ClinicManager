@@ -1,8 +1,12 @@
 package com.clinicmanager.repository;
 
 import com.clinicmanager.model.entitys.Schedule;
+import com.clinicmanager.model.entitys.Slot;
+import com.clinicmanager.model.entitys.TimeRange;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,4 +81,46 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
     public Schedule findByEmail(String email) {
         return null;
     }
+
+
+    public Schedule findByDoctorId(int doctorId) {
+    try (PreparedStatement stmt = conn.prepareStatement(
+            "SELECT * FROM schedules WHERE doctor_id = ? LIMIT 1")) {  // LIMIT 1 dla pewności
+        stmt.setInt(1, doctorId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return new Schedule(rs.getInt("id"), rs.getInt("doctor_id"));
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
+    return null; // brak wyniku
+}
+
+
+public List<Slot> getDoctorSlots(int doctorId, LocalDate date) {
+    List<Slot> slots = new ArrayList<>();
+    String sql = "SELECT * FROM slots WHERE doctor_id = ? AND date = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, doctorId);
+        stmt.setDate(2, java.sql.Date.valueOf(date));
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            LocalTime startTime = rs.getTime("start_time").toLocalTime();
+            LocalTime endTime = rs.getTime("end_time").toLocalTime();
+
+            TimeRange timeRange = new TimeRange(startTime, endTime);  // zakładam taki konstruktor
+
+            slots.add(new Slot(
+                rs.getInt("id"),
+                rs.getInt("doctor_id"),
+                rs.getDate("date").toLocalDate(),
+                timeRange
+            ));
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
+    return slots;
+}
 }

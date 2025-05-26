@@ -66,9 +66,7 @@ public class SlotRepository extends AbstractDatabaseManager<Slot> {
                         LocalDate.parse(rs.getString("date")),
                         new TimeRange(
                                 LocalTime.parse(rs.getString("start_time")),
-                                LocalTime.parse(rs.getString("end_time"))
-                        )
-                );
+                                LocalTime.parse(rs.getString("end_time"))));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -88,9 +86,7 @@ public class SlotRepository extends AbstractDatabaseManager<Slot> {
                         LocalDate.parse(rs.getString("date")),
                         new TimeRange(
                                 LocalTime.parse(rs.getString("start_time")),
-                                LocalTime.parse(rs.getString("end_time"))
-                        )
-                ));
+                                LocalTime.parse(rs.getString("end_time")))));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -102,4 +98,5 @@ public class SlotRepository extends AbstractDatabaseManager<Slot> {
     public Slot findByEmail(String email) {
         return null;
     }
+
 }

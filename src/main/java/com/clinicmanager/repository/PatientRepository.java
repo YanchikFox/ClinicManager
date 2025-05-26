@@ -95,4 +95,25 @@ public class PatientRepository extends AbstractDatabaseManager<Patient> {
     public Patient findByEmail(String email) {
         return null; // Не используется
     }
+
+    public List<Integer> getPatientIdsOfDoctor(int doctorId) {
+    List<Integer> patientIds = new ArrayList<>();
+    String sql = """
+        SELECT DISTINCT p.id
+        FROM patients p
+        JOIN appointments a ON p.id = a.patient_id
+        WHERE a.doctor_id = ?
+    """;
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, doctorId);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            patientIds.add(rs.getInt("id"));
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException("Failed to get patient IDs of doctor", e);
+    }
+    return patientIds;
+}
+
 }
