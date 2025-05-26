@@ -8,18 +8,27 @@ import java.sql.*;
 import java.util.*;
 
 public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
-    public DoctorRepository(String dbUrl) { super(dbUrl); }
+    private final PatientRepository patientRepository;
+
+    public DoctorRepository(String dbUrl, PatientRepository patientRepository) {
+        super(dbUrl);
+        this.patientRepository = patientRepository;
+    }
 
     @Override
-    public void save(Doctor d) {
+    public int save(Doctor d) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO doctors (id, name, date_of_birth, phone_number, schedule_id) VALUES (?, ?, ?, ?, ?)")) {
-            stmt.setInt(1, d.id());
-            stmt.setString(2, d.name());
-            stmt.setString(3, d.dateOfBirth());
-            stmt.setString(4, d.phoneNumber());
-            stmt.setInt(5, d.scheduleId());
+                "INSERT INTO doctors (name, date_of_birth, phone_number, schedule_id) VALUES (?, ?, ?, ?)")) {
+            stmt.setString(1, d.name());
+            stmt.setString(2, d.dateOfBirth());
+            stmt.setString(3, d.phoneNumber());
+            stmt.setInt(4, d.scheduleId());
             stmt.executeUpdate();
+            try (Statement s = conn.createStatement()) {
+                ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
+                if (rs2.next()) return rs2.getInt(1);
+            }
+            throw new RuntimeException("No ID returned for doctor");
         } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
@@ -50,8 +59,14 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Doctor(rs.getInt("id"), rs.getString("name"), rs.getString("date_of_birth"),
-                        rs.getString("phone_number"), rs.getInt("schedule_id"));
+                return new Doctor(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("date_of_birth"),
+                        rs.getString("phone_number"),
+                        rs.getInt("schedule_id"),
+                        patientRepository
+                );
             }
         } catch (SQLException e) { throw new RuntimeException(e); }
         return null;
@@ -63,8 +78,14 @@ public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
         try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery("SELECT * FROM doctors");
             while (rs.next()) {
-                list.add(new Doctor(rs.getInt("id"), rs.getString("name"), rs.getString("date_of_birth"),
-                        rs.getString("phone_number"), rs.getInt("schedule_id")));
+                list.add(new Doctor(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("date_of_birth"),
+                        rs.getString("phone_number"),
+                        rs.getInt("schedule_id"),
+                        patientRepository
+                ));
             }
         } catch (SQLException e) { throw new RuntimeException(e); }
         return list;

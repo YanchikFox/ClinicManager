@@ -12,9 +12,9 @@ public class RepositoryManager {
     public final NotificationRepository notifications;
 
     public RepositoryManager(String dbUrl) {
-        this.accounts = new AccountRepository(dbUrl);
-        this.doctors = new DoctorRepository(dbUrl);
         this.patients = new PatientRepository(dbUrl);
+        this.accounts = new AccountRepository(dbUrl);
+        this.doctors = new DoctorRepository(dbUrl, this.patients);
         this.appointments = new AppointmentRepository(dbUrl);
         this.schedules = new ScheduleRepository(dbUrl);
         this.slots = new SlotRepository(dbUrl);

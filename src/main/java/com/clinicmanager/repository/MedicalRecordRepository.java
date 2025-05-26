@@ -13,15 +13,20 @@ public class MedicalRecordRepository extends AbstractDatabaseManager<MedicalReco
     }
 
     @Override
-    public void save(MedicalRecord record) {
+    public int save(MedicalRecord record) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO medical_records (id, medical_card_id, doctor_id, date, description) VALUES (?, ?, ?, ?, ?)")) {
-            stmt.setInt(1, record.id());
-            stmt.setInt(2, record.medicalCardId());
-            stmt.setInt(3, record.doctorId());
-            stmt.setString(4, record.date().toString());
-            stmt.setString(5, record.description());
+                "INSERT INTO medical_records (medical_card_id, doctor_id, date, description) VALUES (?, ?, ?, ?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, record.medicalCardId());
+            stmt.setInt(2, record.doctorId());
+            stmt.setString(3, record.date().toString());
+            stmt.setString(4, record.description());
             stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            throw new RuntimeException("No ID returned for medical record");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

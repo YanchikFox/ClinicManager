@@ -15,6 +15,8 @@ public abstract class AbstractDatabaseManager<T> implements Repository<T> {
         }
     }
 
+    public abstract int save(T entity);
+
     public void close() throws SQLException {
         conn.close();
     }

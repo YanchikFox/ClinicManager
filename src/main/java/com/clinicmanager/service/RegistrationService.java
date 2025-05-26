@@ -28,25 +28,16 @@ public class RegistrationService {
             throw new RegistrationException("Invalid license code: " + licenseCode);
         }
 
-        int doctorId = generateId(); // временно, пока нет автоинкремента
-        Doctor doctor = new Doctor(doctorId, name, dateOfBirth, phone, -1);
-        doctorRepo.save(doctor);
-
-        Account acc = new Account(generateId(), email, HashUtil.sha256(rawPassword), Role.DOCTOR, doctorId, true);
+        Doctor doctor = new Doctor(-1, name, dateOfBirth, phone, -1, patientRepo);
+        int doctorId = doctorRepo.save(doctor);
+        Account acc = new Account(-1, email, HashUtil.sha256(rawPassword), Role.DOCTOR, doctorId, true);
         accountRepo.save(acc);
     }
 
     public void registerPatient(String email, String rawPassword, String name, String dateOfBirth, String phone) {
-        int patientId = generateId();
-        Patient patient = new Patient(patientId, name, dateOfBirth, phone, -1);
-        patientRepo.save(patient);
-
-        Account acc = new Account(generateId(), email, HashUtil.sha256(rawPassword), Role.PATIENT, patientId, true);
+        Patient patient = new Patient(-1, name, dateOfBirth, phone, -1);
+        int patientId = patientRepo.save(patient);
+        Account acc = new Account(-1, email, HashUtil.sha256(rawPassword), Role.PATIENT, patientId, true);
         accountRepo.save(acc);
-    }
-
-    private int generateId() {
-        // Для SQLite, можно заменить позже на автоинкремент
-        return (int)(Math.random() * 100000);
     }
 }

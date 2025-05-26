@@ -1,6 +1,5 @@
 package com.clinicmanager.model.actors;
 
-import com.clinicmanager.gui.AppContext;
 import com.clinicmanager.model.entitys.Slot;
 import com.clinicmanager.model.entitys.TimeRange;
 import com.clinicmanager.repository.PatientRepository;
@@ -11,18 +10,19 @@ import java.util.List;
 public class Doctor extends Person {
     private final int scheduleId;
     private List<Integer> patients = null;
-    PatientRepository repo = AppContext.getRepositories().patients;// FIXME: this should not be hardcoded, but rather
-                                                                   // injected or passed as a parameter
+    private final PatientRepository patientRepository;
 
-    public Doctor(int id, String name, String dateOfBirth, String phoneNumber, int scheduleId) {
+    public Doctor(int id, String name, String dateOfBirth, String phoneNumber, int scheduleId, PatientRepository patientRepository) {
         super(id, name, dateOfBirth, phoneNumber);
         this.scheduleId = scheduleId;
+        this.patientRepository = patientRepository;
     }
 
-    public Doctor(int id, String name, String dateOfBirth, String phoneNumber, int scheduleId, List<Integer> patients) {
+    public Doctor(int id, String name, String dateOfBirth, String phoneNumber, int scheduleId, List<Integer> patients, PatientRepository patientRepository) {
         super(id, name, dateOfBirth, phoneNumber);
         this.scheduleId = scheduleId;
         this.patients = patients;
+        this.patientRepository = patientRepository;
     }
 
     public int scheduleId() {
@@ -30,11 +30,11 @@ public class Doctor extends Person {
     }
 
     public void updateCuredPatientIds() {
-        this.patients = repo.getPatientIdsOfDoctor(this.id());
+        this.patients = patientRepository.getPatientIdsOfDoctor(this.id());
     }
 
     public List<Integer> getPatientsList() {
-        this.patients = repo.getPatientIdsOfDoctor(this.id()); // auto-update za każdym razem
+        this.patients = patientRepository.getPatientIdsOfDoctor(this.id());
         return patients;
     }
 
@@ -42,11 +42,13 @@ public class Doctor extends Person {
         if (slot.scheduleId() != this.scheduleId) {
             throw new IllegalArgumentException("Slot scheduleId must match doctor's scheduleId.");
         }
-        AppContext.getRepositories().slots.save(slot);
+        // TODO: SlotRepository should be injected as well, not accessed statically
+        // AppContext.getRepositories().slots.save(slot);
     }
 
     public void addAvailableSlot(LocalDate date, TimeRange timeRange) {
         Slot slot = new Slot(this.scheduleId, date, timeRange);
-        AppContext.getRepositories().slots.save(slot);
+        // TODO: SlotRepository should be injected as well, not accessed statically
+        // AppContext.getRepositories().slots.save(slot);
     }
 }

@@ -16,12 +16,17 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
     }
 
     @Override
-    public void save(Schedule s) {
+    public int save(Schedule s) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO schedules (id, doctor_id) VALUES (?, ?)")) {
-            stmt.setInt(1, s.id());
-            stmt.setInt(2, s.doctorId());
+                "INSERT INTO schedules (doctor_id) VALUES (?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, s.doctorId());
             stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            throw new RuntimeException("No ID returned for schedule");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

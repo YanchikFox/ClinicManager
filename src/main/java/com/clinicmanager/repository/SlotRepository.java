@@ -15,15 +15,20 @@ public class SlotRepository extends AbstractDatabaseManager<Slot> {
     }
 
     @Override
-    public void save(Slot slot) {
+    public int save(Slot slot) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO slots (id, schedule_id, date, start_time, end_time) VALUES (?, ?, ?, ?, ?)")) {
-            stmt.setInt(1, slot.id());
-            stmt.setInt(2, slot.scheduleId());
-            stmt.setString(3, slot.date().toString());
-            stmt.setString(4, slot.timeRange().start().toString());
-            stmt.setString(5, slot.timeRange().end().toString());
+                "INSERT INTO slots (schedule_id, date, start_time, end_time) VALUES (?, ?, ?, ?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, slot.scheduleId());
+            stmt.setString(2, slot.date().toString());
+            stmt.setString(3, slot.timeRange().start().toString());
+            stmt.setString(4, slot.timeRange().end().toString());
             stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            throw new RuntimeException("No ID returned for slot");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

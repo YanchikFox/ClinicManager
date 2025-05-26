@@ -12,12 +12,22 @@ public class MedicalCardRepository extends AbstractDatabaseManager<MedicalCard> 
     }
 
     @Override
-    public void save(MedicalCard card) {
+    public int save(MedicalCard card) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO medical_cards (id, patient_id) VALUES (?, ?)")) {
-            stmt.setInt(1, card.id());
-            stmt.setInt(2, card.patientId());
+                "INSERT INTO medical_cards (patient_id) VALUES (?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, card.patientId());
             stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                try (Statement s = conn.createStatement()) {
+                    ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
+                    if (rs2.next()) return rs2.getInt(1);
+                }
+            }
+            throw new RuntimeException("No ID returned for medical card");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -11,15 +11,20 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
     public AppointmentRepository(String dbUrl) { super(dbUrl); }
 
     @Override
-    public void save(Appointment a) {
+    public int save(Appointment a) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO appointments (id, patient_id, doctor_id, slot_id, status) VALUES (?, ?, ?, ?, ?)")) {
-            stmt.setInt(1, a.id());
-            stmt.setInt(2, a.patientId());
-            stmt.setInt(3, a.doctorId());
-            stmt.setInt(4, a.slotId());
-            stmt.setString(5, a.status().name());
+                "INSERT INTO appointments (patient_id, doctor_id, slot_id, status) VALUES (?, ?, ?, ?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, a.patientId());
+            stmt.setInt(2, a.doctorId());
+            stmt.setInt(3, a.slotId());
+            stmt.setString(4, a.status().name());
             stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            throw new RuntimeException("No ID returned for appointment");
         } catch (SQLException e) { throw new RuntimeException(e); }
     }
 

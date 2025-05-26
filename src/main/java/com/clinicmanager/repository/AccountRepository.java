@@ -13,17 +13,22 @@ public class AccountRepository extends AbstractDatabaseManager<Account> {
     }
 
     @Override
-    public void save(Account acc) {
+    public int save(Account acc) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO accounts (email, password_hash, role, owner_id) VALUES (?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO accounts (email, password_hash, role, owner_id) VALUES (?, ?, ?, ?)")) {
             stmt.setString(1, acc.email());
             stmt.setString(2, acc.passwordHash());
             stmt.setString(3, acc.role().name());
             stmt.setInt(4, acc.ownerId());
             stmt.executeUpdate();
+            try (Statement s = conn.createStatement()) {
+                ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
+                if (rs2.next()) return rs2.getInt(1);
+            }
+            throw new RuntimeException("No ID returned for account");
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to save account", e);
+            // Добавим вывод оригинального сообщения SQL-ошибки для диагностики
+            throw new RuntimeException("Failed to save account: " + e.getMessage(), e);
         }
     }
 
