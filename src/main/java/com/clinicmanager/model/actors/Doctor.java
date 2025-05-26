@@ -46,12 +46,15 @@ public class Doctor extends Person {
         if (slot.scheduleId() != this.scheduleId) {
             throw new IllegalArgumentException("Slot scheduleId must match doctor's scheduleId.");
         }
+        slotRepository.save(slot);
         // TODO: SlotRepository should be injected as well, not accessed statically
         // AppContext.getRepositories().slots.save(slot);
     }
 
     public void addAvailableSlot(LocalDate date, TimeRange timeRange) {
+
         Slot slot = new Slot(this.scheduleId, date, timeRange);
+
         // TODO: SlotRepository should be injected as well, not accessed statically
         // AppContext.getRepositories().slots.save(slot);
     }
