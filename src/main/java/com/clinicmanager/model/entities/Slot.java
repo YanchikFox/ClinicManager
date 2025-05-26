@@ -16,7 +16,6 @@ public class Slot {
     private final AppointmentRepository appointmentRepository;
     private Appointment appointment;
 
-
     public Slot(int id, int scheduleId, LocalDate date, TimeRange timeRange) {
         this.id = id;
         this.scheduleId = scheduleId;
@@ -46,6 +45,16 @@ public class Slot {
         return timeRange;
     }
 
+    public boolean isAvailable() {
+        slotRepository.findById(id)
+        // Sprawdza, czy slot jest dostępny, czyli czy nie ma przypisanego spotkania
+         appointment = appointmentRepository.findById(id);
+         if(appointment == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     // Przykład metody wykorzystującej slotRepository
     // TODO: Można dodać więcej metod operujących na slotach
 }
