@@ -14,13 +14,19 @@ public class Schedule {
         this.doctorId = doctorId;
     }
 
-    public int id() { return id; }
-    public int doctorId() { return doctorId; }
+    public int id() {
+        return id;
+    }
+
+    public int doctorId() {
+        return doctorId;
+    }
 
 
-// TODO: Anton shis should not be hardcoded, but rather injected or passed as a parameter
+    // TODO: Anton shis should not be hardcoded, but rather injected or passed as a parameter
     public List<Slot> getSlots(LocalDate date) {
         return AppContext.getRepositories().schedules.getDoctorSlots(doctorId, date);
 //                slots.getSlots(doctorId, date);
     }
+    // TODO: getUpgoningSlots should be implemented
 }

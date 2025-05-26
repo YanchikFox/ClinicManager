@@ -1,5 +1,6 @@
 package com.clinicmanager.controller;
 
+import com.clinicmanager.model.entities.Schedule;
 import com.clinicmanager.service.AccountManager;
 import com.clinicmanager.service.NotificationManager;
 import com.clinicmanager.model.actors.Doctor;
@@ -10,7 +11,7 @@ public class DoctorControlPanel extends BaseControlPanel {
     private Doctor doctor;
 
     public DoctorControlPanel(String token, AccountManager accountManager, NotificationManager notificationManager) {
-        super(token, accountManager, notificationManager );
+        super(token, accountManager, notificationManager);
         // Получаем аккаунт по токену
         Account acc = accountManager.getAccountByToken(token);
         // Получаем доктора по ownerId
@@ -23,6 +24,13 @@ public class DoctorControlPanel extends BaseControlPanel {
         return doctor;
     }
 
+
+    Schedule viewMySchedule() {
+        requireValidToken();
+        // Получаем расписание доктора
+        RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
+        return repos.schedules.findByDoctorId(doctor.id());
+    }
     // ...другие методы
 }
 
