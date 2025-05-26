@@ -14,10 +14,10 @@ public class RepositoryManager {
     public RepositoryManager(String dbUrl) {
         this.patients = new PatientRepository(dbUrl);
         this.accounts = new AccountRepository(dbUrl);
-        this.doctors = new DoctorRepository(dbUrl, this.patients);
+        this.slots = new SlotRepository(dbUrl);
+        this.doctors = new DoctorRepository(dbUrl, this.patients, this.slots);
         this.appointments = new AppointmentRepository(dbUrl);
         this.schedules = new ScheduleRepository(dbUrl);
-        this.slots = new SlotRepository(dbUrl);
         this.cards = new MedicalCardRepository(dbUrl);
         this.records = new MedicalRecordRepository(dbUrl);
         this.notifications = new NotificationRepository(dbUrl);
