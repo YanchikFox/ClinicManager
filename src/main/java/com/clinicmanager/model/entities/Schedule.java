@@ -12,10 +12,13 @@ public class Schedule {
     private final int doctorId;
     private final ScheduleRepository scheduleRepository;
 
+    private final SlotRepository slotRepository;
+
     public Schedule(int id, int doctorId) {
         this.id = id;
         this.doctorId = doctorId;
         this.scheduleRepository = AppContext.getInstance().getRepositories().schedules;
+        this.slotRepository = AppContext.getInstance().getRepositories().slots;
     }
 
     public int id() {
@@ -32,5 +35,13 @@ public class Schedule {
         return ScheduleRepository.getDoctorSlots(doctorId, date);
         // slots.getSlots(doctorId, date);
     }
+
+    public void removeSlot(Slot slot) {
+        slotRepository.delete(slot);
+    }
+
     // TODO: getUpgoningSlots should be implemented
+    public void addSlot(Slot slot) {
+        slotRepository.save(slot);
+    }
 }
