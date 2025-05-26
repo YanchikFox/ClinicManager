@@ -1,6 +1,12 @@
 package com.clinicmanager.model.entities;
 
+import com.clinicmanager.model.actors.Doctor;
+import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.enums.AppointmentStatus;
+import com.clinicmanager.gui.AppContext;
+import com.clinicmanager.repository.DoctorRepository;
+import com.clinicmanager.repository.PatientRepository;
+import com.clinicmanager.repository.SlotRepository;
 
 public class Appointment {
     private final int id;
@@ -23,11 +29,25 @@ public class Appointment {
     public int slotId() { return slotId; }
     public AppointmentStatus status() { return status; }
 
+    // Методы для изменения статуса
     public void confirm() { this.status = AppointmentStatus.CONFIRMED; }
     public void cancel() { this.status = AppointmentStatus.CANCELLED; }
     public void reschedule(int newSlotId) {
         this.slotId = newSlotId;
         this.status = AppointmentStatus.PENDING;
     }
-}
 
+    // Методы для получения связанных объектов (по id)
+    public Patient getPatient() {
+        PatientRepository repo = AppContext.getInstance().getRepositories().patients;
+        return repo.findById(patientId);
+    }
+    public Doctor getDoctor() {
+        DoctorRepository repo = AppContext.getInstance().getRepositories().doctors;
+        return repo.findById(doctorId);
+    }
+    public Slot getSlot() {
+        SlotRepository repo = AppContext.getInstance().getRepositories().slots;
+        return repo.findById(slotId);
+    }
+}
