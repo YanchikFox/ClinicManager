@@ -3,6 +3,15 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+# Ignore all .idea files
+.idea/
+
+# But allow specific shared settings
+!.idea/codeStyles/
+!.idea/runConfigurations/
+
+
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -27,3 +36,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
