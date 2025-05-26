@@ -42,8 +42,4 @@ public class MedicalRecord {
         return description;
     }
 
-    // Przykład użycia repo
-    // public void save() {
-    //     medicalRecordRepository.save(this);
-    // }
 }
