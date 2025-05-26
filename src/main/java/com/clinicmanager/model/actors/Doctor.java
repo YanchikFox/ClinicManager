@@ -18,6 +18,7 @@ public class Doctor extends Person {
         super(id, name, dateOfBirth, phoneNumber);
         this.scheduleId = scheduleId;
         this.patientRepository = patientRepository;
+        this.slotRepository = slotRepository;
     }
 
     public Doctor(int id, String name, String dateOfBirth, String phoneNumber, int scheduleId, List<Integer> patients, PatientRepository patientRepository, SlotRepository slotRepository) {
@@ -25,6 +26,7 @@ public class Doctor extends Person {
         this.scheduleId = scheduleId;
         this.patients = patients;
         this.patientRepository = patientRepository;
+        this.slotRepository = slotRepository;
     }
 
     public int scheduleId() {

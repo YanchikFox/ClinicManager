@@ -16,11 +16,13 @@ public class RegistrationService {
     private final AccountRepository accountRepo;
     private final DoctorRepository doctorRepo;
     private final PatientRepository patientRepo;
+    private final SlotRepository slotRepo;
 
-    public RegistrationService(AccountRepository accountRepo, DoctorRepository doctorRepo, PatientRepository patientRepo) {
+    public RegistrationService(AccountRepository accountRepo, DoctorRepository doctorRepo, PatientRepository patientRepo, SlotRepository slotRepo) {
         this.accountRepo = accountRepo;
         this.doctorRepo = doctorRepo;
         this.patientRepo = patientRepo;
+        this.slotRepo = slotRepo;
     }
 
     public void registerDoctor(String email, String rawPassword, String name, String dateOfBirth, String phone, String licenseCode) {
@@ -28,7 +30,7 @@ public class RegistrationService {
             throw new RegistrationException("Invalid license code: " + licenseCode);
         }
 
-        Doctor doctor = new Doctor(-1, name, dateOfBirth, phone, -1, patientRepo);
+        Doctor doctor = new Doctor(-1, name, dateOfBirth, phone, -1, patientRepo, slotRepo);
         int doctorId = doctorRepo.save(doctor);
         Account acc = new Account(-1, email, HashUtil.sha256(rawPassword), Role.DOCTOR, doctorId, true);
         accountRepo.save(acc);
