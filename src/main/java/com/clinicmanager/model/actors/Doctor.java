@@ -1,7 +1,7 @@
 package com.clinicmanager.model.actors;
 
-import com.clinicmanager.model.entitys.Slot;
-import com.clinicmanager.model.entitys.TimeRange;
+import com.clinicmanager.model.entities.Slot;
+import com.clinicmanager.model.entities.TimeRange;
 import com.clinicmanager.repository.PatientRepository;
 import com.clinicmanager.repository.SlotRepository;
 

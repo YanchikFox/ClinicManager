@@ -1,11 +1,11 @@
 package com.clinicmanager.controller;
 
 import com.clinicmanager.exception.InvalidTokenException;
-import com.clinicmanager.model.entitys.Notification;
+import com.clinicmanager.model.entities.Notification;
 import com.clinicmanager.service.AccountManager;
 
 import java.util.List;
-import com.clinicmanager.app.Clinic;
+
 import com.clinicmanager.service.NotificationManager;
 
 public abstract class BaseControlPanel {
@@ -28,9 +28,11 @@ public abstract class BaseControlPanel {
         System.out.println("Токен действителен — доступ к функции разрешён.");
     }
 
-public List<Notification> viewNotifications() {
-    requireValidToken();
-    int accountId = accountManager.getAccountByToken(token).id();
-    return notificationManager.getAllNotificationsByPersonId(accountId);
-}
+    public List<Notification> viewNotifications() {
+        requireValidToken();
+        int accountId = accountManager.getAccountByToken(token).id();
+        return notificationManager.getAllNotificationsByPersonId(accountId);
+    }
+
+    public abstract Object currentPerson();
 }

@@ -1,7 +1,7 @@
 package com.clinicmanager.repository;
 
-import com.clinicmanager.model.entitys.Slot;
-import com.clinicmanager.model.entitys.TimeRange;
+import com.clinicmanager.model.entities.Slot;
+import com.clinicmanager.model.entities.TimeRange;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -17,16 +17,15 @@ public class SlotRepository extends AbstractDatabaseManager<Slot> {
     @Override
     public int save(Slot slot) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO slots (schedule_id, date, start_time, end_time) VALUES (?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO slots (schedule_id, date, start_time, end_time) VALUES (?, ?, ?, ?)") ) {
             stmt.setInt(1, slot.scheduleId());
             stmt.setString(2, slot.date().toString());
             stmt.setString(3, slot.timeRange().start().toString());
             stmt.setString(4, slot.timeRange().end().toString());
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (Statement s = conn.createStatement()) {
+                ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
+                if (rs2.next()) return rs2.getInt(1);
             }
             throw new RuntimeException("No ID returned for slot");
         } catch (SQLException e) {

@@ -1,6 +1,6 @@
 package com.clinicmanager.repository;
 
-import com.clinicmanager.model.entitys.Notification;
+import com.clinicmanager.model.entities.Notification;
 
 import java.sql.*;
 import java.time.LocalDateTime;

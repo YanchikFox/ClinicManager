@@ -1,4 +1,4 @@
-package com.clinicmanager.model.entitys;
+package com.clinicmanager.model.entities;
 
 
 import java.time.LocalTime;

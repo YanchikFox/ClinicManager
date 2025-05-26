@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinicmanager.gui.DoctorSearchController">
+    <left>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <Label text="Список врачей:" />
+            <ListView fx:id="doctorListView" prefWidth="200" />
+        </VBox>
+    </left>
+    <center>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <Label text="Данные врача:" />
+            <Label fx:id="doctorInfoLabel" wrapText="true" />
+            <Label text="Расписание:" />
+            <ListView fx:id="scheduleListView" prefHeight="150" />
+            <Button fx:id="makeAppointmentBtn" text="Записаться на приём" disable="true" />
+        </VBox>
+    </center>
+</BorderPane>
+

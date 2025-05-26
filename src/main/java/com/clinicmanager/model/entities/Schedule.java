@@ -1,7 +1,5 @@
-package com.clinicmanager.model.entitys;
+package com.clinicmanager.model.entities;
 
-import com.clinicmanager.repository.RepositoryManager;
-import com.clinicmanager.repository.ScheduleRepository;
 import com.clinicmanager.gui.AppContext;
 
 import java.time.LocalDate;

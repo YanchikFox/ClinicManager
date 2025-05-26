@@ -1,8 +1,8 @@
 package com.clinicmanager.repository;
 
-import com.clinicmanager.model.entitys.Schedule;
-import com.clinicmanager.model.entitys.Slot;
-import com.clinicmanager.model.entitys.TimeRange;
+import com.clinicmanager.model.entities.Schedule;
+import com.clinicmanager.model.entities.Slot;
+import com.clinicmanager.model.entities.TimeRange;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -18,13 +18,12 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
     @Override
     public int save(Schedule s) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO schedules (doctor_id) VALUES (?)",
-                Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO schedules (doctor_id) VALUES (?)")) {
             stmt.setInt(1, s.doctorId());
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (Statement st = conn.createStatement()) {
+                ResultSet rs2 = st.executeQuery("SELECT last_insert_rowid()");
+                if (rs2.next()) return rs2.getInt(1);
             }
             throw new RuntimeException("No ID returned for schedule");
         } catch (SQLException e) {

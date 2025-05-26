@@ -1,6 +1,6 @@
 package com.clinicmanager.repository;
 
-import com.clinicmanager.model.entitys.MedicalCard;
+import com.clinicmanager.model.entities.MedicalCard;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,18 +14,12 @@ public class MedicalCardRepository extends AbstractDatabaseManager<MedicalCard> 
     @Override
     public int save(MedicalCard card) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO medical_cards (patient_id) VALUES (?)",
-                Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO medical_cards (patient_id) VALUES (?)")) {
             stmt.setInt(1, card.patientId());
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
-            } else {
-                try (Statement s = conn.createStatement()) {
-                    ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
-                    if (rs2.next()) return rs2.getInt(1);
-                }
+            try (Statement s = conn.createStatement()) {
+                ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
+                if (rs2.next()) return rs2.getInt(1);
             }
             throw new RuntimeException("No ID returned for medical card");
         } catch (SQLException e) {

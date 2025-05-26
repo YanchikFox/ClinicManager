@@ -1,6 +1,6 @@
 package com.clinicmanager.repository;
 
-import com.clinicmanager.model.entitys.MedicalRecord;
+import com.clinicmanager.model.entities.MedicalRecord;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -15,16 +15,17 @@ public class MedicalRecordRepository extends AbstractDatabaseManager<MedicalReco
     @Override
     public int save(MedicalRecord record) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO medical_records (medical_card_id, doctor_id, date, description) VALUES (?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO medical_records (medical_card_id, doctor_id, date, description) VALUES (?, ?, ?, ?)")) {
             stmt.setInt(1, record.medicalCardId());
             stmt.setInt(2, record.doctorId());
             stmt.setString(3, record.date().toString());
             stmt.setString(4, record.description());
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (Statement s = conn.createStatement()) {
+                ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
+                if (rs2.next()) {
+                    return rs2.getInt(1);
+                }
             }
             throw new RuntimeException("No ID returned for medical record");
         } catch (SQLException e) {

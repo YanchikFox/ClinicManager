@@ -1,6 +1,6 @@
 package com.clinicmanager.repository;
 
-import com.clinicmanager.model.entitys.Appointment;
+import com.clinicmanager.model.entities.Appointment;
 import com.clinicmanager.model.enums.AppointmentStatus;
 
 import java.sql.*;
@@ -13,16 +13,17 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
     @Override
     public int save(Appointment a) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO appointments (patient_id, doctor_id, slot_id, status) VALUES (?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO appointments (patient_id, doctor_id, slot_id, status) VALUES (?, ?, ?, ?)") ) {
             stmt.setInt(1, a.patientId());
             stmt.setInt(2, a.doctorId());
             stmt.setInt(3, a.slotId());
             stmt.setString(4, a.status().name());
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (Statement s = conn.createStatement()) {
+                ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
+                if (rs2.next()) {
+                    return rs2.getInt(1);
+                }
             }
             throw new RuntimeException("No ID returned for appointment");
         } catch (SQLException e) { throw new RuntimeException(e); }

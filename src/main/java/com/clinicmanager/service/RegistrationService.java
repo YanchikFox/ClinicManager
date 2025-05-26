@@ -3,6 +3,7 @@ package com.clinicmanager.service;
 import com.clinicmanager.model.actors.Account;
 import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
+import com.clinicmanager.model.entities.MedicalCard;
 import com.clinicmanager.model.enums.Role;
 import com.clinicmanager.repository.*;
 import com.clinicmanager.security.HashUtil;
@@ -17,12 +18,14 @@ public class RegistrationService {
     private final DoctorRepository doctorRepo;
     private final PatientRepository patientRepo;
     private final SlotRepository slotRepo;
+    private final MedicalCardRepository cardRepo;
 
-    public RegistrationService(AccountRepository accountRepo, DoctorRepository doctorRepo, PatientRepository patientRepo, SlotRepository slotRepo) {
+    public RegistrationService(AccountRepository accountRepo, DoctorRepository doctorRepo, PatientRepository patientRepo, SlotRepository slotRepo, MedicalCardRepository cardRepo) {
         this.accountRepo = accountRepo;
         this.doctorRepo = doctorRepo;
         this.patientRepo = patientRepo;
         this.slotRepo = slotRepo;
+        this.cardRepo = cardRepo;
     }
 
     public void registerDoctor(String email, String rawPassword, String name, String dateOfBirth, String phone, String licenseCode) {
@@ -37,8 +40,16 @@ public class RegistrationService {
     }
 
     public void registerPatient(String email, String rawPassword, String name, String dateOfBirth, String phone) {
+        // 1. Сохраняем пациента без карты
         Patient patient = new Patient(-1, name, dateOfBirth, phone, -1);
         int patientId = patientRepo.save(patient);
+        // 2. Создаём медицинскую карту
+        MedicalCard card = new MedicalCard(-1, patientId);
+        int cardId = cardRepo.save(card);
+        // 3. Обновляем пациента с medicalCardId
+        Patient patientWithCard = new Patient(patientId, name, dateOfBirth, phone, cardId);
+        patientRepo.update(patientWithCard);
+        // 4. Создаём аккаунт
         Account acc = new Account(-1, email, HashUtil.sha256(rawPassword), Role.PATIENT, patientId, true);
         accountRepo.save(acc);
     }
