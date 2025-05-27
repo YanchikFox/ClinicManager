@@ -8,7 +8,7 @@
       fx:controller="com.clinicmanager.gui.StartMenuController"
       alignment="CENTER" spacing="15" style="-fx-padding: 30">
 
-    <Label text="Clinic Manager" style="-fx-font-size: 20;"/>
-    <Button text="Войти" onAction="#handleLogin"/>
-    <Button text="Зарегистрироваться" onAction="#handleRegister"/>
+    <Label text="Menedżer Kliniki" style="-fx-font-size: 20;"/>
+    <Button text="Zaloguj się" onAction="#handleLogin"/>
+    <Button text="Zarejestruj się" onAction="#handleRegister"/>
 </VBox>

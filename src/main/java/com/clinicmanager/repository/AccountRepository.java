@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// Repozytorium do obsługi kont użytkowników (CRUD na tabeli accounts)
 public class AccountRepository extends AbstractDatabaseManager<Account> {
     public AccountRepository(String dbUrl) {
         super(dbUrl);
@@ -27,7 +28,7 @@ public class AccountRepository extends AbstractDatabaseManager<Account> {
             }
             throw new RuntimeException("No ID returned for account");
         } catch (SQLException e) {
-            // Добавим вывод оригинального сообщения SQL-ошибки для диагностики
+            // Dodano wyświetlanie oryginalnej wiadomości SQL dla diagnostyki
             throw new RuntimeException("Failed to save account: " + e.getMessage(), e);
         }
     }
@@ -99,6 +100,7 @@ public class AccountRepository extends AbstractDatabaseManager<Account> {
         return null;
     }
 
+    // Mapuje wynik zapytania SQL na obiekt Account
     private Account mapAccount(ResultSet rs) throws SQLException {
         return new Account(
                 rs.getInt("id"),
@@ -106,7 +108,7 @@ public class AccountRepository extends AbstractDatabaseManager<Account> {
                 rs.getString("password_hash"),
                 Role.valueOf(rs.getString("role")),
                 rs.getInt("owner_id"),
-                true // пароль уже захеширован в базе
+                true // hasło już zahashowane w bazie
         );
     }
 }

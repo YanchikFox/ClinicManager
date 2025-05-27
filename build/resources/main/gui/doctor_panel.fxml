@@ -8,13 +8,13 @@
       fx:controller="com.clinicmanager.gui.DoctorPanelController"
       spacing="10" alignment="CENTER" style="-fx-padding: 20">
 
-    <Label text="👨‍⚕️ Doctor Panel" style="-fx-font-size: 18"/>
+    <Label text="👨‍⚕️ Panel lekarza" style="-fx-font-size: 18"/>
 
-    <Button text="Моё расписание" fx:id="viewScheduleBtn"/>
-    <Button text="Редактировать расписание" fx:id="editScheduleBtn"/>
-    <Button text="Мои приёмы" fx:id="viewAppointmentsBtn"/>
-    <Button text="Открыть медкарту пациента" fx:id="viewMedicalCardBtn"/>
-    <Button text="Добавить запись в медкарту" fx:id="addRecordBtn"/>
-    <Button text="Выйти" fx:id="logoutBtn"/>
+    <Button text="Mój grafik" fx:id="viewScheduleBtn"/>
+    <Button text="Edytuj grafik" fx:id="editScheduleBtn"/>
+    <Button text="Moje wizyty" fx:id="viewAppointmentsBtn"/>
+    <Button text="Otwórz kartę pacjenta" fx:id="viewMedicalCardBtn"/>
+    <Button text="Dodaj wpis do karty" fx:id="addRecordBtn"/>
+    <Button text="Wyloguj się" fx:id="logoutBtn"/>
 
 </VBox>

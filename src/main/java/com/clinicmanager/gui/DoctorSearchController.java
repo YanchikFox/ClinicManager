@@ -12,21 +12,28 @@ import javafx.scene.control.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+// Kontroler obsługujący wyszukiwanie lekarzy i rezerwację wizyt
 public class DoctorSearchController {
-    @FXML private ListView<Doctor> doctorListView;
-    @FXML private Label doctorInfoLabel;
-    @FXML private ListView<String> scheduleListView;
-    @FXML private Button makeAppointmentBtn;
+    @FXML
+    private ListView<Doctor> doctorListView;
+    @FXML
+    private Label doctorInfoLabel;
+    @FXML
+    private ListView<String> scheduleListView;
+    @FXML
+    private Button makeAppointmentBtn;
 
     private Doctor selectedDoctor;
     private Slot selectedSlot;
 
+    // Dostęp do repozytoriów przez AppContext (wzorzec singleton)
     private final RepositoryManager repos = AppContext.getRepositories();
     private final DoctorRepository doctorRepo = repos.doctors;
     private final ScheduleRepository scheduleRepo = repos.schedules;
 
     @FXML
     private void initialize() {
+        // Pobieranie wszystkich lekarzy i wyświetlanie na liście
         List<Doctor> doctors = doctorRepo.findAll();
         doctorListView.setItems(FXCollections.observableArrayList(doctors));
         doctorListView.setCellFactory(param -> new ListCell<>() {
@@ -36,15 +43,18 @@ public class DoctorSearchController {
                 setText((empty || item == null) ? null : item.name());
             }
         });
+        // Obsługa wyboru lekarza z listy
         doctorListView.getSelectionModel().selectedItemProperty().addListener((obs, old, doc) -> {
             selectedDoctor = doc;
             showDoctorInfo(doc);
         });
+        // Obsługa przycisku rezerwacji wizyty
         makeAppointmentBtn.setOnAction(e -> handleMakeAppointment());
         makeAppointmentBtn.setDisable(true);
+        // Obsługa wyboru slotu w grafiku lekarza
         scheduleListView.getSelectionModel().selectedItemProperty().addListener((obs, old, val) -> {
             if (val != null && selectedDoctor != null) {
-                // Найти выбранный слот по строке
+                // Wyszukiwanie dostępnych slotów dla wybranego lekarza
                 List<Slot> slots = repos.slots.findAll();
                 List<Slot> doctorSlots = slots.stream().filter(s -> s.scheduleId() == selectedDoctor.scheduleId() && s.isAvailable()).toList();
                 int idx = scheduleListView.getSelectionModel().getSelectedIndex();
@@ -62,6 +72,7 @@ public class DoctorSearchController {
         });
     }
 
+    // Wyświetlanie informacji o wybranym lekarzu oraz jego dostępnych terminach
     private void showDoctorInfo(Doctor doc) {
         if (doc == null) {
             doctorInfoLabel.setText("");
@@ -70,32 +81,34 @@ public class DoctorSearchController {
             return;
         }
         doctorInfoLabel.setText("Imię: " + doc.name() + "\nTelefon: " + doc.phoneNumber());
-        // Получаем расписание (только свободные слоты)
+        // Pobieranie dostępnych slotów dla lekarza
         List<Slot> slots = repos.slots.findAll();
         List<Slot> doctorSlots = slots.stream().filter(s -> s.scheduleId() == doc.scheduleId() && s.isAvailable()).toList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         scheduleListView.setItems(FXCollections.observableArrayList(
-            doctorSlots.stream().map(s -> s.date().toString() + " " + s.timeRange().start() + "-" + s.timeRange().end()).toList()
+                doctorSlots.stream().map(s -> s.date().toString() + " " + s.timeRange().start() + "-" + s.timeRange().end()).toList()
         ));
-        // Сохраняем список слотов для выбора
+        // Czyszczenie wyboru slotu i blokowanie przycisku rezerwacji
         scheduleListView.getSelectionModel().clearSelection();
         makeAppointmentBtn.setDisable(true);
     }
 
+    // Obsługa procesu rezerwacji wizyty
     private void handleMakeAppointment() {
         if (selectedDoctor == null || selectedSlot == null) return;
-        // Получаем текущего пациента
+        // Pobranie aktualnie zalogowanego pacjenta
         var panel = AppContext.getPanel();
         if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
+            // Wyświetlenie błędu, jeśli nie znaleziono pacjenta
             new Alert(Alert.AlertType.ERROR, "Błąd: nie znaleziono bieżącego pacjenta", ButtonType.OK).showAndWait();
             return;
         }
-        // Проверка: нельзя записаться к одному врачу более 1 раза в день
+        // Sprawdzenie, czy pacjent nie jest już zapisany do tego lekarza na ten dzień
         if (!repos.appointments.canPatientBookSlot(patient.id(), selectedDoctor.id(), selectedSlot.date())) {
             new Alert(Alert.AlertType.WARNING, "Już jesteś zapisany do tego lekarza na wybrany dzień!", ButtonType.OK).showAndWait();
             return;
         }
-        // Создаём Appointment
+        // Tworzenie nowej wizyty i zapis do bazy
         var appointment = new com.clinicmanager.model.entities.Appointment(
                 -1,
                 patient.id(),
@@ -104,8 +117,9 @@ public class DoctorSearchController {
                 com.clinicmanager.model.enums.AppointmentStatus.PENDING
         );
         repos.appointments.save(appointment);
-        // Обновляем список слотов
+        // Odświeżenie listy dostępnych slotów
         showDoctorInfo(selectedDoctor);
         new Alert(Alert.AlertType.INFORMATION, "Wizyta została umówiona!", ButtonType.OK).showAndWait();
     }
 }
+

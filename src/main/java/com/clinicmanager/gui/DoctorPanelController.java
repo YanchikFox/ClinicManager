@@ -8,12 +8,18 @@ public class DoctorPanelController {
     private boolean medicalCardOpened = false;
     private boolean patientHasAppointment = false;
 
-    @FXML private Button viewScheduleBtn;
-    @FXML private Button editScheduleBtn;
-    @FXML private Button viewAppointmentsBtn;
-    @FXML private Button viewMedicalCardBtn;
-    @FXML private Button addRecordBtn;
-    @FXML private Button logoutBtn;
+    @FXML
+    private Button viewScheduleBtn;
+    @FXML
+    private Button editScheduleBtn;
+    @FXML
+    private Button viewAppointmentsBtn;
+    @FXML
+    private Button viewMedicalCardBtn;
+    @FXML
+    private Button addRecordBtn;
+    @FXML
+    private Button logoutBtn;
 
     @FXML
     private void initialize() {
@@ -21,42 +27,42 @@ public class DoctorPanelController {
         addRecordBtn.setDisable(true);
 
         viewScheduleBtn.setOnAction(e -> {
-            System.out.println("✅ Открыто расписание");
+            System.out.println("✅ Schedule opened");
             scheduleOpened = true;
             editScheduleBtn.setDisable(false);
         });
 
         editScheduleBtn.setOnAction(e -> {
-            System.out.println("✏️ Редактируем расписание...");
+            System.out.println("✏️ Editing schedule...");
         });
 
         viewAppointmentsBtn.setOnAction(e -> {
-            System.out.println("📅 Просмотр приёмов");
+            System.out.println("📅 Viewing appointments");
         });
 
         viewMedicalCardBtn.setOnAction(e -> {
-            System.out.println("📖 Медкарта пациента открыта");
+            System.out.println("📖 Patient medical card opened");
             medicalCardOpened = true;
-            patientHasAppointment = true; // допустим, есть приём
+            patientHasAppointment = true; // przykładowo: pacjent ma wizytę
             if (patientHasAppointment) {
                 addRecordBtn.setDisable(false);
             }
         });
 
         addRecordBtn.setOnAction(e -> {
-            System.out.println("➕ Добавлена запись в медкарту");
+            System.out.println("➕ Record added to medical card");
         });
 
         logoutBtn.setOnAction(e -> {
             try {
-                // revoke токен при выходе
-                var panel = com.clinicmanager.gui.AppContext.getPanel();
+                // Wylogowanie i cofnięcie tokena
+                var panel = AppContext.getPanel();
                 if (panel != null) {
                     panel.revokeToken();
                 }
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
-                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
-                javafx.stage.Stage stage = (javafx.stage.Stage) logoutBtn.getScene().getWindow();
+                var loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
+                var scene = new javafx.scene.Scene(loader.load());
+                var stage = (javafx.stage.Stage) logoutBtn.getScene().getWindow();
                 stage.setScene(scene);
             } catch (Exception ex) {
                 ex.printStackTrace();

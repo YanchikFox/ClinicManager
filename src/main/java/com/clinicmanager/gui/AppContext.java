@@ -5,19 +5,21 @@ import com.clinicmanager.repository.RepositoryManager;
 import com.clinicmanager.service.RegistrationService;
 
 public class AppContext {
+    // Aktualnie zalogowany panel (pacjenta lub lekarza)
     private static BaseControlPanel panel;
+
+    // Wspólny dostęp do repozytoriów i usług
     private static final RepositoryManager repos = new RepositoryManager("jdbc:sqlite:clinic.db");
     private static final RegistrationService regService = new RegistrationService();
-//            repos.accounts, repos.doctors, repos.patients, repos.slots, repos.cards);
 
-    // Singleton instance
+    // Instancja singletona
     private static AppContext sharedInstance;
 
-    // Private constructor
+    // Prywatny konstruktor (wzorzec Singleton)
     private AppContext() {
     }
 
-    // Public accessor for singleton
+    // Zwraca globalną instancję AppContext
     public static AppContext getInstance() {
         if (sharedInstance == null) {
             sharedInstance = new AppContext();

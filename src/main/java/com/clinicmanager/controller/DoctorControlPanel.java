@@ -12,9 +12,8 @@ public class DoctorControlPanel extends BaseControlPanel {
 
     public DoctorControlPanel(String token, AccountManager accountManager, NotificationManager notificationManager) {
         super(token, accountManager, notificationManager);
-        // Получаем аккаунт по токену
+        // Pobierz konto i przypisz lekarza na podstawie ownerId
         Account acc = accountManager.getAccountByToken(token);
-        // Получаем доктора по ownerId
         RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         this.doctor = repos.doctors.findById(acc.ownerId());
     }
@@ -33,33 +32,32 @@ public class DoctorControlPanel extends BaseControlPanel {
         return repos.schedules.findByDoctorId(doctor.id());
     }
 
-    // Пример защищённого метода: получить список пациентов
+    // Zwraca listę identyfikatorów pacjentów lekarza
     public java.util.List<Integer> getPatientsList() {
         requireValidToken();
         requireDoctorRole();
         return doctor.getPatientsList();
     }
 
-    // Пример защищённого метода: добавить слот
+    // Dodaje dostępny slot dla lekarza
     public void addAvailableSlot(com.clinicmanager.model.entities.Slot slot) {
         requireValidToken();
         requireDoctorRole();
         doctor.addAvailableSlot(slot);
     }
 
-    // Пример защищённого метода: завершить приём
+    // Kończy wizytę
     public void endAppointment(com.clinicmanager.model.entities.Appointment appointment) {
         requireValidToken();
         requireDoctorRole();
         appointment.end(com.clinicmanager.gui.AppContext.getRepositories().appointments);
     }
 
+    // Sprawdza czy zalogowany użytkownik ma rolę DOCTOR
     private void requireDoctorRole() {
         if (!(accountManager.getAccountByToken(token).role().name().equals("DOCTOR"))) {
             throw new com.clinicmanager.exception.InvalidTokenException("Access denied: not a doctor");
         }
     }
 
-    // ...другие методы
 }
-

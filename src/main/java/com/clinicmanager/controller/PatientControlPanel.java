@@ -11,9 +11,8 @@ public class PatientControlPanel extends BaseControlPanel {
 
     public PatientControlPanel(String token, AccountManager accountManager, NotificationManager notificationManager) {
         super(token, accountManager, notificationManager);
-        // Получаем аккаунт по токену
+        // Pobierz konto i przypisz pacjenta na podstawie ownerId
         Account acc = accountManager.getAccountByToken(token);
-        // Получаем пациента по ownerId
         RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         this.patient = repos.patients.findById(acc.ownerId());
     }
@@ -25,24 +24,25 @@ public class PatientControlPanel extends BaseControlPanel {
         return patient;
     }
 
-    // Пример защищённого метода: получить свою медкарту
+    // Zwraca kartę medyczną pacjenta
     public com.clinicmanager.model.entities.MedicalCard viewMedicalCard() {
         requireValidToken();
         requirePatientRole();
-        com.clinicmanager.repository.RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
+        RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         return repos.cards.findById(patient.medicalCardId());
     }
 
-    // Пример защищённого метода: получить список своих записей
+    // Zwraca wszystkie wizyty przypisane do pacjenta
     public java.util.List<com.clinicmanager.model.entities.Appointment> getMyAppointments() {
         requireValidToken();
         requirePatientRole();
-        com.clinicmanager.repository.RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
+        RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         return repos.appointments.findAll().stream()
-            .filter(a -> a.patientId() == patient.id())
-            .toList();
+                .filter(a -> a.patientId() == patient.id())
+                .toList();
     }
 
+    // Sprawdza czy zalogowany użytkownik ma rolę PATIENT
     private void requirePatientRole() {
         if (!(accountManager.getAccountByToken(token).role().name().equals("PATIENT"))) {
             throw new com.clinicmanager.exception.InvalidTokenException("Access denied: not a patient");
