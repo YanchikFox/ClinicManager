@@ -10,6 +10,7 @@ public class PatientPanelController {
     @FXML private Button viewMedicalCardBtn;
     @FXML private Button logoutBtn;
     @FXML private Button notificationsBtn;
+    @FXML private Button favoriteDoctorsBtn;
 
     @FXML
     private void initialize() {
@@ -90,6 +91,30 @@ public class PatientPanelController {
                         });
                     }
                 });
+            }
+        });
+
+        favoriteDoctorsBtn.setOnAction(e -> {
+            try {
+                var panel = com.clinicmanager.gui.AppContext.getPanel();
+                if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) return;
+                var repos = com.clinicmanager.gui.AppContext.getRepositories();
+                var favs = repos.favoriteDoctors.findByPatientId(patient.id());
+                java.util.List<com.clinicmanager.model.actors.Doctor> doctors = favs.stream()
+                    .map(fav -> repos.doctors.findById(fav.doctorId()))
+                    .filter(d -> d != null)
+                    .toList();
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_search.fxml"));
+                javafx.scene.Parent root = loader.load();
+                com.clinicmanager.gui.DoctorSearchController controller = loader.getController();
+                controller.setDoctors(doctors);
+                javafx.scene.Scene scene = new javafx.scene.Scene(root);
+                javafx.stage.Stage stage = new javafx.stage.Stage();
+                stage.setTitle("Ulubieni lekarze");
+                stage.setScene(scene);
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
     }

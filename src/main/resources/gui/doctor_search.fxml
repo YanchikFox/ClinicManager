@@ -15,6 +15,7 @@
             <Label text="Grafik:" />
             <ListView fx:id="scheduleListView" prefHeight="150" />
             <Button fx:id="makeAppointmentBtn" text="Umów wizytę" disable="true" />
+            <Button fx:id="addFavoriteBtn" text="Dodaj do ulubionych" disable="true" />
         </VBox>
     </center>
 </BorderPane>

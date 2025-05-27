@@ -10,6 +10,7 @@ public class RepositoryManager {
     public final MedicalCardRepository cards;
     public final MedicalRecordRepository records;
     public final NotificationRepository notifications;
+    public final FavoriteDoctorRepository favoriteDoctors;
 
     public RepositoryManager(String dbUrl) {
         this.patients = new PatientRepository(dbUrl);
@@ -21,6 +22,7 @@ public class RepositoryManager {
         this.cards = new MedicalCardRepository(dbUrl);
         this.records = new MedicalRecordRepository(dbUrl);
         this.notifications = new NotificationRepository(dbUrl);
+        this.favoriteDoctors = new FavoriteDoctorRepository(dbUrl);
     }
 
     public void closeAll() {

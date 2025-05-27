@@ -14,6 +14,7 @@ public class MainFX extends Application {
         stage.setTitle("Clinic Manager");
         stage.setScene(scene);
         stage.show();
+
     }
     private static Stage primaryStage;
 

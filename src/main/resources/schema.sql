@@ -64,3 +64,10 @@ CREATE TABLE IF NOT EXISTS notifications (
     read BOOLEAN NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS favorite_doctors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id INTEGER NOT NULL,
+    doctor_id INTEGER NOT NULL,
+    UNIQUE(patient_id, doctor_id)
+);
+

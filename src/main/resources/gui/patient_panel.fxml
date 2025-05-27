@@ -14,6 +14,7 @@
     <Button text="Moje wizyty" fx:id="viewAppointmentsBtn"/>
     <Button text="Karta medyczna" fx:id="viewMedicalCardBtn"/>
     <Button text="Powiadomienia" fx:id="notificationsBtn" style="-fx-background-color: #cccccc;"/>
+    <Button text="Ulubieni lekarze" fx:id="favoriteDoctorsBtn"/>
     <Button text="Wyloguj się" fx:id="logoutBtn"/>
 
 </VBox>

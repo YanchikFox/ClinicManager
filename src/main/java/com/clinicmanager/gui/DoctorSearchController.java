@@ -17,6 +17,7 @@ public class DoctorSearchController {
     @FXML private Label doctorInfoLabel;
     @FXML private ListView<String> scheduleListView;
     @FXML private Button makeAppointmentBtn;
+    @FXML private Button addFavoriteBtn;
 
     private Doctor selectedDoctor;
     private Slot selectedSlot;
@@ -39,9 +40,12 @@ public class DoctorSearchController {
         doctorListView.getSelectionModel().selectedItemProperty().addListener((obs, old, doc) -> {
             selectedDoctor = doc;
             showDoctorInfo(doc);
+            updateFavoriteBtn();
         });
         makeAppointmentBtn.setOnAction(e -> handleMakeAppointment());
         makeAppointmentBtn.setDisable(true);
+        addFavoriteBtn.setDisable(true);
+        addFavoriteBtn.setOnAction(e -> handleAddFavorite());
         scheduleListView.getSelectionModel().selectedItemProperty().addListener((obs, old, val) -> {
             if (val != null && selectedDoctor != null) {
                 // Найти выбранный слот по строке
@@ -60,6 +64,17 @@ public class DoctorSearchController {
                 makeAppointmentBtn.setDisable(true);
             }
         });
+    }
+
+    private void updateFavoriteBtn() {
+        var panel = AppContext.getPanel();
+        if (selectedDoctor == null || panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
+            addFavoriteBtn.setDisable(true);
+            return;
+        }
+        boolean isFav = repos.favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id());
+        addFavoriteBtn.setDisable(isFav);
+        addFavoriteBtn.setText(isFav ? "Już w ulubionych" : "Dodaj do ulubionych");
     }
 
     private void showDoctorInfo(Doctor doc) {
@@ -107,5 +122,45 @@ public class DoctorSearchController {
         // Обновляем список слотов
         showDoctorInfo(selectedDoctor);
         new Alert(Alert.AlertType.INFORMATION, "Wizyta została umówiona!", ButtonType.OK).showAndWait();
+    }
+
+    private void handleAddFavorite() {
+        var panel = AppContext.getPanel();
+        if (selectedDoctor == null || panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
+            return;
+        }
+        if (!repos.favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id())) {
+            repos.favoriteDoctors.save(new com.clinicmanager.model.entities.FavoriteDoctor(-1, patient.id(), selectedDoctor.id()));
+            updateFavoriteBtn();
+            new Alert(Alert.AlertType.INFORMATION, "Lekarz dodany do ulubionych!", ButtonType.OK).showAndWait();
+        }
+    }
+
+    // Позволяет выбрать врача программно (например, из избранных)
+    public void selectDoctor(Doctor doctor) {
+        if (doctor == null) return;
+        doctorListView.getSelectionModel().select(doctor);
+        showDoctorInfo(doctor);
+        updateFavoriteBtn();
+    }
+
+    // Позволяет задать произвольный список докторов для отображения (например, только любимых)
+    public void setDoctors(List<Doctor> doctors) {
+        doctorListView.setItems(FXCollections.observableArrayList(doctors));
+        doctorListView.getSelectionModel().clearSelection();
+        doctorInfoLabel.setText("");
+        scheduleListView.setItems(FXCollections.emptyObservableList());
+        makeAppointmentBtn.setDisable(true);
+        addFavoriteBtn.setDisable(true);
+    }
+
+    // Позволяет удалить выбранного врача из любимых (если он есть)
+    public void removeFromFavoritesForCurrentPatient() {
+        var panel = AppContext.getPanel();
+        if (selectedDoctor == null || panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
+            return;
+        }
+        repos.favoriteDoctors.deleteByPatientAndDoctor(patient.id(), selectedDoctor.id());
+        updateFavoriteBtn();
     }
 }
