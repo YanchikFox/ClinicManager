@@ -17,6 +17,7 @@ public class NotificationWindow {
     public static void showNotifications(Stage owner, NotificationManager notificationManager, int personId) {
         ListView<String> listView = new ListView<>();
         Runnable refreshList = () -> {
+            // Always reload notifications from DB
             List<Notification> notifications = notificationManager.getAllNotificationsByPersonId(personId);
             listView.setItems(FXCollections.observableArrayList(
                 notifications.stream().map(n -> (n.isRead() ? "" : "[NOWE] ") + n.timestamp() + ": " + n.message()).toList()
@@ -26,12 +27,14 @@ public class NotificationWindow {
 
         Button markReadBtn = new Button("Oznacz jako przeczytane");
         markReadBtn.setOnAction(e -> {
+            // Always reload notifications from DB before marking as read
             List<Notification> notifications = notificationManager.getAllNotificationsByPersonId(personId);
             for (Notification n : notifications) {
                 if (!n.isRead()) {
                     notificationManager.markAsRead(n);
                 }
             }
+            // After marking as read, reload notifications from DB again
             refreshList.run();
         });
 
