@@ -69,7 +69,7 @@ public class DoctorSearchController {
             makeAppointmentBtn.setDisable(true);
             return;
         }
-        doctorInfoLabel.setText("Имя: " + doc.name() + "\nТелефон: " + doc.phoneNumber());
+        doctorInfoLabel.setText("Imię: " + doc.name() + "\nTelefon: " + doc.phoneNumber());
         // Получаем расписание (только свободные слоты)
         List<Slot> slots = repos.slots.findAll();
         List<Slot> doctorSlots = slots.stream().filter(s -> s.scheduleId() == doc.scheduleId() && s.isAvailable()).toList();
@@ -87,12 +87,12 @@ public class DoctorSearchController {
         // Получаем текущего пациента
         var panel = AppContext.getPanel();
         if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
-            new Alert(Alert.AlertType.ERROR, "Ошибка: не найден текущий пациент", ButtonType.OK).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Błąd: nie znaleziono bieżącego pacjenta", ButtonType.OK).showAndWait();
             return;
         }
         // Проверка: нельзя записаться к одному врачу более 1 раза в день
         if (!repos.appointments.canPatientBookSlot(patient.id(), selectedDoctor.id(), selectedSlot.date())) {
-            new Alert(Alert.AlertType.WARNING, "Вы уже записаны к этому врачу на выбранный день!", ButtonType.OK).showAndWait();
+            new Alert(Alert.AlertType.WARNING, "Już jesteś zapisany do tego lekarza na wybrany dzień!", ButtonType.OK).showAndWait();
             return;
         }
         // Создаём Appointment
@@ -106,6 +106,6 @@ public class DoctorSearchController {
         repos.appointments.save(appointment);
         // Обновляем список слотов
         showDoctorInfo(selectedDoctor);
-        new Alert(Alert.AlertType.INFORMATION, "Запись на приём оформлена!", ButtonType.OK).showAndWait();
+        new Alert(Alert.AlertType.INFORMATION, "Wizyta została umówiona!", ButtonType.OK).showAndWait();
     }
 }

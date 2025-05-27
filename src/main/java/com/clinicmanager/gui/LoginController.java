@@ -44,7 +44,7 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
             stage.setScene(new Scene(loader.load()));
         } catch (Exception e) {
-            messageLabel.setText("Ошибка: " + e.getMessage());
+            messageLabel.setText("Błąd: " + e.getMessage());
         }
     }
     @FXML
@@ -55,6 +55,7 @@ public class LoginController {
             stage.setScene(new Scene(loader.load()));
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
-}
+    }

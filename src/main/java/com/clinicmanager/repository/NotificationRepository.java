@@ -15,16 +15,17 @@ public class NotificationRepository extends AbstractDatabaseManager<Notification
     @Override
     public int save(Notification n) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO notifications (person_id, message, timestamp, read) VALUES (?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO notifications (person_id, message, timestamp, read) VALUES (?, ?, ?, ?)")) {
             stmt.setInt(1, n.personId());
             stmt.setString(2, n.message());
             stmt.setString(3, n.timestamp().toString());
             stmt.setBoolean(4, n.isRead());
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (Statement s = conn.createStatement()) {
+                ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
+                if (rs2.next()) {
+                    return rs2.getInt(1);
+                }
             }
             throw new RuntimeException("No ID returned for notification");
         } catch (SQLException e) {

@@ -22,6 +22,8 @@ public class PatientAppointmentsController {
     @FXML private Button confirmBtn;
 
     private final RepositoryManager repos = AppContext.getRepositories();
+    private final com.clinicmanager.service.NotificationManager notificationManager =
+            new com.clinicmanager.service.NotificationManager(AppContext.getRepositories().notifications);
     private List<Appointment> myAppointments;
     private Appointment selectedAppointment;
 
@@ -58,20 +60,22 @@ public class PatientAppointmentsController {
         List<String> display = myAppointments.stream().map(a -> {
             Doctor doc = a.getDoctor();
             Slot slot = a.getSlot();
-            return String.format("Доктор: %s | Дата: %s | Время: %s-%s | Статус: %s",
+            return String.format("Lekarz: %s | Data: %s | Godzina: %s-%s | Status: %s",
                     doc.name(),
                     slot.date(),
                     slot.timeRange().start(),
                     slot.timeRange().end(),
                     a.status().name());
         }).toList();
-        infoLabel.setText("Ваши активные записи:");
+        infoLabel.setText("Twoje aktywne wizyty:");
         appointmentsListView.setItems(FXCollections.observableArrayList(display));
     }
 
     private void handleCancel() {
         if (selectedAppointment != null) {
             selectedAppointment.cancel(repos.appointments);
+            notificationManager.createNotification(selectedAppointment.patientId(),
+                "Twoja wizyta została anulowana przez użytkownika.");
             myAppointments = repos.appointments.findAll().stream()
                     .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
                     .toList();
@@ -81,7 +85,6 @@ public class PatientAppointmentsController {
 
     private void handleReschedule() {
         if (selectedAppointment != null) {
-            // Получаем все свободные слоты этого врача
             List<Slot> slots = repos.slots.findAll();
             List<Slot> freeSlots = slots.stream()
                     .filter(s -> s.scheduleId() == selectedAppointment.getDoctor().scheduleId() && s.isAvailable())
@@ -90,7 +93,6 @@ public class PatientAppointmentsController {
                 new Alert(Alert.AlertType.WARNING, "Нет свободных слотов для переноса.", ButtonType.OK).showAndWait();
                 return;
             }
-            // Показываем диалог выбора слота
             ChoiceDialog<Slot> dialog = new ChoiceDialog<>(freeSlots.get(0), freeSlots);
             dialog.setTitle("Перенос записи");
             dialog.setHeaderText("Выберите новый слот для переноса:");
@@ -119,6 +121,8 @@ public class PatientAppointmentsController {
             dialog.showAndWait().ifPresent(newSlot -> {
                 if (newSlot != null) {
                     selectedAppointment.reschedule(newSlot.id(), repos.appointments);
+                    notificationManager.createNotification(selectedAppointment.patientId(),
+                        "Twoja wizyta została przełożona на: " + newSlot.date() + " " + newSlot.timeRange().start() + "-" + newSlot.timeRange().end());
                     myAppointments = repos.appointments.findAll().stream()
                             .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
                             .toList();
@@ -131,6 +135,8 @@ public class PatientAppointmentsController {
     private void handleConfirm() {
         if (selectedAppointment != null) {
             selectedAppointment.confirm(repos.appointments);
+            notificationManager.createNotification(selectedAppointment.patientId(),
+                "Twoja wizyta została potwierdzona.");
             myAppointments = repos.appointments.findAll().stream()
                     .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
                     .toList();

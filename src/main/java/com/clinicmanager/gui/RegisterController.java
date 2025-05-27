@@ -9,10 +9,14 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 public class RegisterController {
-    @FXML private ChoiceBox<String> roleBox;
-    @FXML private TextField emailField, nameField, dobField, phoneField, licenseField;
-    @FXML private PasswordField passwordField;
-    @FXML private Label messageLabel;
+    @FXML
+    private ChoiceBox<String> roleBox;
+    @FXML
+    private TextField emailField, nameField, dobField, phoneField, licenseField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Label messageLabel;
 
     private final RegistrationService regService;
 
@@ -41,11 +45,12 @@ public class RegisterController {
                         nameField.getText(), dobField.getText(),
                         phoneField.getText());
             }
-            messageLabel.setText("✅ Успешно зарегистрировано!");
+            messageLabel.setText("✅ Zarejestrowano pomyślnie!");
         } catch (Exception e) {
-            messageLabel.setText("❌ Ошибка: " + e.getMessage());
+            messageLabel.setText("❌ Błąd: " + e.getMessage());
         }
     }
+
     @FXML
     private void handleBack() {
         try {
@@ -54,7 +59,7 @@ public class RegisterController {
             stage.setScene(new Scene(loader.load()));
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
-
 }

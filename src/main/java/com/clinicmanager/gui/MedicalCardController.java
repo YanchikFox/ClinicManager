@@ -22,7 +22,7 @@ public class MedicalCardController {
         // Получаем текущего пациента
         Patient patient = (Patient) AppContext.getPanel().currentPerson();
         MedicalCard card = repos.cards.findById(patient.medicalCardId());
-        cardInfoLabel.setText("ID карты: " + card.id() + " | Пациент: " + patient.name());
+        cardInfoLabel.setText("ID karty: " + card.id() + " | Pacjent: " + patient.name());
         List<MedicalRecord> records = repos.records.findAll().stream()
                 .filter(r -> r.medicalCardId() == card.id())
                 .toList();

@@ -9,6 +9,7 @@ public class PatientPanelController {
     @FXML private Button viewAppointmentsBtn;
     @FXML private Button viewMedicalCardBtn;
     @FXML private Button logoutBtn;
+    @FXML private Button notificationsBtn;
 
     @FXML
     private void initialize() {
@@ -17,7 +18,7 @@ public class PatientPanelController {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_search.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Поиск врача");
+                stage.setTitle("Wyszukiwanie lekarza");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -30,7 +31,7 @@ public class PatientPanelController {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/patient_appointments.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Мои приёмы");
+                stage.setTitle("Moje wizyty");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -43,7 +44,7 @@ public class PatientPanelController {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/medical_card.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Медицинская карта");
+                stage.setTitle("Karta medyczna");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -66,5 +67,42 @@ public class PatientPanelController {
                 ex.printStackTrace();
             }
         });
+
+        // Уведомления
+        javafx.application.Platform.runLater(this::updateNotificationsButtonStyle);
+        notificationsBtn.setOnAction(e -> {
+            var panel = com.clinicmanager.gui.AppContext.getPanel();
+            if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) return;
+            var notificationManager = com.clinicmanager.gui.AppContext.getRepositories().notifications;
+            var service = new com.clinicmanager.service.NotificationManager(notificationManager);
+            // force reload notifications from DB each time
+            NotificationWindow.showNotifications((javafx.stage.Stage) notificationsBtn.getScene().getWindow(), service, patient.id());
+            // update style after closing window
+            javafx.application.Platform.runLater(this::updateNotificationsButtonStyle);
+        });
+        // add listener to update style when window regains focus
+        notificationsBtn.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((o, oldWin, newWin) -> {
+                    if (newWin != null) {
+                        newWin.focusedProperty().addListener((of, was, isNow) -> {
+                            if (isNow) javafx.application.Platform.runLater(this::updateNotificationsButtonStyle);
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    private void updateNotificationsButtonStyle() {
+        var panel = com.clinicmanager.gui.AppContext.getPanel();
+        if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) return;
+        var notificationManager = com.clinicmanager.gui.AppContext.getRepositories().notifications;
+        var service = new com.clinicmanager.service.NotificationManager(notificationManager);
+        // always reload from DB
+        boolean hasUnread = !service.getUnreadNotificationsByPersonId(patient.id()).isEmpty();
+        notificationsBtn.setStyle(hasUnread
+            ? "-fx-background-color: #ffcccc; -fx-border-color: red; -fx-border-width: 2px;"
+            : "-fx-background-color: #cccccc;");
     }
 }
