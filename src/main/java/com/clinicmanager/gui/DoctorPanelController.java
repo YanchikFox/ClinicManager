@@ -4,12 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
 public class DoctorPanelController {
-    private boolean scheduleOpened = false;
-    private boolean medicalCardOpened = false;
-    private boolean patientHasAppointment = false;
-
     @FXML private Button viewScheduleBtn;
-    @FXML private Button editScheduleBtn;
     @FXML private Button viewAppointmentsBtn;
     @FXML private Button viewMedicalCardBtn;
     @FXML private Button addRecordBtn;
@@ -17,39 +12,59 @@ public class DoctorPanelController {
 
     @FXML
     private void initialize() {
-        editScheduleBtn.setDisable(true);
+        // Отключаем неиспользуемые кнопки
         addRecordBtn.setDisable(true);
 
+        // Открыть "Мой график"
         viewScheduleBtn.setOnAction(e -> {
-            System.out.println("✅ Открыто расписание");
-            scheduleOpened = true;
-            editScheduleBtn.setDisable(false);
-        });
-
-        editScheduleBtn.setOnAction(e -> {
-            System.out.println("✏️ Редактируем расписание...");
-        });
-
-        viewAppointmentsBtn.setOnAction(e -> {
-            System.out.println("📅 Просмотр приёмов");
-        });
-
-        viewMedicalCardBtn.setOnAction(e -> {
-            System.out.println("📖 Медкарта пациента открыта");
-            medicalCardOpened = true;
-            patientHasAppointment = true; // допустим, есть приём
-            if (patientHasAppointment) {
-                addRecordBtn.setDisable(false);
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_schedule.fxml"));
+                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
+                javafx.stage.Stage stage = new javafx.stage.Stage();
+                stage.setTitle("Mój grafik");
+                stage.setScene(scene);
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
 
-        addRecordBtn.setOnAction(e -> {
-            System.out.println("➕ Добавлена запись в медкарту");
+        // Открыть "Мои визиты"
+        viewAppointmentsBtn.setOnAction(e -> {
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_appointments.fxml"));
+                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
+                javafx.stage.Stage stage = new javafx.stage.Stage();
+                stage.setTitle("Moje wizyty");
+                stage.setScene(scene);
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
 
+        // Открыть "Мои пациенты"
+        viewMedicalCardBtn.setOnAction(e -> {
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_patients.fxml"));
+                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
+                javafx.stage.Stage stage = new javafx.stage.Stage();
+                stage.setTitle("Moi pacjenci");
+                stage.setScene(scene);
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        // Кнопка "Добавить запись в медкарту" (будет активна только при выборе визита)
+        addRecordBtn.setOnAction(e -> {
+            // TODO: реализовать добавление записи в медкарту
+        });
+
+        // Кнопка выхода
         logoutBtn.setOnAction(e -> {
             try {
-                // revoke токен при выходе
                 var panel = com.clinicmanager.gui.AppContext.getPanel();
                 if (panel != null) {
                     panel.revokeToken();

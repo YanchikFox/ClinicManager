@@ -11,7 +11,6 @@
     <Label text="👨‍⚕️ Panel lekarza" style="-fx-font-size: 18"/>
 
     <Button text="Mój grafik" fx:id="viewScheduleBtn"/>
-    <Button text="Edytuj grafik" fx:id="editScheduleBtn"/>
     <Button text="Moje wizyty" fx:id="viewAppointmentsBtn"/>
     <Button text="Otwórz kartę pacjenta" fx:id="viewMedicalCardBtn"/>
     <Button text="Dodaj wpis do karty" fx:id="addRecordBtn"/>

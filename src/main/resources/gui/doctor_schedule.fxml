@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinicmanager.gui.DoctorScheduleController">
+    <top>
+        <Label text="Mój grafik" style="-fx-font-size: 16; -fx-padding: 10;" />
+    </top>
+    <center>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <TableView fx:id="slotsTable" prefHeight="250">
+                <columns>
+                    <TableColumn text="Data" fx:id="dateCol" />
+                    <TableColumn text="Godzina od" fx:id="startCol" />
+                    <TableColumn text="Godzina do" fx:id="endCol" />
+                    <TableColumn text="Status" fx:id="statusCol" />
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="center" style="-fx-padding: 10;">
+            <Button text="Dodaj slot" fx:id="addSlotBtn" />
+            <Button text="Usuń slot" fx:id="removeSlotBtn" />
+            <Button text="Zamknij slot" fx:id="closeSlotBtn" />
+            <Button text="Otwórz slot" fx:id="openSlotBtn" />
+            <Button text="Odśwież" fx:id="refreshBtn" />
+            <Button text="Zamknij okno" fx:id="closeBtn" />
+        </HBox>
+    </bottom>
+</BorderPane>
+
