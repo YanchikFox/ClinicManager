@@ -134,13 +134,16 @@ public class PatientAppointmentsController {
 
     private void handleConfirm() {
         if (selectedAppointment != null) {
-            selectedAppointment.confirm(repos.appointments);
-            notificationManager.createNotification(selectedAppointment.patientId(),
-                "Twoja wizyta została potwierdzona.");
-            myAppointments = repos.appointments.findAll().stream()
-                    .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
-                    .toList();
-            updateList();
+            // Only confirm if not already confirmed
+            if (!selectedAppointment.status().name().equals("CONFIRMED")) {
+                selectedAppointment.confirm(repos.appointments);
+                notificationManager.createNotification(selectedAppointment.patientId(),
+                    "Twoja wizyta została potwierdzona.");
+                myAppointments = repos.appointments.findAll().stream()
+                        .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
+                        .toList();
+                updateList();
+            }
         }
     }
 }
