@@ -6,6 +6,7 @@ out/
 # Ignore all .idea files
 .idea/
 
+
 # But allow specific shared settings
 !.idea/codeStyles/
 !.idea/runConfigurations/
@@ -37,4 +38,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-.gdradle
+build/
+.gradle/
