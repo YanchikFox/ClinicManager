@@ -29,4 +29,6 @@ public class Clinic {
             case PATIENT -> new PatientControlPanel(token, accountManager, notificationManager);
         };
     }
+
+
 }

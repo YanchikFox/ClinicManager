@@ -4,6 +4,8 @@ import com.clinicmanager.app.Clinic;
 import com.clinicmanager.controller.BaseControlPanel;
 import com.clinicmanager.controller.DoctorControlPanel;
 import com.clinicmanager.controller.PatientControlPanel;
+import com.clinicmanager.repository.AccountRepository;
+import com.clinicmanager.repository.NotificationRepository;
 import com.clinicmanager.repository.RepositoryManager;
 import com.clinicmanager.security.TokenService;
 import com.clinicmanager.service.AccountManager;
@@ -13,17 +15,26 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import com.clinicmanager.service.NotificationManager;
+
 public class LoginController {
-    @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private Label messageLabel;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Label messageLabel;
 
     private final Clinic clinic;
+    private NotificationRepository notificationRepository;
+    private AccountRepository accountRepository;
 
     public LoginController() {
-        RepositoryManager repos = AppContext.getRepositories();
-        AccountManager manager = new AccountManager(repos.accounts, new TokenService());
-        NotificationManager notificationManager = new NotificationManager(repos.notifications);
+        RepositoryManager repos = AppContext.getInstance().getRepositories();
+        this.notificationRepository = repos.notifications;
+        this.accountRepository = repos.accounts;
+
+        AccountManager manager = new AccountManager(accountRepository, new TokenService());
+        NotificationManager notificationManager = new NotificationManager(notificationRepository);
         this.clinic = new Clinic(manager, notificationManager);
     }
 
@@ -47,6 +58,7 @@ public class LoginController {
             messageLabel.setText("Błąd: " + e.getMessage());
         }
     }
+
     @FXML
     private void handleBack() {
         try {

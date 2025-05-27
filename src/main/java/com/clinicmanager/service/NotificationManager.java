@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class NotificationManager {
-    private final NotificationRepository repo;
+    private final NotificationRepository notificationRepository;
 
-    public NotificationManager(NotificationRepository repo) {
-        this.repo = repo;
+    public NotificationManager(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
     }
 
     public Notification createNotification(int personId, String message) {
@@ -19,22 +19,21 @@ public class NotificationManager {
                 personId,
                 message,
                 LocalDateTime.now(),
-                false
-        );
-        repo.save(n);
+                false);
+        notificationRepository.save(n);
         return n;
     }
 
     public void markAsRead(Notification n) {
         n.markAsRead();
-        repo.update(n);
+        notificationRepository.update(n);
     }
 
     public List<Notification> getAllNotificationsByPersonId(int personId) {
-        return repo.findByPersonId(personId);
+        return notificationRepository.findByPersonId(personId);
     }
 
     public List<Notification> getUnreadNotificationsByPersonId(int personId) {
-        return repo.findUnreadByPersonId(personId);
+        return notificationRepository.findUnreadByPersonId(personId);
     }
 }
