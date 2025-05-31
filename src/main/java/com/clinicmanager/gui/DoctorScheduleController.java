@@ -16,17 +16,30 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class DoctorScheduleController {
-    @FXML private TableView<SlotTableRow> slotsTable;
-    @FXML private TableColumn<SlotTableRow, String> dateCol;
-    @FXML private TableColumn<SlotTableRow, String> startCol;
-    @FXML private TableColumn<SlotTableRow, String> endCol;
-    @FXML private TableColumn<SlotTableRow, String> statusCol;
-    @FXML private Button addSlotBtn;
-    @FXML private Button removeSlotBtn;
-    @FXML private Button closeSlotBtn;
-    @FXML private Button openSlotBtn;
-    @FXML private Button refreshBtn;
-    @FXML private Button closeBtn;
+    @FXML
+    private TableView<SlotTableRow> slotsTable;
+    @FXML
+    private TableColumn<SlotTableRow, String> dateCol;
+    @FXML
+    private TableColumn<SlotTableRow, String> startCol;
+    @FXML
+    private TableColumn<SlotTableRow, String> endCol;
+    @FXML
+    private TableColumn<SlotTableRow, String> statusCol;
+    @FXML
+    private Button addSlotBtn;
+    @FXML
+    private Button removeSlotBtn;
+    @FXML
+    private Button closeSlotBtn;
+    @FXML
+    private Button openSlotBtn;
+    @FXML
+    private Button refreshBtn;
+    @FXML
+    private Button closeBtn;
+
+    private SlotTableRow selectedSlotRow;
 
     @FXML
     private void initialize() {
@@ -34,9 +47,18 @@ public class DoctorScheduleController {
         setupTable();
         loadSlots();
         refreshBtn.setOnAction(e -> loadSlots());
+        // Add selection listener to update button states
+        slotsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            selectedSlotRow = newSel;
+            updateSlotButtons();
+        });
+        // Initial state
+        updateSlotButtons();
     }
 
     private void setupTable() {
+        slotsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         startCol.setCellValueFactory(new PropertyValueFactory<>("startTime"));
         endCol.setCellValueFactory(new PropertyValueFactory<>("endTime"));
@@ -49,20 +71,32 @@ public class DoctorScheduleController {
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
         RepositoryManager repos = AppContext.getRepositories();
         List<com.clinicmanager.model.entities.Slot> allSlots = repos.slots.findAll().stream()
-            .filter(s -> s.scheduleId() == doctor.scheduleId())
-            .toList();
+                .filter(s -> s.scheduleId() == doctor.scheduleId())
+                .toList();
         ObservableList<SlotTableRow> rows = FXCollections.observableArrayList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (var slot : allSlots) {
             String status = slot.isAvailable() ? "wolny" : "zajęty";
             rows.add(new SlotTableRow(
-                slot.date().format(fmt),
-                slot.timeRange().start().toString(),
-                slot.timeRange().end().toString(),
-                status
+                    slot.date().format(fmt),
+                    slot.timeRange().start().toString(),
+                    slot.timeRange().end().toString(),
+                    status
             ));
         }
         slotsTable.setItems(rows);
+    }
+
+    private void updateSlotButtons() {
+        if (selectedSlotRow == null) {
+            closeSlotBtn.setDisable(true);
+            openSlotBtn.setDisable(true);
+        } else {
+            // Enable Zamknij slot if status is "wolny"
+            closeSlotBtn.setDisable(!"wolny".equals(selectedSlotRow.getStatus()));
+            // Enable Otwórz slot if status is "zajęty"
+            openSlotBtn.setDisable(!"zajęty".equals(selectedSlotRow.getStatus()));
+        }
     }
 
     public static class SlotTableRow {
@@ -70,15 +104,28 @@ public class DoctorScheduleController {
         private final String startTime;
         private final String endTime;
         private final String status;
+
         public SlotTableRow(String date, String startTime, String endTime, String status) {
             this.date = date;
             this.startTime = startTime;
             this.endTime = endTime;
             this.status = status;
         }
-        public String getDate() { return date; }
-        public String getStartTime() { return startTime; }
-        public String getEndTime() { return endTime; }
-        public String getStatus() { return status; }
+
+        public String getDate() {
+            return date;
+        }
+
+        public String getStartTime() {
+            return startTime;
+        }
+
+        public String getEndTime() {
+            return endTime;
+        }
+
+        public String getStatus() {
+            return status;
+        }
     }
 }

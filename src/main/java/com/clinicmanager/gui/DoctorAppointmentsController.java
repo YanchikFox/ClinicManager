@@ -18,17 +18,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class DoctorAppointmentsController {
-    @FXML private TableView<AppointmentTableRow> appointmentsTable;
-    @FXML private TableColumn<AppointmentTableRow, String> patientCol;
-    @FXML private TableColumn<AppointmentTableRow, String> dateCol;
-    @FXML private TableColumn<AppointmentTableRow, String> timeCol;
-    @FXML private TableColumn<AppointmentTableRow, String> statusCol;
-    @FXML private Button viewDetailsBtn;
-    @FXML private Button openCardBtn;
-    @FXML private Button patientInfoBtn;
-    @FXML private Button addRecordBtn;
-    @FXML private Button endAppointmentBtn;
-    @FXML private Button closeBtn;
+    @FXML
+    private TableView<AppointmentTableRow> appointmentsTable;
+    @FXML
+    private TableColumn<AppointmentTableRow, String> patientCol;
+    @FXML
+    private TableColumn<AppointmentTableRow, String> dateCol;
+    @FXML
+    private TableColumn<AppointmentTableRow, String> timeCol;
+    @FXML
+    private TableColumn<AppointmentTableRow, String> statusCol;
+    @FXML
+    private Button viewDetailsBtn;
+    @FXML
+    private Button openCardBtn;
+    @FXML
+    private Button patientInfoBtn;
+    @FXML
+    private Button addRecordBtn;
+    @FXML
+    private Button endAppointmentBtn; //
+    @FXML
+    private Button closeBtn;
 
     private List<Appointment> myAppointments;
     private Appointment selectedAppointment;
@@ -49,6 +60,7 @@ public class DoctorAppointmentsController {
     }
 
     private void setupTable() {
+        appointmentsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         patientCol.setCellValueFactory(new PropertyValueFactory<>("patientName"));
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         timeCol.setCellValueFactory(new PropertyValueFactory<>("time"));
@@ -61,8 +73,8 @@ public class DoctorAppointmentsController {
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
         RepositoryManager repos = AppContext.getRepositories();
         myAppointments = repos.appointments.findAll().stream()
-            .filter(a -> a.doctorId() == doctor.id())
-            .toList();
+                .filter(a -> a.doctorId() == doctor.id())
+                .toList();
         ObservableList<AppointmentTableRow> rows = FXCollections.observableArrayList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (var app : myAppointments) {
@@ -71,10 +83,10 @@ public class DoctorAppointmentsController {
             String date = slot != null ? slot.date().format(fmt) : "";
             String time = slot != null ? slot.timeRange().start() + "-" + slot.timeRange().end() : "";
             rows.add(new AppointmentTableRow(
-                patient != null ? patient.name() : "?",
-                date,
-                time,
-                app.status().name()
+                    patient != null ? patient.name() : "?",
+                    date,
+                    time,
+                    app.status().name()
             ));
         }
         appointmentsTable.setItems(rows);
@@ -85,15 +97,29 @@ public class DoctorAppointmentsController {
         private final String date;
         private final String time;
         private final String status;
+
         public AppointmentTableRow(String patientName, String date, String time, String status) {
             this.patientName = patientName;
             this.date = date;
             this.time = time;
             this.status = status;
         }
-        public String getPatientName() { return patientName; }
-        public String getDate() { return date; }
-        public String getTime() { return time; }
-        public String getStatus() { return status; }
+
+        public String getPatientName() {
+            return patientName;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public String getTime() {
+            return time;
+        }
+
+        public String getStatus() {
+            return status;
+        }
     }
 }
+

@@ -1,10 +1,8 @@
 package com.clinicmanager.gui;
 
-import com.clinicmanager.controller.BaseControlPanel;
-import com.clinicmanager.model.entities.Notification;
 import com.clinicmanager.repository.RepositoryManager;
-import com.clinicmanager.service.NotificationManager;
 import com.clinicmanager.service.RegistrationService;
+import com.clinicmanager.controller.BaseControlPanel;
 
 public class AppContext {
     private static BaseControlPanel panel;
