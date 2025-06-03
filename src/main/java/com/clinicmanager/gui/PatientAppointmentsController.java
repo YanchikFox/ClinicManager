@@ -15,11 +15,16 @@ import javafx.scene.Scene;
 import java.util.List;
 
 public class PatientAppointmentsController {
-    @FXML private Label infoLabel;
-    @FXML private ListView<String> appointmentsListView;
-    @FXML private Button cancelBtn;
-    @FXML private Button rescheduleBtn;
-    @FXML private Button confirmBtn;
+    @FXML
+    private Label infoLabel;
+    @FXML
+    private ListView<String> appointmentsListView;
+    @FXML
+    private Button cancelBtn;
+    @FXML
+    private Button rescheduleBtn;
+    @FXML
+    private Button confirmBtn;
 
     private final RepositoryManager repos = AppContext.getRepositories();
     private final com.clinicmanager.service.NotificationManager notificationManager =
@@ -54,7 +59,7 @@ public class PatientAppointmentsController {
         cancelBtn.setDisable(true);
         rescheduleBtn.setDisable(true);
         confirmBtn.setDisable(true);
-        // --- Сохраняем контроллер в свойствах root для глобального обновления ---
+        // --- Zapisujemy kontroler w właściwościach root do globalnej aktualizacji ---
         javafx.application.Platform.runLater(() -> {
             if (appointmentsListView.getScene() != null && appointmentsListView.getScene().getRoot() != null) {
                 appointmentsListView.getScene().getRoot().getProperties().put("fx:controller", this);
@@ -62,7 +67,7 @@ public class PatientAppointmentsController {
         });
     }
 
-    // --- Публичный метод для обновления списка визитов ---
+    // --- Publiczna metoda do aktualizacji listy wizyt ---
     public void reloadAppointments() {
         Patient patient = (Patient) AppContext.getPanel().currentPerson();
         List<Appointment> all = repos.appointments.findAll();
@@ -95,7 +100,7 @@ public class PatientAppointmentsController {
         if (selectedAppointment != null) {
             selectedAppointment.cancel(repos.appointments);
             notificationManager.createNotification(selectedAppointment.patientId(),
-                "Twoja wizyta została anulowana przez użytkownika.");
+                    "Twoja wizyta została anulowana przez użytkownika.");
             myAppointments = repos.appointments.findAll().stream()
                     .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
                     .toList();
@@ -110,13 +115,13 @@ public class PatientAppointmentsController {
                     .filter(s -> s.scheduleId() == selectedAppointment.getDoctor().scheduleId() && s.isAvailable())
                     .toList();
             if (freeSlots.isEmpty()) {
-                new Alert(Alert.AlertType.WARNING, "Нет свободных слотов для переноса.", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.WARNING, "Brak dostępnych slotów do przełożenia.", ButtonType.OK).showAndWait();
                 return;
             }
             ChoiceDialog<Slot> dialog = new ChoiceDialog<>(freeSlots.get(0), freeSlots);
-            dialog.setTitle("Перенос записи");
-            dialog.setHeaderText("Выберите новый слот для переноса:");
-            dialog.setContentText("Слот:");
+            dialog.setTitle("Przełożenie wizyty");
+            dialog.setHeaderText("Wybierz nowy slot do przełożenia:");
+            dialog.setContentText("Slot:");
             dialog.setGraphic(null);
             dialog.getDialogPane().setPrefWidth(350);
             dialog.getDialogPane().setPrefHeight(200);
@@ -130,7 +135,7 @@ public class PatientAppointmentsController {
                 }
             });
             slotListView.getSelectionModel().selectFirst();
-            VBox vbox = new VBox(new Label("Выберите слот для переноса записи."), slotListView);
+            VBox vbox = new VBox(new Label("Wybierz slot do przełożenia wizyty."), slotListView);
             dialog.getDialogPane().setContent(vbox);
             dialog.setResultConverter(buttonType -> {
                 if (buttonType == ButtonType.OK) {
@@ -142,7 +147,7 @@ public class PatientAppointmentsController {
                 if (newSlot != null) {
                     selectedAppointment.reschedule(newSlot.id(), repos.appointments);
                     notificationManager.createNotification(selectedAppointment.patientId(),
-                        "Twoja wizyta została przełożona на: " + newSlot.date() + " " + newSlot.timeRange().start() + "-" + newSlot.timeRange().end());
+                            "Twoja wizyta została przełożona na: " + newSlot.date() + " " + newSlot.timeRange().start() + "-" + newSlot.timeRange().end());
                     myAppointments = repos.appointments.findAll().stream()
                             .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
                             .toList();
@@ -154,11 +159,10 @@ public class PatientAppointmentsController {
 
     private void handleConfirm() {
         if (selectedAppointment != null) {
-            // Only confirm if not already confirmed
             if (!selectedAppointment.status().name().equals("CONFIRMED")) {
                 selectedAppointment.confirm(repos.appointments);
                 notificationManager.createNotification(selectedAppointment.patientId(),
-                    "Twoja wizyta została potwierdzona.");
+                        "Twoja wizyta została potwierdzona.");
                 myAppointments = repos.appointments.findAll().stream()
                         .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
                         .toList();
