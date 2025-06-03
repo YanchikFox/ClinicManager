@@ -6,6 +6,7 @@ import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.Appointment;
 import com.clinicmanager.model.entities.Slot;
 import com.clinicmanager.repository.RepositoryManager;
+import com.clinicmanager.time.TimeManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -17,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import com.clinicmanager.gui.AppContext;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -100,9 +102,21 @@ public class DoctorAppointmentsController {
     }
 
     private void setButtonsEnabled(boolean enabled) {
-        boolean canEnd = enabled && selectedAppointment != null &&
-                !(selectedAppointment.status().name().equals("ENDED") || selectedAppointment.status().name().equals("CANCELLED"));
-        boolean canAddRecord = canEnd;
+        boolean canEnd = false;
+        boolean canAddRecord = false;
+        if (enabled && selectedAppointment != null) {
+            // Проверка: статус и время слота
+            Slot slot = selectedAppointment.getSlot();
+            if (slot != null) {
+                LocalDateTime now = TimeManager.getInstance().getCurrentTime();
+                LocalDateTime slotStart = LocalDateTime.of(slot.date(), slot.timeRange().start());
+                LocalDateTime slotEnd = LocalDateTime.of(slot.date(), slot.timeRange().end());
+                boolean inSlotTime = !now.isBefore(slotStart) && now.isBefore(slotEnd);
+                boolean isActiveStatus = selectedAppointment.status().name().equals("CONFIRMED") || selectedAppointment.status().name().equals("PENDING");
+                canEnd = inSlotTime && isActiveStatus;
+                canAddRecord = inSlotTime && isActiveStatus;
+            }
+        }
         viewDetailsBtn.setDisable(!enabled);
         openCardBtn.setDisable(!enabled);
         patientInfoBtn.setDisable(!enabled);
@@ -189,6 +203,19 @@ public class DoctorAppointmentsController {
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
+    private void autoEndAppointments() {
+        LocalDateTime now = TimeManager.getInstance().getCurrentTime();
+        RepositoryManager repos = AppContext.getRepositories();
+        for (Appointment app : myAppointments) {
+            if ((app.status().name().equals("CONFIRMED") || app.status().name().equals("PENDING")) && app.getSlot() != null) {
+                LocalDateTime slotEnd = LocalDateTime.of(app.getSlot().date(), app.getSlot().timeRange().end());
+                if (now.isAfter(slotEnd)) {
+                    app.end(repos.appointments);
+                }
+            }
+        }
+    }
+
     private void loadAppointments() {
         var panel = AppContext.getPanel();
         if (!(panel instanceof DoctorControlPanel doctorPanel)) return;
@@ -205,6 +232,7 @@ public class DoctorAppointmentsController {
         } else {
             myAppointments = all;
         }
+        autoEndAppointments(); // автозавершение приёмов
         ObservableList<AppointmentTableRow> rows = FXCollections.observableArrayList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (var app : myAppointments) {
