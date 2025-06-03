@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import com.clinicmanager.service.NotificationManager;
+import com.clinicmanager.service.SlotAutoGeneratorService;
 
 public class LoginController {
     @FXML
@@ -47,6 +48,9 @@ public class LoginController {
             BaseControlPanel panel = clinic.login(email, pass);
             AppContext.setPanel(panel);
 
+            // --- Автогенерация слотов для всех докторов при входе ---
+            new SlotAutoGeneratorService().ensureFutureSlotsForAllDoctors();
+
             String fxml = (panel instanceof DoctorControlPanel)
                     ? "/gui/doctor_panel.fxml"
                     : "/gui/patient_panel.fxml";
@@ -70,4 +74,5 @@ public class LoginController {
 
         }
     }
-    }
+}
+

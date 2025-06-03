@@ -13,11 +13,12 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
     @Override
     public int save(Appointment a) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO appointments (patient_id, doctor_id, slot_id, status) VALUES (?, ?, ?, ?)") ) {
+                "INSERT INTO appointments (patient_id, doctor_id, slot_id, status, problem_description) VALUES (?, ?, ?, ?, ?)") ) {
             stmt.setInt(1, a.patientId());
             stmt.setInt(2, a.doctorId());
             stmt.setInt(3, a.slotId());
             stmt.setString(4, a.status().name());
+            stmt.setString(5, a.problemDescription());
             stmt.executeUpdate();
             try (Statement s = conn.createStatement()) {
                 ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
@@ -40,12 +41,13 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
     @Override
     public void update(Appointment a) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "UPDATE appointments SET patient_id = ?, doctor_id = ?, slot_id = ?, status = ? WHERE id = ?")) {
+                "UPDATE appointments SET patient_id = ?, doctor_id = ?, slot_id = ?, status = ?, problem_description = ? WHERE id = ?")) {
             stmt.setInt(1, a.patientId());
             stmt.setInt(2, a.doctorId());
             stmt.setInt(3, a.slotId());
             stmt.setString(4, a.status().name());
-            stmt.setInt(5, a.id());
+            stmt.setString(5, a.problemDescription());
+            stmt.setInt(6, a.id());
             stmt.executeUpdate();
         } catch (SQLException e) { throw new RuntimeException(e); }
     }
@@ -61,7 +63,8 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
                         rs.getInt("patient_id"),
                         rs.getInt("doctor_id"),
                         rs.getInt("slot_id"),
-                        AppointmentStatus.valueOf(rs.getString("status")));
+                        AppointmentStatus.valueOf(rs.getString("status")),
+                        rs.getString("problem_description"));
             }
         } catch (SQLException e) { throw new RuntimeException(e); }
         return null;
@@ -78,7 +81,8 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
                         rs.getInt("patient_id"),
                         rs.getInt("doctor_id"),
                         rs.getInt("slot_id"),
-                        AppointmentStatus.valueOf(rs.getString("status"))));
+                        AppointmentStatus.valueOf(rs.getString("status")),
+                        rs.getString("problem_description")));
             }
         } catch (SQLException e) { throw new RuntimeException(e); }
         return list;

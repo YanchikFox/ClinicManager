@@ -15,13 +15,20 @@ public class Appointment {
     private final int doctorId;
     private int slotId;
     private AppointmentStatus status;
+    private final String problemDescription;
 
-    public Appointment(int id, int patientId, int doctorId, int slotId, AppointmentStatus status) {
+    public Appointment(int id, int patientId, int doctorId, int slotId, AppointmentStatus status, String problemDescription) {
         this.id = id;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.slotId = slotId;
         this.status = status;
+        this.problemDescription = problemDescription;
+    }
+
+    // Старый конструктор для обратной совместимости
+    public Appointment(int id, int patientId, int doctorId, int slotId, AppointmentStatus status) {
+        this(id, patientId, doctorId, slotId, status, "");
     }
 
     public int id() { return id; }
@@ -29,6 +36,7 @@ public class Appointment {
     public int doctorId() { return doctorId; }
     public int slotId() { return slotId; }
     public AppointmentStatus status() { return status; }
+    public String problemDescription() { return problemDescription; }
 
     // Методы для изменения статуса
     public void confirm() { this.status = AppointmentStatus.CONFIRMED; }

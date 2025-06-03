@@ -6,32 +6,19 @@ import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.MedicalCard;
 import com.clinicmanager.model.entities.Schedule;
-import com.clinicmanager.model.enums.Role;
-import com.clinicmanager.repository.*;
-import com.clinicmanager.security.HashUtil;
-import com.clinicmanager.exception.RegistrationException;
-
-import java.util.Set;
-
-//package com.clinicmanager.service;
-
-import com.clinicmanager.gui.AppContext;
-import com.clinicmanager.model.actors.Account;
-import com.clinicmanager.model.actors.Doctor;
-import com.clinicmanager.model.actors.Patient;
-import com.clinicmanager.model.entities.MedicalCard;
-import com.clinicmanager.model.entities.Schedule;
 import com.clinicmanager.model.entities.Slot;
 import com.clinicmanager.model.entities.TimeRange;
 import com.clinicmanager.model.enums.Role;
 import com.clinicmanager.repository.*;
 import com.clinicmanager.security.HashUtil;
 import com.clinicmanager.exception.RegistrationException;
+import com.clinicmanager.time.TimeManager;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
+import java.util.List;
 
 public class RegistrationService {
     private static final Set<String> VALID_LICENSES = Set.of("DOC123", "DOC456", "SURG2025");
@@ -67,8 +54,9 @@ public class RegistrationService {
         Doctor updatedDoctor = new Doctor(doctorId, name, dateOfBirth, phone, scheduleId);
         doctorRepository.update(updatedDoctor);
 
-        LocalDate today = LocalDate.now();
-        for (int i = 0; i < 7; i++) {
+        // --- Создаём слоты на 3 дня вперёд от текущего виртуального времени ---
+        LocalDate today = TimeManager.getInstance().getCurrentTime().toLocalDate();
+        for (int i = 0; i < 3; i++) {
             LocalDate date = today.plusDays(i);
             if (isWeekday(date)) {
                 for (int hour = 9; hour < 17; hour++) {

@@ -1,7 +1,15 @@
 package com.clinicmanager.gui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import com.clinicmanager.time.TimeManager;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 public class PatientPanelController {
 
@@ -11,6 +19,13 @@ public class PatientPanelController {
     @FXML private Button logoutBtn;
     @FXML private Button notificationsBtn;
     @FXML private Button favoriteDoctorsBtn;
+    @FXML private Label virtualTimeLabel;
+    @FXML private Button startTimeBtn;
+    @FXML private Button stopTimeBtn;
+    @FXML private Button setTimeBtn;
+
+    private final TimeManager timeManager = TimeManager.getInstance();
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @FXML
     private void initialize() {
@@ -115,6 +130,49 @@ public class PatientPanelController {
                 stage.show();
             } catch (Exception ex) {
                 ex.printStackTrace();
+            }
+        });
+
+        // Виртуальное время
+        updateTimeLabel(timeManager.getCurrentTime());
+        timeManager.addListener(this::onTimeChanged);
+        startTimeBtn.setOnAction(e -> timeManager.start());
+        stopTimeBtn.setOnAction(e -> timeManager.stop());
+        setTimeBtn.setOnAction(e -> handleSetTime());
+    }
+
+    private void updateTimeLabel(LocalDateTime time) {
+        Platform.runLater(() -> virtualTimeLabel.setText(dtf.format(time)));
+    }
+
+    private void onTimeChanged(LocalDateTime time) {
+        updateTimeLabel(time);
+        // Автоматически обновлять все открытые окна пациента при изменении времени
+        javafx.application.Platform.runLater(() -> {
+            // Обновить окно визитов пациента, если оно открыто
+            for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
+                if (window.isShowing() && window.getScene() != null && window.getScene().getRoot() instanceof javafx.scene.Parent) {
+                    javafx.scene.Parent root = (javafx.scene.Parent) window.getScene().getRoot();
+                    Object controller = root.getProperties().get("fx:controller");
+                    if (controller instanceof PatientAppointmentsController) {
+                        ((PatientAppointmentsController) controller).reloadAppointments();
+                    }
+                }
+            }
+        });
+    }
+
+    private void handleSetTime() {
+        TextInputDialog dialog = new TextInputDialog(dtf.format(timeManager.getCurrentTime()));
+        dialog.setTitle("Ustaw czas systemowy");
+        dialog.setHeaderText("Podaj nowy czas (yyyy-MM-dd HH:mm):");
+        dialog.setContentText("Czas:");
+        dialog.showAndWait().ifPresent(str -> {
+            try {
+                LocalDateTime newTime = LocalDateTime.parse(str, dtf);
+                timeManager.setCurrentTime(newTime);
+            } catch (Exception ex) {
+                new Alert(Alert.AlertType.ERROR, "Nieprawidłowy format czasu!", ButtonType.OK).showAndWait();
             }
         });
     }

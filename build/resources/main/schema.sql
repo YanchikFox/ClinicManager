@@ -53,7 +53,8 @@ CREATE TABLE IF NOT EXISTS appointments (
     patient_id INTEGER NOT NULL,
     doctor_id INTEGER NOT NULL,
     slot_id INTEGER NOT NULL,
-    status TEXT NOT NULL
+    status TEXT NOT NULL,
+    problem_description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS notifications (
@@ -62,5 +63,12 @@ CREATE TABLE IF NOT EXISTS notifications (
     message TEXT NOT NULL,
     timestamp TEXT NOT NULL,
     read BOOLEAN NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS favorite_doctors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id INTEGER NOT NULL,
+    doctor_id INTEGER NOT NULL,
+    UNIQUE(patient_id, doctor_id)
 );
 

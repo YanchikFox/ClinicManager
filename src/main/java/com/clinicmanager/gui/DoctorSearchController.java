@@ -110,13 +110,25 @@ public class DoctorSearchController {
             new Alert(Alert.AlertType.WARNING, "Już jesteś zapisany do tego lekarza na wybrany dzień!", ButtonType.OK).showAndWait();
             return;
         }
+        // Запросить у пациента описание проблемы
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Opis problemu");
+        dialog.setHeaderText("Podaj krótki opis problemu lub powodu wizyty:");
+        dialog.setContentText("Opis:");
+        var result = dialog.showAndWait();
+        if (result.isEmpty() || result.get().isBlank()) {
+            new Alert(Alert.AlertType.WARNING, "Musisz podać opis problemu!", ButtonType.OK).showAndWait();
+            return;
+        }
+        String problemDescription = result.get();
         // Создаём Appointment
         var appointment = new com.clinicmanager.model.entities.Appointment(
                 -1,
                 patient.id(),
                 selectedDoctor.id(),
                 selectedSlot.id(),
-                com.clinicmanager.model.enums.AppointmentStatus.PENDING
+                com.clinicmanager.model.enums.AppointmentStatus.PENDING,
+                problemDescription
         );
         repos.appointments.save(appointment);
         // Обновляем список слотов

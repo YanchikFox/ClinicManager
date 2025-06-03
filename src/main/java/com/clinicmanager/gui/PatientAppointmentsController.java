@@ -54,17 +54,37 @@ public class PatientAppointmentsController {
         cancelBtn.setDisable(true);
         rescheduleBtn.setDisable(true);
         confirmBtn.setDisable(true);
+        // --- Сохраняем контроллер в свойствах root для глобального обновления ---
+        javafx.application.Platform.runLater(() -> {
+            if (appointmentsListView.getScene() != null && appointmentsListView.getScene().getRoot() != null) {
+                appointmentsListView.getScene().getRoot().getProperties().put("fx:controller", this);
+            }
+        });
+    }
+
+    // --- Публичный метод для обновления списка визитов ---
+    public void reloadAppointments() {
+        Patient patient = (Patient) AppContext.getPanel().currentPerson();
+        List<Appointment> all = repos.appointments.findAll();
+        myAppointments = all.stream()
+                .filter(a -> a.patientId() == patient.id() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
+                .toList();
+        updateList();
     }
 
     private void updateList() {
         List<String> display = myAppointments.stream().map(a -> {
             Doctor doc = a.getDoctor();
             Slot slot = a.getSlot();
+            String doctorName = (doc != null) ? doc.name() : "?";
+            String date = (slot != null) ? slot.date().toString() : "?";
+            String timeStart = (slot != null) ? slot.timeRange().start().toString() : "?";
+            String timeEnd = (slot != null) ? slot.timeRange().end().toString() : "?";
             return String.format("Lekarz: %s | Data: %s | Godzina: %s-%s | Status: %s",
-                    doc.name(),
-                    slot.date(),
-                    slot.timeRange().start(),
-                    slot.timeRange().end(),
+                    doctorName,
+                    date,
+                    timeStart,
+                    timeEnd,
                     a.status().name());
         }).toList();
         infoLabel.setText("Twoje aktywne wizyty:");
