@@ -1,42 +1,51 @@
 <project name="ClinicManager" default="run" basedir=".">
-    <!-- Java version -->
-    <property name="src.dir" value="src"/>
+    <property name="src.dir" value="src/main/java"/>
     <property name="build.dir" value="build"/>
-    <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="lib.dir" value="lib"/>
     <property name="main.class" value="com.clinicmanager.gui.MainFX"/>
 
-    <!-- JavaFX settings -->
-    <property name="javafx.version" value="21.0.1"/>
-
     <path id="classpath">
-        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <fileset dir="${lib.dir}">
+            <include name="sqlite-jdbc-3.43.2.1.jar"/>
+            <include name="slf4j-api-2.0.13.jar"/>
+            <include name="slf4j-simple-2.0.13.jar"/>
+            <include name="javafx-*.jar"/>
+        </fileset>
     </path>
 
     <target name="clean">
         <delete dir="${build.dir}"/>
     </target>
 
-    <target name="prepare">
-        <mkdir dir="${classes.dir}"/>
-    </target>
-
-    <target name="compile" depends="prepare">
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" source="17" target="17">
+    <target name="compile">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="17" target="17">
             <classpath refid="classpath"/>
         </javac>
     </target>
 
     <target name="run" depends="compile">
-        <java fork="true" classname="${main.class}">
-            <classpath>
-                <pathelement path="${classes.dir}"/>
-                <path refid="classpath"/>
-            </classpath>
+        <java classname="${main.class}" fork="true">
             <jvmarg value="--module-path"/>
-            <jvmarg value="${lib.dir}/javafx-sdk-${javafx.version}/lib"/>
+            <jvmarg value="lib"/> <!-- zakłada, że JavaFX JARy są w lib/ -->
             <jvmarg value="--add-modules"/>
             <jvmarg value="javafx.controls,javafx.fxml"/>
+            <jvmarg value="--module-path=lib"/>
+            <jvmarg value="--add-modules=javafx.controls,javafx.fxml"/>
+            <classpath>
+                <pathelement path="${build.dir}"/>
+                <path refid="classpath"/>
+            </classpath>
         </java>
     </target>
+    <copy todir="${build.dir}">
+        <fileset dir="src/main/resources"/>
+    </copy>
+
+
+    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false"
+           source="17" target="17" fork="true">
+        <compilerarg line="--module-path lib --add-modules javafx.controls,javafx.fxml"/>
+        <classpath refid="classpath"/>
+    </javac>
 </project>
