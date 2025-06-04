@@ -11,9 +11,9 @@ public class PatientControlPanel extends BaseControlPanel {
 
     public PatientControlPanel(String token, AccountManager accountManager, NotificationManager notificationManager) {
         super(token, accountManager, notificationManager);
-        // Получаем аккаунт по токену
+        // Pobieramy konto na podstawie tokenu
         Account acc = accountManager.getAccountByToken(token);
-        // Получаем пациента по ownerId
+        // Pobieramy pacjenta na podstawie ownerId
         RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         this.patient = repos.patients.findById(acc.ownerId());
     }
@@ -25,7 +25,7 @@ public class PatientControlPanel extends BaseControlPanel {
         return patient;
     }
 
-    // Пример защищённого метода: получить свою медкарту
+    // Przykładowa metoda chroniona: pobierz swoją kartę medyczną
     public com.clinicmanager.model.entities.MedicalCard viewMedicalCard() {
         requireValidToken();
         requirePatientRole();
@@ -33,14 +33,14 @@ public class PatientControlPanel extends BaseControlPanel {
         return repos.cards.findById(patient.medicalCardId());
     }
 
-    // Пример защищённого метода: получить список своих записей
+    // Przykładowa metoda chroniona: pobierz listę swoich wizyt
     public java.util.List<com.clinicmanager.model.entities.Appointment> getMyAppointments() {
         requireValidToken();
         requirePatientRole();
         com.clinicmanager.repository.RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         return repos.appointments.findAll().stream()
-            .filter(a -> a.patientId() == patient.id())
-            .toList();
+                .filter(a -> a.patientId() == patient.id())
+                .toList();
     }
 
     private void requirePatientRole() {

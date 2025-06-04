@@ -17,7 +17,7 @@ public class TimeTickHandler {
         RepositoryManager repos = AppContext.getRepositories();
         NotificationManager notificationManager = new NotificationManager(repos.notifications);
 
-        // 1. Удаление старых слотов
+        // 1. Usuwanie starych slotów
         List<Slot> slots = repos.slots.findAll();
         for (Slot slot : slots) {
             LocalDateTime slotEnd = LocalDateTime.of(slot.date(), slot.timeRange().end());
@@ -26,7 +26,7 @@ public class TimeTickHandler {
             }
         }
 
-        // 2. Завершение просроченных записей (Appointment)
+        // 2. Zakończenie przeterminowanych wizyt (Appointment)
         List<Appointment> appointments = repos.appointments.findAll();
         for (Appointment app : appointments) {
             Slot slot = app.getSlot();
@@ -39,22 +39,22 @@ public class TimeTickHandler {
             }
         }
 
-        // 3. Уведомления за 10 минут до приёма (только CONFIRMED/PENDING)
+        // 3. Powiadomienia na 10 minut przed wizytą (tylko CONFIRMED/PENDING)
         for (Appointment app : appointments) {
             Slot slot = app.getSlot();
             if (slot == null) continue;
             LocalDateTime slotStart = LocalDateTime.of(slot.date(), slot.timeRange().start());
             if (!app.status().equals(AppointmentStatus.ENDED) && !app.status().equals(AppointmentStatus.CANCELLED)) {
                 if (slotStart.minusMinutes(10).equals(now)) {
-                    // Уведомить доктора и пациента
+                    // Powiadom lekarza i pacjenta
                     notificationManager.createNotification(app.doctorId(), "Za 10 minut rozpocznie się przyjęcie.");
                     notificationManager.createNotification(app.patientId(), "Za 10 minut rozpocznie się Twoja wizyta.");
                 }
             }
         }
 
-        // 4. Обновить UI (все контроллеры должны слушать TimeManager)
-        // Контроллеры уже подписаны на TimeManager и обновят UI сами
+        // 4. Odśwież UI (wszystkie kontrolery muszą nasłuchiwać TimeManagera)
+        // Kontrolery są już podpięte do TimeManagera i same odświeżą UI
     }
 }
 

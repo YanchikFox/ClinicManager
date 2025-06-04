@@ -12,8 +12,10 @@ import javafx.scene.control.ListView;
 import java.util.List;
 
 public class MedicalCardController {
-    @FXML private Label cardInfoLabel;
-    @FXML private ListView<String> recordsListView;
+    @FXML
+    private Label cardInfoLabel;
+    @FXML
+    private ListView<String> recordsListView;
 
     private final RepositoryManager repos = AppContext.getRepositories();
     private Patient patient;
@@ -32,13 +34,13 @@ public class MedicalCardController {
         if (patient != null) {
             loadCard();
         } else {
-            // Если пациент не был передан явно, пробуем получить из AppContext
+            // Jeśli pacjent nie został przekazany jawnie, próbujemy pobrać z AppContext
             Object person = AppContext.getPanel().currentPerson();
             if (person instanceof Patient p) {
                 patient = p;
                 loadCard();
             } else {
-                // Если не пациент — ничего не делаем
+                // Jeśli nie pacjent — nic nie robimy
                 cardInfoLabel.setText("Błąd: brak danych pacjenta");
                 recordsListView.setItems(FXCollections.observableArrayList());
             }
@@ -47,7 +49,7 @@ public class MedicalCardController {
 
     private void loadCard() {
         if (patient == null) {
-            cardInfoLabel.setText("Błąd: brak данных pacjenta");
+            cardInfoLabel.setText("Błąd: brak danych pacjenta");
             recordsListView.setItems(FXCollections.observableArrayList());
             return;
         }
@@ -60,7 +62,6 @@ public class MedicalCardController {
         cardInfoLabel.setText("ID karty: " + card.id() + " | Pacjent: " + patient.name());
         List<MedicalRecord> records = card.getRecords();
         recordsListView.setItems(FXCollections.observableArrayList(
-                records.stream().map(r -> r.date() + ": " + r.description()).toList()
-        ));
+                records.stream().map(r -> r.date() + ": " + r.description()).toList()));
     }
 }

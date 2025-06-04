@@ -17,7 +17,8 @@ public class Appointment {
     private AppointmentStatus status;
     private final String problemDescription;
 
-    public Appointment(int id, int patientId, int doctorId, int slotId, AppointmentStatus status, String problemDescription) {
+    public Appointment(int id, int patientId, int doctorId, int slotId, AppointmentStatus status,
+            String problemDescription) {
         this.id = id;
         this.patientId = patientId;
         this.doctorId = doctorId;
@@ -26,27 +27,50 @@ public class Appointment {
         this.problemDescription = problemDescription;
     }
 
-    // Старый конструктор для обратной совместимости
+    // Stary konstruktor dla kompatybilności wstecznej
     public Appointment(int id, int patientId, int doctorId, int slotId, AppointmentStatus status) {
         this(id, patientId, doctorId, slotId, status, "");
     }
 
-    public int id() { return id; }
-    public int patientId() { return patientId; }
-    public int doctorId() { return doctorId; }
-    public int slotId() { return slotId; }
-    public AppointmentStatus status() { return status; }
-    public String problemDescription() { return problemDescription; }
+    public int id() {
+        return id;
+    }
 
-    // Методы для изменения статуса
-    public void confirm() { this.status = AppointmentStatus.CONFIRMED; }
-    public void cancel() { this.status = AppointmentStatus.CANCELLED; }
+    public int patientId() {
+        return patientId;
+    }
+
+    public int doctorId() {
+        return doctorId;
+    }
+
+    public int slotId() {
+        return slotId;
+    }
+
+    public AppointmentStatus status() {
+        return status;
+    }
+
+    public String problemDescription() {
+        return problemDescription;
+    }
+
+    // Metody do zmiany statusu
+    public void confirm() {
+        this.status = AppointmentStatus.CONFIRMED;
+    }
+
+    public void cancel() {
+        this.status = AppointmentStatus.CANCELLED;
+    }
+
     public void reschedule(int newSlotId) {
         this.slotId = newSlotId;
         this.status = AppointmentStatus.PENDING;
     }
 
-    // Методы для отмены, переноса и подтверждения записи
+    // Metody do anulowania, przełożenia i potwierdzenia wizyty
     public void cancel(AppointmentRepository repo) {
         this.status = AppointmentStatus.CANCELLED;
         repo.update(this);
@@ -68,15 +92,17 @@ public class Appointment {
         repo.update(this);
     }
 
-    // Методы для получения связанных объектов (по id)
+    // Metody do pobierania powiązanych obiektów (po id)
     public Patient getPatient() {
         PatientRepository repo = AppContext.getInstance().getRepositories().patients;
         return repo.findById(patientId);
     }
+
     public Doctor getDoctor() {
         DoctorRepository repo = AppContext.getInstance().getRepositories().doctors;
         return repo.findById(doctorId);
     }
+
     public Slot getSlot() {
         SlotRepository repo = AppContext.getInstance().getRepositories().slots;
         return repo.findById(slotId);

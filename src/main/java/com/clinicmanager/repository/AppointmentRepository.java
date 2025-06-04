@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentRepository extends AbstractDatabaseManager<Appointment> {
-    public AppointmentRepository(String dbUrl) { super(dbUrl); }
+    public AppointmentRepository(String dbUrl) {
+        super(dbUrl);
+    }
 
     @Override
     public int save(Appointment a) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO appointments (patient_id, doctor_id, slot_id, status, problem_description) VALUES (?, ?, ?, ?, ?)") ) {
+                "INSERT INTO appointments (patient_id, doctor_id, slot_id, status, problem_description) VALUES (?, ?, ?, ?, ?)")) {
             stmt.setInt(1, a.patientId());
             stmt.setInt(2, a.doctorId());
             stmt.setInt(3, a.slotId());
@@ -27,7 +29,9 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
                 }
             }
             throw new RuntimeException("No ID returned for appointment");
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -35,7 +39,9 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
         try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM appointments WHERE id = ?")) {
             stmt.setInt(1, a.id());
             stmt.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -49,7 +55,9 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
             stmt.setString(5, a.problemDescription());
             stmt.setInt(6, a.id());
             stmt.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -66,7 +74,9 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
                         AppointmentStatus.valueOf(rs.getString("status")),
                         rs.getString("problem_description"));
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
@@ -84,7 +94,9 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
                         AppointmentStatus.valueOf(rs.getString("status")),
                         rs.getString("problem_description")));
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return list;
     }
 
@@ -94,14 +106,12 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
     }
 
     public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
-        // Проверяем, есть ли уже запись у этого пациента к этому врачу на эту дату
-        return findAll().stream().noneMatch(a ->
-                a.patientId() == patientId &&
+        // Sprawdzamy, czy pacjent ma już wizytę u tego lekarza w tym dniu
+        return findAll().stream().noneMatch(a -> a.patientId() == patientId &&
                 a.doctorId() == doctorId &&
                 getSlotDateSafe(a) != null &&
                 getSlotDateSafe(a).equals(date) &&
-                !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED)
-        );
+                !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED));
     }
 
     private java.time.LocalDate getSlotDateSafe(com.clinicmanager.model.entities.Appointment a) {

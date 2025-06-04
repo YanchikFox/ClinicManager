@@ -17,6 +17,7 @@ public class Account {
         this.role = role;
         this.ownerId = ownerId;
     }
+
     public Account(int id, String email, String passwordOrHash, Role role, int ownerId, boolean hashed) {
         this.id = id;
         this.email = email;
@@ -26,14 +27,28 @@ public class Account {
     }
 
     public boolean validatePassword(String rawPassword) {
-        // Сравниваем хеш введённого пароля с сохранённым хешем
+        // Porównujemy hash wprowadzonego hasła z zapisanym hashem
         return this.passwordHash.equals(HashUtil.sha256(rawPassword));
     }
 
-    // Геттеры для доступа к полям
-    public int id() { return id; }
-    public String email() { return email; }
-    public String passwordHash() { return passwordHash; }
-    public Role role() { return role; }
-    public int ownerId() { return ownerId; }
+    // Gettery do pól
+    public int id() {
+        return id;
+    }
+
+    public String email() {
+        return email;
+    }
+
+    public String passwordHash() {
+        return passwordHash;
+    }
+
+    public Role role() {
+        return role;
+    }
+
+    public int ownerId() {
+        return ownerId;
+    }
 }

@@ -22,7 +22,8 @@ public class PatientRepository extends AbstractDatabaseManager<Patient> {
             stmt.executeUpdate();
             try (Statement s = conn.createStatement()) {
                 ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
-                if (rs2.next()) return rs2.getInt(1);
+                if (rs2.next())
+                    return rs2.getInt(1);
             }
             throw new RuntimeException("No ID returned for patient");
         } catch (SQLException e) {
@@ -66,8 +67,7 @@ public class PatientRepository extends AbstractDatabaseManager<Patient> {
                         rs.getString("name"),
                         rs.getString("date_of_birth"),
                         rs.getString("phone_number"),
-                        rs.getInt("medical_card_id")
-                );
+                        rs.getInt("medical_card_id"));
             }
         } catch (SQLException e) {
             throw new RuntimeException("DB error", e);
@@ -86,8 +86,7 @@ public class PatientRepository extends AbstractDatabaseManager<Patient> {
                         rs.getString("name"),
                         rs.getString("date_of_birth"),
                         rs.getString("phone_number"),
-                        rs.getInt("medical_card_id")
-                ));
+                        rs.getInt("medical_card_id")));
             }
         } catch (SQLException e) {
             throw new RuntimeException("DB error", e);
@@ -97,17 +96,17 @@ public class PatientRepository extends AbstractDatabaseManager<Patient> {
 
     @Override
     public Patient findByEmail(String email) {
-        return null; // Не используется
+        return null; // Nie używane
     }
 
     public List<Integer> getPatientIdsOfDoctor(int doctorId) {
         List<Integer> patientIds = new ArrayList<>();
         String sql = """
-            SELECT DISTINCT p.id
-            FROM patients p
-            JOIN appointments a ON p.id = a.patient_id
-            WHERE a.doctor_id = ?
-        """;
+                    SELECT DISTINCT p.id
+                    FROM patients p
+                    JOIN appointments a ON p.id = a.patient_id
+                    WHERE a.doctor_id = ?
+                """;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();

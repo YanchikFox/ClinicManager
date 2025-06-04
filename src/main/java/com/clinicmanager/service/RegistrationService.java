@@ -40,7 +40,7 @@ public class RegistrationService {
     }
 
     public void registerDoctor(String email, String rawPassword, String name, String dateOfBirth,
-                               String phone, String licenseCode) {
+            String phone, String licenseCode) {
         if (!VALID_LICENSES.contains(licenseCode)) {
             throw new RegistrationException("Invalid license code: " + licenseCode);
         }
@@ -54,7 +54,7 @@ public class RegistrationService {
         Doctor updatedDoctor = new Doctor(doctorId, name, dateOfBirth, phone, scheduleId);
         doctorRepository.update(updatedDoctor);
 
-        // --- Создаём слоты на 3 дня вперёд от текущего виртуального времени ---
+        // --- Tworzymy sloty na 3 dni do przodu od aktualnego wirtualnego czasu ---
         LocalDate today = TimeManager.getInstance().getCurrentTime().toLocalDate();
         for (int i = 0; i < 3; i++) {
             LocalDate date = today.plusDays(i);

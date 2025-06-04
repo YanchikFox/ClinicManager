@@ -12,14 +12,22 @@ import com.clinicmanager.time.TimeManager;
 import java.time.LocalDateTime;
 
 public class DoctorPanelController {
-    @FXML private Button viewScheduleBtn;
-    @FXML private Button viewAppointmentsBtn;
-    @FXML private Button viewMedicalCardBtn;
-    @FXML private Button logoutBtn;
-    @FXML private Label virtualTimeLabel;
-    @FXML private Button startTimeBtn;
-    @FXML private Button stopTimeBtn;
-    @FXML private Button setTimeBtn;
+    @FXML
+    private Button viewScheduleBtn;
+    @FXML
+    private Button viewAppointmentsBtn;
+    @FXML
+    private Button viewMedicalCardBtn;
+    @FXML
+    private Button logoutBtn;
+    @FXML
+    private Label virtualTimeLabel;
+    @FXML
+    private Button startTimeBtn;
+    @FXML
+    private Button stopTimeBtn;
+    @FXML
+    private Button setTimeBtn;
 
     private final TimeManager timeManager = TimeManager.getInstance();
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -30,7 +38,8 @@ public class DoctorPanelController {
         // Otwórz okno z grafikiem lekarza
         viewScheduleBtn.setOnAction(e -> {
             try {
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_schedule.fxml"));
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                        getClass().getResource("/gui/doctor_schedule.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
                 stage.setTitle("Mój grafik");
@@ -44,7 +53,8 @@ public class DoctorPanelController {
         // Otwórz okno z wizytami lekarza
         viewAppointmentsBtn.setOnAction(e -> {
             try {
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_appointments.fxml"));
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                        getClass().getResource("/gui/doctor_appointments.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
                 stage.setTitle("Moje wizyty");
@@ -58,7 +68,8 @@ public class DoctorPanelController {
         // Otwórz okno z listą pacjentów
         viewMedicalCardBtn.setOnAction(e -> {
             try {
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_patients.fxml"));
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                        getClass().getResource("/gui/doctor_patients.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
                 stage.setTitle("Moi pacjenci");
@@ -76,7 +87,8 @@ public class DoctorPanelController {
                 if (panel != null) {
                     panel.revokeToken();
                 }
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                        getClass().getResource("/gui/start_menu.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = (javafx.stage.Stage) logoutBtn.getScene().getWindow();
                 stage.setScene(scene);
@@ -85,7 +97,7 @@ public class DoctorPanelController {
             }
         });
 
-        // Виртуальное время
+        // Wirtualny czas
         updateTimeLabel(timeManager.getCurrentTime());
         timeManager.addListener(this::onTimeChanged);
         startTimeBtn.setOnAction(e -> timeManager.start());
@@ -99,35 +111,35 @@ public class DoctorPanelController {
 
     private void onTimeChanged(LocalDateTime time) {
         updateTimeLabel(time);
-        // Глобальное обновление UI и данных
+        // Usuń wszystkie wolne sloty, które są całkowicie w przeszłości (koniec < teraz)
         var slotRepo = com.clinicmanager.gui.AppContext.getRepositories().slots;
         var appointmentRepo = com.clinicmanager.gui.AppContext.getRepositories().appointments;
-        // Удаляем все свободные слоты, которые полностью в прошлом (конец < now)
         slotRepo.findAll().forEach(slot -> {
             LocalDateTime slotEnd = LocalDateTime.of(slot.date(), slot.timeRange().end());
             boolean isPast = slotEnd.isBefore(time);
             boolean hasActiveAppointment = appointmentRepo.findAll().stream()
-                .anyMatch(a -> a.slotId() == slot.id() && !a.status().name().equals("CANCELLED"));
+                    .anyMatch(a -> a.slotId() == slot.id() && !a.status().name().equals("CANCELLED"));
             if (isPast && !hasActiveAppointment) {
                 slotRepo.delete(slot);
             }
         });
-        // --- Новое: удаляем все свободные слоты, которые начинаются после текущего времени (будущее) ---
+        // --- Nowość: usuń wszystkie wolne sloty, które zaczynają się po aktualnym czasie (przyszłość) ---
         slotRepo.findAll().forEach(slot -> {
             LocalDateTime slotStart = LocalDateTime.of(slot.date(), slot.timeRange().start());
             boolean isFuture = slotStart.isAfter(time);
             boolean hasActiveAppointment = appointmentRepo.findAll().stream()
-                .anyMatch(a -> a.slotId() == slot.id() && !a.status().name().equals("CANCELLED"));
+                    .anyMatch(a -> a.slotId() == slot.id() && !a.status().name().equals("CANCELLED"));
             if (isFuture && !hasActiveAppointment) {
                 slotRepo.delete(slot);
             }
         });
-        // --- Автогенерация слотов для всех докторов после смены времени ---
+        // --- Autogenerowanie slotów dla wszystkich lekarzy po zmianie czasu ---
         slotAutoGeneratorService.ensureFutureSlotsForAllDoctors();
-        // --- Обновить все открытые окна/контроллеры (например, списки визитов, расписание) ---
+        // --- Odśwież wszystkie otwarte okna/kontrolery (np. listy wizyt, grafik) ---
         javafx.application.Platform.runLater(() -> {
             for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
-                if (window.isShowing() && window.getScene() != null && window.getScene().getRoot() instanceof javafx.scene.Parent) {
+                if (window.isShowing() && window.getScene() != null
+                        && window.getScene().getRoot() instanceof javafx.scene.Parent) {
                     javafx.scene.Parent root = (javafx.scene.Parent) window.getScene().getRoot();
                     Object controller = root.getProperties().get("fx:controller");
                     if (controller instanceof com.clinicmanager.gui.DoctorAppointmentsController) {
@@ -139,7 +151,7 @@ public class DoctorPanelController {
                 }
             }
         });
-        // TODO: отправлять уведомления за 10 минут до приёма
+        // TODO: wysyłaj powiadomienia na 10 minut przed wizytą
     }
 
     private void handleSetTime() {
