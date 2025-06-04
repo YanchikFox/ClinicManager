@@ -27,15 +27,27 @@ public class Slot {
         this(-1, scheduleId, date, timeRange);
     }
 
-    public int id() { return id; }
-    public int scheduleId() { return scheduleId; }
-    public LocalDate date() { return date; }
-    public TimeRange timeRange() { return timeRange; }
+    public int id() {
+        return id;
+    }
 
-    // Проверяет, свободен ли слот (нет ли активной записи на этот слот)
+    public int scheduleId() {
+        return scheduleId;
+    }
+
+    public LocalDate date() {
+        return date;
+    }
+
+    public TimeRange timeRange() {
+        return timeRange;
+    }
+
+    // Sprawdza, czy slot jest wolny (czy nie ma aktywnej wizyty na ten slot)
     public boolean isAvailable() {
-        // Слот занят, если есть запись с этим slotId и статус не CANCELLED
+        // Slot zajęty, jeśli jest wizyta z tym slotId i status różny od CANCELLED
         return appointmentRepository.findAll().stream()
-            .noneMatch(a -> a.slotId() == id && !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED));
+                .noneMatch(a -> a.slotId() == id
+                        && !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED));
     }
 }

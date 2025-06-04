@@ -23,11 +23,12 @@ public class AccountRepository extends AbstractDatabaseManager<Account> {
             stmt.executeUpdate();
             try (Statement s = conn.createStatement()) {
                 ResultSet rs2 = s.executeQuery("SELECT last_insert_rowid()");
-                if (rs2.next()) return rs2.getInt(1);
+                if (rs2.next())
+                    return rs2.getInt(1);
             }
             throw new RuntimeException("No ID returned for account");
         } catch (SQLException e) {
-            // Добавим вывод оригинального сообщения SQL-ошибки для диагностики
+            // Dodajemy wyświetlanie oryginalnej wiadomości błędu SQL do diagnostyki
             throw new RuntimeException("Failed to save account: " + e.getMessage(), e);
         }
     }
@@ -106,7 +107,7 @@ public class AccountRepository extends AbstractDatabaseManager<Account> {
                 rs.getString("password_hash"),
                 Role.valueOf(rs.getString("role")),
                 rs.getInt("owner_id"),
-                true // пароль уже захеширован в базе
+                true // hasło już jest zahaszowane w bazie
         );
     }
 }

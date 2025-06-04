@@ -13,14 +13,15 @@ public class TimeManager {
     private final List<Consumer<LocalDateTime>> listeners = new ArrayList<>();
     private Timer timer;
     private boolean running = false;
-    private int speedSecondsPerTick = 10; // 1 минута = 10 секунд
+    private int speedSecondsPerTick = 10; // 1 minuta = 10 sekund
 
     private TimeManager() {
         this.currentTime = LocalDateTime.now();
     }
 
     public static TimeManager getInstance() {
-        if (instance == null) instance = new TimeManager();
+        if (instance == null)
+            instance = new TimeManager();
         return instance;
     }
 
@@ -42,11 +43,13 @@ public class TimeManager {
     }
 
     private void notifyListeners() {
-        for (var l : listeners) l.accept(currentTime);
+        for (var l : listeners)
+            l.accept(currentTime);
     }
 
     public void start() {
-        if (running) return;
+        if (running)
+            return;
         running = true;
         timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -54,14 +57,15 @@ public class TimeManager {
             public void run() {
                 currentTime = currentTime.plusMinutes(1);
                 notifyListeners();
-                // --- Глобальная обработка времени ---
+                // --- Globalna obsługa czasu ---
                 com.clinicmanager.time.TimeTickHandler.handleTimeTick(currentTime);
             }
         }, speedSecondsPerTick * 1000, speedSecondsPerTick * 1000);
     }
 
     public void stop() {
-        if (timer != null) timer.cancel();
+        if (timer != null)
+            timer.cancel();
         running = false;
     }
 

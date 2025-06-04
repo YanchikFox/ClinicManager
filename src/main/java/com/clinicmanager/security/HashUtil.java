@@ -10,7 +10,7 @@ public class HashUtil {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
 
-            // Преобразуем в hex
+            // Konwertujemy na hex
             StringBuilder hex = new StringBuilder();
             for (byte b : hashBytes) {
                 hex.append(String.format("%02x", b));

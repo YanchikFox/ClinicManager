@@ -48,7 +48,7 @@ public class LoginController {
             BaseControlPanel panel = clinic.login(email, pass);
             AppContext.setPanel(panel);
 
-            // --- Автогенерация слотов для всех докторов при входе ---
+            // --- Autogenerowanie slotów dla wszystkich lekarzy przy logowaniu ---
             new SlotAutoGeneratorService().ensureFutureSlotsForAllDoctors();
 
             String fxml = (panel instanceof DoctorControlPanel)
@@ -75,4 +75,3 @@ public class LoginController {
         }
     }
 }
-

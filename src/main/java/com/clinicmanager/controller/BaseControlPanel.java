@@ -12,6 +12,7 @@ public abstract class BaseControlPanel {
     protected final String token;
     protected final AccountManager accountManager;
     protected final NotificationManager notificationManager;
+
     protected BaseControlPanel(String token, AccountManager accountManager, NotificationManager notificationManager) {
         this.token = token;
         this.accountManager = accountManager;
@@ -23,9 +24,10 @@ public abstract class BaseControlPanel {
             throw new InvalidTokenException("Access denied: invalid token");
         }
     }
+
     public void demoAction() {
         requireValidToken();
-        System.out.println("Токен действителен — доступ к функции разрешён.");
+        System.out.println("Token jest ważny — dostęp do funkcji dozwolony.");
     }
 
     public List<Notification> viewNotifications() {

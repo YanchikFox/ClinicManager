@@ -1,4 +1,26 @@
-CREATE TABLE IF NOT EXISTS accounts (
+// ...existing code...
+    public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
+        // Sprawdzamy, czy pacjent ma już wizytę u tego lekarza w tym dniu
+        return findAll().stream().noneMatch(a ->
+                a.patientId() == patientId &&
+                a.doctorId() == doctorId &&
+                getSlotDateSafe(a) != null &&
+                getSlotDateSafe(a).equals(date) &&
+                !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED)
+        );
+    }
+// ...existing code...// ...existing code...
+    public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
+        // Sprawdzamy, czy pacjent ma już wizytę u tego lekarza w tym dniu
+        return findAll().stream().noneMatch(a ->
+                a.patientId() == patientId &&
+                a.doctorId() == doctorId &&
+                getSlotDateSafe(a) != null &&
+                getSlotDateSafe(a).equals(date) &&
+                !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED)
+        );
+    }
+// ...existing code...CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,

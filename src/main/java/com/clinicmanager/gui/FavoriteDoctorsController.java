@@ -13,10 +13,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FavoriteDoctorsController {
-    @FXML private ListView<Doctor> favoriteDoctorsListView;
-    @FXML private Button showDoctorBtn;
-    @FXML private Button removeFavoriteBtn;
-    @FXML private Button closeBtn;
+    @FXML
+    private ListView<Doctor> favoriteDoctorsListView;
+    @FXML
+    private Button showDoctorBtn;
+    @FXML
+    private Button removeFavoriteBtn;
+    @FXML
+    private Button closeBtn;
 
     private final RepositoryManager repos = AppContext.getRepositories();
     private Patient currentPatient;
@@ -62,12 +66,14 @@ public class FavoriteDoctorsController {
     }
 
     private void handleShowDoctor() {
-        if (selectedDoctor == null) return;
+        if (selectedDoctor == null)
+            return;
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/doctor_search.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/gui/doctor_search.fxml"));
             javafx.scene.Parent root = loader.load();
             DoctorSearchController controller = loader.getController();
-            // Передаём выбранного врача в контроллер поиска
+            // Przekazujemy wybranego lekarza do kontrolera wyszukiwania
             controller.selectDoctor(selectedDoctor);
             javafx.scene.Scene scene = new javafx.scene.Scene(root);
             javafx.stage.Stage stage = new javafx.stage.Stage();
@@ -80,11 +86,11 @@ public class FavoriteDoctorsController {
     }
 
     private void handleRemoveFavorite() {
-        if (selectedDoctor == null) return;
+        if (selectedDoctor == null)
+            return;
         repos.favoriteDoctors.deleteByPatientAndDoctor(currentPatient.id(), selectedDoctor.id());
         loadFavoriteDoctors();
         showDoctorBtn.setDisable(true);
         removeFavoriteBtn.setDisable(true);
     }
 }
-

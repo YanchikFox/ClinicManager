@@ -32,17 +32,20 @@ public class SlotAutoGeneratorService {
                 LocalDate date = virtualToday.plusDays(i);
                 if (isWeekday(date)) {
                     int startHour = (i == 0)
-                        ? Math.max(9, virtualNowTime.getMinute() > 0 ? virtualNowTime.getHour() + 1 : virtualNowTime.getHour())
-                        : 9;
-                    if (startHour >= 17) continue;
-                    // Получаем только слоты для этого scheduleId и date
+                            ? Math.max(9,
+                                    virtualNowTime.getMinute() > 0 ? virtualNowTime.getHour() + 1
+                                            : virtualNowTime.getHour())
+                            : 9;
+                    if (startHour >= 17)
+                        continue;
+                    // Pobieramy tylko sloty dla tego scheduleId i date
                     List<Slot> slotsForDay = slotRepository.findAll().stream()
-                        .filter(s -> s.scheduleId() == scheduleId && s.date().equals(date))
-                        .toList();
+                            .filter(s -> s.scheduleId() == scheduleId && s.date().equals(date))
+                            .toList();
                     for (int hour = startHour; hour < 17; hour++) {
                         final int slotHour = hour;
                         boolean exists = slotsForDay.stream()
-                            .anyMatch(s -> s.timeRange().start().getHour() == slotHour);
+                                .anyMatch(s -> s.timeRange().start().getHour() == slotHour);
                         if (!exists) {
                             TimeRange range = new TimeRange(LocalTime.of(hour, 0), LocalTime.of(hour + 1, 0));
                             Slot slot = new Slot(scheduleId, date, range);
