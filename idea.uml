@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>/Users/th/IdeaProjects/ClinicManager copy</OriginalElement>
+  <nodes>
+    <node x="1694.0" y="2198.0">com.clinicmanager.exception.AuthenticationException</node>
+    <node x="1038.0" y="2198.0">com.clinicmanager.repository.DatabaseInitializer</node>
+    <node x="1677.0" y="1226.0">com.clinicmanager.model.actors.Patient</node>
+    <node x="1867.0" y="2036.0">com.clinicmanager.gui.LoginController</node>
+    <node x="1660.0" y="1564.0">com.clinicmanager.model.entities.MedicalRecord</node>
+    <node x="1374.0" y="1564.0">com.clinicmanager.gui.AppContext</node>
+    <node x="493.0" y="1564.0">com.clinicmanager.model.actors.Account</node>
+    <node x="-188.0" y="2036.0">com.clinicmanager.service.RegistrationService</node>
+    <node x="1542.25" y="987.0">com.clinicmanager.model.actors.Person</node>
+    <node x="-188.0" y="1834.0">com.clinicmanager.model.entities.Schedule</node>
+    <node x="856.0" y="2036.0">com.clinicmanager.service.SlotAutoGeneratorService</node>
+    <node x="1047.0" y="355.0">com.clinicmanager.repository.Repository</node>
+    <node x="168.0" y="987.0">com.clinicmanager.model.entities.Appointment</node>
+    <node x="1477.0" y="1834.0">com.clinicmanager.gui.DoctorPanelController</node>
+    <node x="-178.0" y="89.0">com.clinicmanager.gui.DoctorScheduleController.SlotTableRow</node>
+    <node x="1139.0" y="2036.0">com.clinicmanager.model.entities.TimeRange</node>
+    <node x="-4.0" y="705.0">com.clinicmanager.repository.FavoriteDoctorRepository</node>
+    <node x="869.0" y="705.0">com.clinicmanager.repository.ScheduleRepository</node>
+    <node x="736.5" y="987.0">com.clinicmanager.controller.BaseControlPanel</node>
+    <node x="1496.0" y="2198.0">com.clinicmanager.security.HashUtil</node>
+    <node x="1001.0" y="558.0">com.clinicmanager.repository.AbstractDatabaseManager</node>
+    <node x="933.0" y="1194.0">com.clinicmanager.controller.DoctorControlPanel</node>
+    <node x="1088.0" y="1564.0">com.clinicmanager.gui.PatientAppointmentsController</node>
+    <node x="815.0" y="1564.0">com.clinicmanager.model.entities.Slot</node>
+    <node x="1603.0" y="725.0">com.clinicmanager.repository.MedicalRecordRepository</node>
+    <node x="2106.0" y="725.0">com.clinicmanager.repository.PatientRepository</node>
+    <node x="-152.5" y="987.0">com.clinicmanager.gui.DoctorAppointmentsController</node>
+    <node x="435.0" y="2036.0">com.clinicmanager.gui.StartMenuController</node>
+    <node x="1115.0" y="1834.0">com.clinicmanager.service.AccountManager</node>
+    <node x="791.0" y="2198.0">com.clinicmanager.gui.DoctorPatientsController</node>
+    <node x="1764.0" y="1834.0">com.clinicmanager.gui.FavoriteDoctorsController</node>
+    <node x="512.0" y="2198.0">com.clinicmanager.time.TimeTickHandler</node>
+    <node x="480.0" y="1834.0">com.clinicmanager.model.entities.MedicalCard</node>
+    <node x="1350.0" y="1174.0">com.clinicmanager.model.actors.Doctor</node>
+    <node x="1144.0" y="735.0">com.clinicmanager.repository.MedicalCardRepository</node>
+    <node x="1948.0" y="2198.0">com.clinicmanager.exception.InvalidTokenException</node>
+    <node x="169.0" y="1564.0">com.clinicmanager.gui.DoctorSearchController</node>
+    <node x="1954.0" y="987.0">com.clinicmanager.time.TimeManager</node>
+    <node x="1373.0" y="725.0">com.clinicmanager.repository.AccountRepository</node>
+    <node x="-188.0" y="2320.0">com.clinicmanager.exception.RegistrationException</node>
+    <node x="1407.0" y="2036.0">com.clinicmanager.model.enums.AppointmentStatus</node>
+    <node x="-188.0" y="1564.0">com.clinicmanager.model.entities.Notification</node>
+    <node x="734.0" y="1834.0">com.clinicmanager.service.NotificationManager</node>
+    <node x="1675.0" y="2036.0">com.clinicmanager.model.enums.Role</node>
+    <node x="1981.0" y="1564.0">com.clinicmanager.gui.PatientPanelController</node>
+    <node x="-188.0" y="2198.0">com.clinicmanager.gui.NotificationWindow</node>
+    <node x="545.0" y="1214.0">com.clinicmanager.controller.PatientControlPanel</node>
+    <node x="-188.0" y="-278.0">com.clinicmanager.gui.DoctorScheduleController</node>
+    <node x="1267.0" y="2198.0">com.clinicmanager.repository.RepositoryManager</node>
+    <node x="209.0" y="2036.0">com.clinicmanager.model.entities.FavoriteDoctor</node>
+    <node x="653.0" y="2036.0">com.clinicmanager.gui.RegisterController</node>
+    <node x="1907.0" y="735.0">com.clinicmanager.repository.DoctorRepository</node>
+    <node x="2018.0" y="1834.0">com.clinicmanager.security.TokenService</node>
+    <node x="574.9999999999999" y="715.0">com.clinicmanager.repository.NotificationRepository</node>
+    <node x="-188.0" y="1298.0">com.clinicmanager.gui.DoctorAppointmentsController.AppointmentTableRow</node>
+    <node x="59.0" y="1834.0">com.clinicmanager.gui.MedicalCardController</node>
+    <node x="270.9999999999999" y="715.0">com.clinicmanager.repository.AppointmentRepository</node>
+    <node x="185.0" y="2198.0">com.clinicmanager.app.Clinic</node>
+    <node x="291.0" y="1834.0">com.clinicmanager.gui.MainFX</node>
+    <node x="-188.0" y="735.0">com.clinicmanager.repository.SlotRepository</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.clinicmanager.repository.AccountRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-98.5" />
+      <point x="1478.0" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.controller.PatientControlPanel" target="com.clinicmanager.controller.BaseControlPanel" relationship="GENERALIZATION">
+      <point x="0.0" y="-70.5" />
+      <point x="729.0" y="1169.0" />
+      <point x="924.0" y="1169.0" />
+      <point x="0.0" y="78.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.MedicalRecordRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-98.5" />
+      <point x="1745.0" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.ScheduleRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-118.5" />
+      <point x="996.5" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.FavoriteDoctorRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-118.5" />
+      <point x="123.5" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.MedicalCardRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-88.5" />
+      <point x="1248.5" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.model.actors.Patient" target="com.clinicmanager.model.actors.Person" relationship="GENERALIZATION">
+      <point x="0.0" y="-38.5" />
+      <point x="1793.0" y="1149.0" />
+      <point x="1648.25" y="1149.0" />
+      <point x="0.0" y="68.5" />
+    </edge>
+    <edge source="com.clinicmanager.controller.DoctorControlPanel" target="com.clinicmanager.controller.BaseControlPanel" relationship="GENERALIZATION">
+      <point x="0.0" y="-90.5" />
+      <point x="1119.0" y="1169.0" />
+      <point x="924.0" y="1169.0" />
+      <point x="0.0" y="78.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.DoctorRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-88.5" />
+      <point x="1996.5" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.AppointmentRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-108.5" />
+      <point x="412.9999999999999" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.gui.DoctorAppointmentsController.AppointmentTableRow" target="com.clinicmanager.gui.DoctorAppointmentsController" relationship="INNER_CLASS">
+      <point x="0.0" y="-110.5" />
+      <point x="0.0" y="130.5" />
+    </edge>
+    <edge source="com.clinicmanager.gui.DoctorScheduleController.SlotTableRow" target="com.clinicmanager.gui.DoctorScheduleController" relationship="INNER_CLASS">
+      <point x="0.0" y="-110.5" />
+      <point x="0.0" y="158.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.SlotRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-88.5" />
+      <point x="-106.0" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.PatientRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-98.5" />
+      <point x="2231.5" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.model.actors.Doctor" target="com.clinicmanager.model.actors.Person" relationship="GENERALIZATION">
+      <point x="0.0" y="-90.5" />
+      <point x="1503.5" y="1149.0" />
+      <point x="1648.25" y="1149.0" />
+      <point x="0.0" y="68.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.NotificationRepository" target="com.clinicmanager.repository.AbstractDatabaseManager" relationship="GENERALIZATION">
+      <point x="0.0" y="-108.5" />
+      <point x="711.9999999999999" y="680.0" />
+      <point x="1122.5" y="680.0" />
+      <point x="0.0" y="48.5" />
+    </edge>
+    <edge source="com.clinicmanager.repository.AbstractDatabaseManager" target="com.clinicmanager.repository.Repository" relationship="REALIZATION">
+      <point x="0.0" y="-48.5" />
+      <point x="0.0" y="76.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.5421677569077386" showDependencies="false" x="894.702093507379" y="1911.9570417740679" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

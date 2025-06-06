@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinicmanager.gui.DoctorPatientsController">
+    <top>
+        <Label text="Moi pacjenci" style="-fx-font-size: 16; -fx-padding: 10;" />
+    </top>
+    <center>
+        <TableView fx:id="patientsTable" prefHeight="250">
+            <columns>
+                <TableColumn text="Imię" fx:id="nameCol" />
+                <TableColumn text="Data urodzenia" fx:id="dobCol" />
+                <TableColumn text="Telefon" fx:id="phoneCol" />
+            </columns>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="center" style="-fx-padding: 10;">
+            <Button text="Pokaż kartę medyczną" fx:id="viewCardBtn" />
+            <Button text="Dane pacjenta" fx:id="patientInfoBtn" />
+            <Button text="Zamknij okno" fx:id="closeBtn" />
+        </HBox>
+    </bottom>
+</BorderPane>
+
