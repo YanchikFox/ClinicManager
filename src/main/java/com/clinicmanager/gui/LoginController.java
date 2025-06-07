@@ -3,10 +3,8 @@ package com.clinicmanager.gui;
 import com.clinicmanager.app.Clinic;
 import com.clinicmanager.controller.BaseControlPanel;
 import com.clinicmanager.controller.DoctorControlPanel;
-import com.clinicmanager.controller.PatientControlPanel;
 import com.clinicmanager.repository.AccountRepository;
 import com.clinicmanager.repository.NotificationRepository;
-import com.clinicmanager.repository.RepositoryManager;
 import com.clinicmanager.security.TokenService;
 import com.clinicmanager.service.AccountManager;
 import javafx.fxml.FXML;
@@ -30,9 +28,8 @@ public class LoginController {
     private AccountRepository accountRepository;
 
     public LoginController() {
-        RepositoryManager repos = AppContext.getInstance().getRepositories();
-        this.notificationRepository = repos.notifications;
-        this.accountRepository = repos.accounts;
+        this.notificationRepository = AppContext.getInstance().getRepositories().notifications;
+        this.accountRepository = AppContext.getInstance().getRepositories().accounts;
 
         AccountManager manager = new AccountManager(accountRepository, new TokenService());
         NotificationManager notificationManager = new NotificationManager(notificationRepository);

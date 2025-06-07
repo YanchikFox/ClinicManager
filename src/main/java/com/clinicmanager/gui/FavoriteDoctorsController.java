@@ -3,7 +3,6 @@ package com.clinicmanager.gui;
 import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.FavoriteDoctor;
-import com.clinicmanager.repository.RepositoryManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -22,7 +21,6 @@ public class FavoriteDoctorsController {
     @FXML
     private Button closeBtn;
 
-    private final RepositoryManager repos = AppContext.getRepositories();
     private Patient currentPatient;
     private Doctor selectedDoctor;
 
@@ -50,9 +48,9 @@ public class FavoriteDoctorsController {
     }
 
     private void loadFavoriteDoctors() {
-        List<FavoriteDoctor> favs = repos.favoriteDoctors.findByPatientId(currentPatient.id());
+        List<FavoriteDoctor> favs = AppContext.getRepositories().favoriteDoctors.findByPatientId(currentPatient.id());
         List<Doctor> doctors = favs.stream()
-                .map(fav -> repos.doctors.findById(fav.doctorId()))
+                .map(fav -> AppContext.getRepositories().doctors.findById(fav.doctorId()))
                 .filter(d -> d != null)
                 .collect(Collectors.toList());
         favoriteDoctorsListView.setItems(FXCollections.observableArrayList(doctors));
@@ -88,7 +86,7 @@ public class FavoriteDoctorsController {
     private void handleRemoveFavorite() {
         if (selectedDoctor == null)
             return;
-        repos.favoriteDoctors.deleteByPatientAndDoctor(currentPatient.id(), selectedDoctor.id());
+        AppContext.getRepositories().favoriteDoctors.deleteByPatientAndDoctor(currentPatient.id(), selectedDoctor.id());
         loadFavoriteDoctors();
         showDoctorBtn.setDisable(true);
         removeFavoriteBtn.setDisable(true);

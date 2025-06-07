@@ -3,7 +3,6 @@ package com.clinicmanager.gui;
 import com.clinicmanager.model.entities.Notification;
 import com.clinicmanager.service.NotificationManager;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;

@@ -27,9 +27,8 @@ public class DoctorSearchController {
     private Doctor selectedDoctor;
     private Slot selectedSlot;
 
-    private final RepositoryManager repos = AppContext.getRepositories();
-    private final DoctorRepository doctorRepo = repos.doctors;
-    private final ScheduleRepository scheduleRepo = repos.schedules;
+    private final DoctorRepository doctorRepo = AppContext.getRepositories().doctors;
+    private final ScheduleRepository scheduleRepo = AppContext.getRepositories().schedules;
 
     @FXML
     private void initialize() {
@@ -54,7 +53,7 @@ public class DoctorSearchController {
         scheduleListView.getSelectionModel().selectedItemProperty().addListener((obs, old, val) -> {
             if (val != null && selectedDoctor != null) {
                 // Znajdź wybrany slot po stringu
-                List<Slot> slots = repos.slots.findAll();
+                List<Slot> slots = AppContext.getRepositories().slots.findAll();
                 List<Slot> doctorSlots = slots.stream()
                         .filter(s -> s.scheduleId() == selectedDoctor.scheduleId() && s.isAvailable()).toList();
                 int idx = scheduleListView.getSelectionModel().getSelectedIndex();
@@ -79,7 +78,7 @@ public class DoctorSearchController {
             addFavoriteBtn.setDisable(true);
             return;
         }
-        boolean isFav = repos.favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id());
+        boolean isFav = AppContext.getRepositories().favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id());
         addFavoriteBtn.setDisable(isFav);
         addFavoriteBtn.setText(isFav ? "Już w ulubionych" : "Dodaj do ulubionych");
     }
@@ -93,7 +92,7 @@ public class DoctorSearchController {
         }
         doctorInfoLabel.setText("Imię: " + doc.name() + "\nTelefon: " + doc.phoneNumber());
         // Pobierz grafik (tylko wolne sloty)
-        List<Slot> slots = repos.slots.findAll();
+        List<Slot> slots = AppContext.getRepositories().slots.findAll();
         List<Slot> doctorSlots = slots.stream().filter(s -> s.scheduleId() == doc.scheduleId() && s.isAvailable())
                 .toList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
@@ -117,7 +116,7 @@ public class DoctorSearchController {
         }
         // Sprawdzenie: nie można umówić się do tego samego lekarza więcej niż raz
         // dziennie
-        if (!repos.appointments.canPatientBookSlot(patient.id(), selectedDoctor.id(), selectedSlot.date())) {
+        if (!AppContext.getRepositories().appointments.canPatientBookSlot(patient.id(), selectedDoctor.id(), selectedSlot.date())) {
             new Alert(Alert.AlertType.WARNING, "Już jesteś zapisany do tego lekarza na wybrany dzień!", ButtonType.OK)
                     .showAndWait();
             return;
@@ -141,7 +140,7 @@ public class DoctorSearchController {
                 selectedSlot.id(),
                 com.clinicmanager.model.enums.AppointmentStatus.PENDING,
                 problemDescription);
-        repos.appointments.save(appointment);
+        AppContext.getRepositories().appointments.save(appointment);
         // Odśwież listę slotów
         showDoctorInfo(selectedDoctor);
         new Alert(Alert.AlertType.INFORMATION, "Wizyta została umówiona!", ButtonType.OK).showAndWait();
@@ -153,8 +152,8 @@ public class DoctorSearchController {
                 || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
             return;
         }
-        if (!repos.favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id())) {
-            repos.favoriteDoctors
+        if (!AppContext.getRepositories().favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id())) {
+            AppContext.getRepositories().favoriteDoctors
                     .save(new com.clinicmanager.model.entities.FavoriteDoctor(-1, patient.id(), selectedDoctor.id()));
             updateFavoriteBtn();
             new Alert(Alert.AlertType.INFORMATION, "Lekarz dodany do ulubionych!", ButtonType.OK).showAndWait();
@@ -187,7 +186,7 @@ public class DoctorSearchController {
                 || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
             return;
         }
-        repos.favoriteDoctors.deleteByPatientAndDoctor(patient.id(), selectedDoctor.id());
+        AppContext.getRepositories().favoriteDoctors.deleteByPatientAndDoctor(patient.id(), selectedDoctor.id());
         updateFavoriteBtn();
     }
 }

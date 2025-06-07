@@ -8,9 +8,7 @@ import com.clinicmanager.repository.RepositoryManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
-import javafx.scene.Scene;
 
 import java.util.List;
 

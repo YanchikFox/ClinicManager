@@ -56,20 +56,6 @@ public class Appointment {
         return problemDescription;
     }
 
-    // Metody do zmiany statusu
-    public void confirm() {
-        this.status = AppointmentStatus.CONFIRMED;
-    }
-
-    public void cancel() {
-        this.status = AppointmentStatus.CANCELLED;
-    }
-
-    public void reschedule(int newSlotId) {
-        this.slotId = newSlotId;
-        this.status = AppointmentStatus.PENDING;
-    }
-
     // Metody do anulowania, przełożenia i potwierdzenia wizyty
     public void cancel(AppointmentRepository repo) {
         this.status = AppointmentStatus.CANCELLED;

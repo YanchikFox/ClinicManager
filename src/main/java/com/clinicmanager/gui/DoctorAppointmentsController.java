@@ -5,7 +5,6 @@ import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.Appointment;
 import com.clinicmanager.model.entities.Slot;
-import com.clinicmanager.repository.RepositoryManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,7 +14,6 @@ import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import com.clinicmanager.gui.AppContext;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -211,8 +209,7 @@ public class DoctorAppointmentsController {
         if (!(panel instanceof DoctorControlPanel doctorPanel))
             return;
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
-        RepositoryManager repos = AppContext.getRepositories();
-        List<Appointment> all = repos.appointments.findAll().stream()
+        List<Appointment> all = AppContext.getRepositories().appointments.findAll().stream()
                 .filter(a -> a.doctorId() == doctor.id())
                 .toList();
         boolean onlyActive = showActiveOnlyCheckBox != null && showActiveOnlyCheckBox.isSelected();

@@ -8,8 +8,6 @@ import com.clinicmanager.repository.RepositoryManager;
 import com.clinicmanager.service.NotificationManager;
 
 import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public class TimeTickHandler {

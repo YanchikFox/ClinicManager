@@ -1,10 +1,8 @@
 package com.clinicmanager.controller;
 
 import com.clinicmanager.exception.InvalidTokenException;
-import com.clinicmanager.model.entities.Notification;
 import com.clinicmanager.service.AccountManager;
 
-import java.util.List;
 
 import com.clinicmanager.service.NotificationManager;
 
@@ -23,17 +21,6 @@ public abstract class BaseControlPanel {
         if (!accountManager.validateToken(token)) {
             throw new InvalidTokenException("Access denied: invalid token");
         }
-    }
-
-    public void demoAction() {
-        requireValidToken();
-        System.out.println("Token jest ważny — dostęp do funkcji dozwolony.");
-    }
-
-    public List<Notification> viewNotifications() {
-        requireValidToken();
-        int accountId = accountManager.getAccountByToken(token).id();
-        return notificationManager.getAllNotificationsByPersonId(accountId);
     }
 
     public void revokeToken() {

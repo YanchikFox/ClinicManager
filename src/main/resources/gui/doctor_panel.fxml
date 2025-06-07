@@ -21,7 +21,6 @@
     <Button text="Mój grafik" fx:id="viewScheduleBtn"/>
     <Button text="Moje wizyty" fx:id="viewAppointmentsBtn"/>
     <Button text="Otwórz kartę pacjenta" fx:id="viewMedicalCardBtn"/>
-    <Button text="Dodaj wpis do karty" fx:id="addRecordBtn"/>
     <Button text="Wyloguj się" fx:id="logoutBtn"/>
 
 </VBox>

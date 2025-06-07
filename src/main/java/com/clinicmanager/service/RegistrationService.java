@@ -18,7 +18,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
-import java.util.List;
 
 public class RegistrationService {
     private static final Set<String> VALID_LICENSES = Set.of("DOC123", "DOC456", "SURG2025");

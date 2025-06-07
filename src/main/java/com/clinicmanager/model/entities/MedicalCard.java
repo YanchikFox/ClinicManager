@@ -28,11 +28,6 @@ public class MedicalCard {
         return patientId;
     }
 
-    public void addRecord(MedicalRecord medicalRecord) {
-        medicalRecordRepository.save(medicalRecord);
-    }
-
-
     public List<MedicalRecord> getRecords() {
         return medicalRecordRepository.findByMedicalCardId(id);
     }

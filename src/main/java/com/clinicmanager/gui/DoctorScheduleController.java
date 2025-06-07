@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import com.clinicmanager.gui.AppContext;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

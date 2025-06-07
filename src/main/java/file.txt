@@ -1,0 +1,687 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class AbstractDatabaseManager<T> {
+  + AbstractDatabaseManager(String): 
+  # conn: Connection
+  + save(T): int
+  + close(): void
+}
+class Account {
+  + Account(int, String, String, Role, int): 
+  + Account(int, String, String, Role, int, boolean): 
+  - email: String
+  - role: Role
+  - passwordHash: String
+  - id: int
+  - ownerId: int
+  + role(): Role
+  + email(): String
+  + validatePassword(String): boolean
+  + id(): int
+  + ownerId(): int
+  + passwordHash(): String
+}
+class AccountManager {
+  + AccountManager(AccountRepository, TokenService): 
+  - accountRepository: AccountRepository
+  - tokenService: TokenService
+  + revokeToken(String): void
+  + login(String, String): String
+  + getAccountByToken(String): Account
+  + validateToken(String): boolean
+}
+class AccountRepository {
+  + AccountRepository(String): 
+  + findAll(): List<Account>
+  - mapAccount(ResultSet): Account
+  + update(Account): void
+  + save(Account): int
+  + delete(Account): void
+  + findByEmail(String): Account
+  + findById(int): Account
+}
+class AppContext {
+  - AppContext(): 
+  - panel: BaseControlPanel
+  - regService: RegistrationService
+  - sharedInstance: AppContext
+  - repos: RepositoryManager
+  + getInstance(): AppContext
+  + getPanel(): BaseControlPanel
+  + setPanel(BaseControlPanel): void
+  + getRepositories(): RepositoryManager
+  + getRegistrationService(): RegistrationService
+}
+class Appointment {
+  + Appointment(int, int, int, int, AppointmentStatus, String): 
+  + Appointment(int, int, int, int, AppointmentStatus): 
+  - patientId: int
+  - doctorId: int
+  - slotId: int
+  - id: int
+  - problemDescription: String
+  - status: AppointmentStatus
+  + end(AppointmentRepository): void
+  + patientId(): int
+  + cancel(): void
+  + slotId(): int
+  + problemDescription(): String
+  + getDoctor(): Doctor
+  + doctorId(): int
+  + reschedule(int): void
+  + getSlot(): Slot
+  + status(): AppointmentStatus
+  + confirm(): void
+  + id(): int
+  + reschedule(int, AppointmentRepository): void
+  + getPatient(): Patient
+  + confirm(AppointmentRepository): void
+  + cancel(AppointmentRepository): void
+}
+class AppointmentRepository {
+  + AppointmentRepository(String): 
+  + delete(Appointment): void
+  + update(Appointment): void
+  - getSlotDateSafe(Appointment): LocalDate?
+  + save(Appointment): int
+  + findById(int): Appointment
+  + canPatientBookSlot(int, int, LocalDate): boolean
+  + findByEmail(String): Appointment
+  + findAll(): List<Appointment>
+}
+enum AppointmentStatus << enumeration >> {
+  + AppointmentStatus(): 
+  + CANCELLED: 
+  + CONFIRMED: 
+  + PENDING: 
+  + ENDED: 
+  + valueOf(String): AppointmentStatus
+  + values(): AppointmentStatus[]
+}
+class AppointmentTableRow {
+  + AppointmentTableRow(String, String, String, String): 
+  - date: String
+  - time: String
+  - status: String
+  - patientName: String
+  + getTime(): String
+  + getPatientName(): String
+  + getDate(): String
+  + getStatus(): String
+}
+class AuthenticationException {
+  + AuthenticationException(String): 
+}
+class BaseControlPanel {
+  # BaseControlPanel(String, AccountManager, NotificationManager): 
+  # token: String
+  # accountManager: AccountManager
+  # notificationManager: NotificationManager
+  # requireValidToken(): void
+  + revokeToken(): void
+  + demoAction(): void
+  + viewNotifications(): List<Notification>
+  + currentPerson(): Object
+}
+class Clinic {
+  + Clinic(AccountManager, NotificationManager): 
+  - accountManager: AccountManager
+  - notificationManager: NotificationManager
+  + login(String, String): BaseControlPanel
+}
+class DatabaseInitializer {
+  + DatabaseInitializer(): 
+  + initialize(String, String): void
+}
+class Doctor {
+  + Doctor(int, String, String, String, int, List<Integer>): 
+  + Doctor(int, String, String, String, int): 
+  - slotRepository: SlotRepository
+  - patientRepository: PatientRepository
+  - scheduleId: int
+  - patients: List<Integer>
+  + getPatientsList(): List<Integer>
+  + addAvailableSlot(Slot): void
+  + updateCuredPatientIds(): void
+  + scheduleId(): int
+  + addAvailableSlot(LocalDate, TimeRange): void
+}
+class DoctorAppointmentsController {
+  + DoctorAppointmentsController(): 
+  - dateCol: TableColumn<AppointmentTableRow, String>
+  - selectedAppointment: Appointment
+  - viewDetailsBtn: Button
+  - myAppointments: List<Appointment>
+  - endAppointmentBtn: Button
+  - statusCol: TableColumn<AppointmentTableRow, String>
+  - showActiveOnlyCheckBox: CheckBox
+  - patientCol: TableColumn<AppointmentTableRow, String>
+  - patientInfoBtn: Button
+  - openCardBtn: Button
+  - timeCol: TableColumn<AppointmentTableRow, String>
+  - closeBtn: Button
+  - appointmentsTable: TableView<AppointmentTableRow>
+  - addRecordBtn: Button
+  - handleViewDetails(): void
+  - loadAppointments(): void
+  - handleEndAppointment(): void
+  + reloadAppointments(): void
+  - setupTable(): void
+  - initialize(): void
+  - handleAddRecord(): void
+  - handlePatientInfo(): void
+  - handleOpenCard(): void
+  - setButtonsEnabled(boolean): void
+}
+class DoctorControlPanel {
+  + DoctorControlPanel(String, AccountManager, NotificationManager): 
+  - doctor: Doctor
+  + addAvailableSlot(Slot): void
+  - requireDoctorRole(): void
+  + endAppointment(Appointment): void
+  + getPatientsList(): List<Integer>
+  + viewMySchedule(): Schedule
+  + currentPerson(): Object
+}
+class DoctorPanelController {
+  + DoctorPanelController(): 
+  - slotAutoGeneratorService: SlotAutoGeneratorService
+  - viewAppointmentsBtn: Button
+  - viewMedicalCardBtn: Button
+  - dtf: DateTimeFormatter
+  - logoutBtn: Button
+  - stopTimeBtn: Button
+  - virtualTimeLabel: Label
+  - viewScheduleBtn: Button
+  - setTimeBtn: Button
+  - startTimeBtn: Button
+  - timeManager: TimeManager
+  - initialize(): void
+  - updateTimeLabel(LocalDateTime): void
+  - onTimeChanged(LocalDateTime): void
+  - handleSetTime(): void
+}
+class DoctorPatientsController {
+  + DoctorPatientsController(): 
+  - patientInfoBtn: Button
+  - nameCol: TableColumn<Patient, String>
+  - phoneCol: TableColumn<Patient, String>
+  - dobCol: TableColumn<Patient, String>
+  - viewCardBtn: Button
+  - patientsTable: TableView<Patient>
+  - selectedPatient: Patient
+  - treatedPatients: List<Patient>
+  - closeBtn: Button
+  - setupTable(): void
+  - loadPatients(): void
+  - handleViewCard(): void
+  - handlePatientInfo(): void
+  - initialize(): void
+}
+class DoctorRepository {
+  + DoctorRepository(String): 
+  + findByEmail(String): Doctor
+  + save(Doctor): int
+  + findById(int): Doctor
+  + delete(Doctor): void
+  + findAll(): List<Doctor>
+  + update(Doctor): void
+}
+class DoctorScheduleController {
+  + DoctorScheduleController(): 
+  - addSlotBtn: Button
+  - removeSlotBtn: Button
+  - slotsTable: TableView<SlotTableRow>
+  - selectedSlotRow: SlotTableRow
+  - statusCol: TableColumn<SlotTableRow, String>
+  - openSlotBtn: Button
+  - closeBtn: Button
+  - dateCol: TableColumn<SlotTableRow, String>
+  - endCol: TableColumn<SlotTableRow, String>
+  - refreshBtn: Button
+  - startCol: TableColumn<SlotTableRow, String>
+  - closeSlotBtn: Button
+  - handleRemoveSlot(): void
+  + loadSlots(): void
+  - handleCloseSlot(): void
+  - isClosedByDoctor(Slot): boolean
+  - timesOverlap(TimeRange, TimeRange): boolean
+  - findSlotByRow(SlotTableRow): Slot?
+  - initialize(): void
+  - handleAddSlot(): void
+  - loadSlotsImpl(): void
+  - handleOpenSlot(): void
+  - hasRealPatientAppointment(Slot): boolean
+  - setupTable(): void
+  - updateSlotButtons(): void
+}
+class DoctorSearchController {
+  + DoctorSearchController(): 
+  - doctorInfoLabel: Label
+  - doctorRepo: DoctorRepository
+  - selectedDoctor: Doctor
+  - scheduleRepo: ScheduleRepository
+  - makeAppointmentBtn: Button
+  - addFavoriteBtn: Button
+  - selectedSlot: Slot
+  - repos: RepositoryManager
+  - scheduleListView: ListView<String>
+  - doctorListView: ListView<Doctor>
+  + selectDoctor(Doctor): void
+  - initialize(): void
+  + setDoctors(List<Doctor>): void
+  - updateFavoriteBtn(): void
+  - handleAddFavorite(): void
+  + removeFromFavoritesForCurrentPatient(): void
+  - showDoctorInfo(Doctor): void
+  - handleMakeAppointment(): void
+}
+class FavoriteDoctor {
+  + FavoriteDoctor(int, int, int): 
+  - id: int
+  - patientId: int
+  - doctorId: int
+  + patientId(): int
+  + id(): int
+  + doctorId(): int
+}
+class FavoriteDoctorRepository {
+  + FavoriteDoctorRepository(String): 
+  + isFavorite(int, int): boolean
+  + findByPatientId(int): List<FavoriteDoctor>
+  + findByEmail(String): FavoriteDoctor
+  + findById(int): FavoriteDoctor
+  + findAll(): List<FavoriteDoctor>
+  + save(FavoriteDoctor): int
+  + update(FavoriteDoctor): void
+  + delete(FavoriteDoctor): void
+  + deleteByPatientAndDoctor(int, int): void
+}
+class FavoriteDoctorsController {
+  + FavoriteDoctorsController(): 
+  - selectedDoctor: Doctor
+  - currentPatient: Patient
+  - repos: RepositoryManager
+  - closeBtn: Button
+  - favoriteDoctorsListView: ListView<Doctor>
+  - showDoctorBtn: Button
+  - removeFavoriteBtn: Button
+  - handleRemoveFavorite(): void
+  - handleShowDoctor(): void
+  - initialize(): void
+  - loadFavoriteDoctors(): void
+}
+class HashUtil {
+  + HashUtil(): 
+  + sha256(String): String
+}
+class InvalidTokenException {
+  + InvalidTokenException(String): 
+}
+class LoginController {
+  + LoginController(): 
+  - messageLabel: Label
+  - notificationRepository: NotificationRepository
+  - clinic: Clinic
+  - passwordField: PasswordField
+  - emailField: TextField
+  - accountRepository: AccountRepository
+  - handleBack(): void
+  - handleLogin(): void
+}
+class MainFX {
+  + MainFX(): 
+  - primaryStage: Stage
+  + start(Stage): void
+  + main(String[]): void
+  + getPrimaryStage(): Stage
+}
+class MedicalCard {
+  + MedicalCard(int, int): 
+  - patientId: int
+  - medicalRecordRepository: MedicalRecordRepository
+  - id: int
+  - medicalCardRepository: MedicalCardRepository
+  + patientId(): int
+  + addRecord(MedicalRecord): void
+  + getRecords(): List<MedicalRecord>
+  + id(): int
+}
+class MedicalCardController {
+  + MedicalCardController(): 
+  - patient: Patient
+  - cardInfoLabel: Label
+  - initialized: boolean
+  - repos: RepositoryManager
+  - recordsListView: ListView<String>
+  + setPatient(Patient): void
+  - loadCard(): void
+  - initialize(): void
+}
+class MedicalCardRepository {
+  + MedicalCardRepository(String): 
+  + save(MedicalCard): int
+  + findByEmail(String): MedicalCard
+  + update(MedicalCard): void
+  + delete(MedicalCard): void
+  + findById(int): MedicalCard
+  + findAll(): List<MedicalCard>
+}
+class MedicalRecord {
+  + MedicalRecord(int, int, int, LocalDate, String): 
+  - medicalRecordRepository: MedicalRecordRepository
+  - id: int
+  - medicalCardId: int
+  - doctorId: int
+  - date: LocalDate
+  - description: String
+  + description(): String
+  + id(): int
+  + doctorId(): int
+  + date(): LocalDate
+  + medicalCardId(): int
+}
+class MedicalRecordRepository {
+  + MedicalRecordRepository(String): 
+  + update(MedicalRecord): void
+  + findById(int): MedicalRecord
+  + findByMedicalCardId(int): List<MedicalRecord>
+  + findAll(): List<MedicalRecord>
+  + save(MedicalRecord): int
+  + delete(MedicalRecord): void
+  + findByEmail(String): MedicalRecord
+}
+class Notification {
+  + Notification(int, int, String, LocalDateTime, boolean): 
+  - id: int
+  - read: boolean
+  - personId: int
+  - message: String
+  - timestamp: LocalDateTime
+  + id(): int
+  + read(): boolean
+  + markAsRead(): void
+  + isRead(): boolean
+  + message(): String
+  + timestamp(): LocalDateTime
+  + personId(): int
+}
+class NotificationManager {
+  + NotificationManager(NotificationRepository): 
+  - notificationRepository: NotificationRepository
+  + getAllNotificationsByPersonId(int): List<Notification>
+  + createNotification(int, String): Notification
+  + markAsRead(Notification): void
+  + getUnreadNotificationsByPersonId(int): List<Notification>
+}
+class NotificationRepository {
+  + NotificationRepository(String): 
+  + save(Notification): int
+  + findById(int): Notification
+  + findAll(): List<Notification>
+  + delete(Notification): void
+  + findByEmail(String): Notification
+  + update(Notification): void
+  + findUnreadByPersonId(int): List<Notification>
+  + findByPersonId(int): List<Notification>
+}
+class NotificationWindow {
+  + NotificationWindow(): 
+  + showNotifications(Stage, NotificationManager, int): void
+}
+class Patient {
+  + Patient(int, String, String, String, int): 
+  - medicalCardId: int
+  + medicalCardId(): int
+}
+class PatientAppointmentsController {
+  + PatientAppointmentsController(): 
+  - notificationManager: NotificationManager
+  - cancelBtn: Button
+  - rescheduleBtn: Button
+  - myAppointments: List<Appointment>
+  - selectedAppointment: Appointment
+  - repos: RepositoryManager
+  - infoLabel: Label
+  - appointmentsListView: ListView<String>
+  - confirmBtn: Button
+  - handleReschedule(): void
+  - handleCancel(): void
+  + reloadAppointments(): void
+  - handleConfirm(): void
+  - updateList(): void
+  - initialize(): void
+}
+class PatientControlPanel {
+  + PatientControlPanel(String, AccountManager, NotificationManager): 
+  - patient: Patient
+  + viewMedicalCard(): MedicalCard
+  + currentPerson(): Object
+  - requirePatientRole(): void
+  + getMyAppointments(): List<Appointment>
+}
+class PatientPanelController {
+  + PatientPanelController(): 
+  - favoriteDoctorsBtn: Button
+  - dtf: DateTimeFormatter
+  - setTimeBtn: Button
+  - logoutBtn: Button
+  - notificationsBtn: Button
+  - startTimeBtn: Button
+  - viewAppointmentsBtn: Button
+  - virtualTimeLabel: Label
+  - searchDoctorsBtn: Button
+  - viewMedicalCardBtn: Button
+  - timeManager: TimeManager
+  - stopTimeBtn: Button
+  - initialize(): void
+  - updateTimeLabel(LocalDateTime): void
+  - updateNotificationsButtonStyle(): void
+  - handleSetTime(): void
+  - onTimeChanged(LocalDateTime): void
+}
+class PatientRepository {
+  + PatientRepository(String): 
+  + getPatientIdsOfDoctor(int): List<Integer>
+  + update(Patient): void
+  + findById(int): Patient
+  + findAll(): List<Patient>
+  + findByEmail(String): Patient
+  + delete(Patient): void
+  + save(Patient): int
+}
+class Person {
+  + Person(int, String, String, String): 
+  - name: String
+  - phoneNumber: String
+  - id: int
+  - dateOfBirth: String
+  + id(): int
+  + getDateOfBirth(): String
+  + dateOfBirth(): String
+  + hashCode(): int
+  + name(): String
+  + phoneNumber(): String
+  + equals(Object): boolean
+  + getPhoneNumber(): String
+  + getName(): String
+}
+class RegisterController {
+  + RegisterController(): 
+  - passwordField: PasswordField
+  - phoneField: TextField
+  - messageLabel: Label
+  - roleBox: ChoiceBox<String>
+  - nameField: TextField
+  - licenseField: TextField
+  - regService: RegistrationService
+  - dobField: TextField
+  - emailField: TextField
+  - initialize(): void
+  - handleBack(): void
+  - handleRegister(): void
+}
+class RegistrationException {
+  + RegistrationException(String): 
+}
+class RegistrationService {
+  + RegistrationService(): 
+  - scheduleRepository: ScheduleRepository
+  - slotRepository: SlotRepository
+  - VALID_LICENSES: Set<String>
+  - medicalCardRepository: MedicalCardRepository
+  - doctorRepository: DoctorRepository
+  - accountRepository: AccountRepository
+  - patientRepository: PatientRepository
+  + registerPatient(String, String, String, String, String): void
+  - isWeekday(LocalDate): boolean
+  + registerDoctor(String, String, String, String, String, String): void
+}
+interface Repository<T> << interface >> {
+  + findByEmail(String): T
+  + findAll(): List<T>
+  + update(T): void
+  + findById(int): T
+  + save(T): int
+  + delete(T): void
+}
+class RepositoryManager {
+  + RepositoryManager(String): 
+  + notifications: NotificationRepository
+  + schedules: ScheduleRepository
+  + cards: MedicalCardRepository
+  + patients: PatientRepository
+  + records: MedicalRecordRepository
+  + doctors: DoctorRepository
+  + favoriteDoctors: FavoriteDoctorRepository
+  + appointments: AppointmentRepository
+  + accounts: AccountRepository
+  + slots: SlotRepository
+  + closeAll(): void
+}
+enum Role << enumeration >> {
+  + Role(): 
+  + PATIENT: 
+  + DOCTOR: 
+  + values(): Role[]
+  + valueOf(String): Role
+}
+class Schedule {
+  + Schedule(int, int): 
+  - doctorId: int
+  - slotRepository: SlotRepository
+  - id: int
+  - scheduleRepository: ScheduleRepository
+  + getSlots(LocalDate): List<Slot>
+  + id(): int
+  + doctorId(): int
+  + addSlot(Slot): void
+  + removeSlot(Slot): void
+}
+class ScheduleRepository {
+  + ScheduleRepository(String): 
+  + delete(Schedule): void
+  + findById(int): Schedule
+  + findByDoctorId(int): Schedule
+  + getOutgoingSchedule(int): List<Slot>
+  + findByEmail(String): Schedule
+  + update(Schedule): void
+  + findAll(): List<Schedule>
+  + getDoctorSlots(int, LocalDate): List<Slot>
+  + save(Schedule): int
+}
+class Slot {
+  + Slot(int, LocalDate, TimeRange): 
+  + Slot(int, int, LocalDate, TimeRange): 
+  - timeRange: TimeRange
+  - id: int
+  - scheduleId: int
+  - slotRepository: SlotRepository
+  - date: LocalDate
+  - appointmentRepository: AppointmentRepository
+  + id(): int
+  + timeRange(): TimeRange
+  + isAvailable(): boolean
+  + date(): LocalDate
+  + scheduleId(): int
+}
+class SlotAutoGeneratorService {
+  + SlotAutoGeneratorService(): 
+  - doctorRepository: DoctorRepository
+  - slotRepository: SlotRepository
+  - isWeekday(LocalDate): boolean
+  + ensureFutureSlotsForAllDoctors(): void
+}
+class SlotRepository {
+  + SlotRepository(String): 
+  + findAll(): List<Slot>
+  + delete(Slot): void
+  + update(Slot): void
+  + findByEmail(String): Slot
+  + save(Slot): int
+  + findById(int): Slot
+}
+class SlotTableRow {
+  + SlotTableRow(String, String, String, String): 
+  - status: String
+  - date: String
+  - startTime: String
+  - endTime: String
+  + getStatus(): String
+  + getDate(): String
+  + getStartTime(): String
+  + getEndTime(): String
+}
+class StartMenuController {
+  + StartMenuController(): 
+  - handleRegister(): void
+  - handleLogin(): void
+  - switchScene(String): void
+}
+class TimeManager {
+  - TimeManager(): 
+  - running: boolean
+  - speedSecondsPerTick: int
+  - currentTime: LocalDateTime
+  - listeners: List<Consumer<LocalDateTime>>
+  - instance: TimeManager
+  - timer: Timer
+  + addListener(Consumer<LocalDateTime>): void
+  + start(): void
+  + stop(): void
+  + setCurrentTime(LocalDateTime): void
+  + getInstance(): TimeManager
+  + removeListener(Consumer<LocalDateTime>): void
+  + setSpeedSecondsPerTick(int): void
+  - notifyListeners(): void
+  + getCurrentTime(): LocalDateTime
+}
+class TimeRange {
+  + TimeRange(LocalTime, LocalTime): 
+  - start: LocalTime
+  - end: LocalTime
+  + start(): LocalTime
+  + end(): LocalTime
+}
+class TimeTickHandler {
+  + TimeTickHandler(): 
+  + handleTimeTick(LocalDateTime): void
+}
+class TokenService {
+  + TokenService(): 
+  - tokens: Map<String, Account>
+  + generateToken(Account): String
+  + revoke(String): void
+  + isValid(String): boolean
+  + getAccount(String): Account
+}
+
+AppointmentTableRow            +-[#820000,plain]-  DoctorAppointmentsController  
+DoctorAppointmentsController   -[#595959,dashed]->  AppointmentTableRow           
+DoctorScheduleController      "1" *-[#595959,plain]-> "selectedSlotRow\n1" SlotTableRow                  
+SlotTableRow                   +-[#820000,plain]-  DoctorScheduleController      
+@enduml

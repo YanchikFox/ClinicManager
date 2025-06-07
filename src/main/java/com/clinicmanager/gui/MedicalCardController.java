@@ -3,7 +3,6 @@ package com.clinicmanager.gui;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.MedicalCard;
 import com.clinicmanager.model.entities.MedicalRecord;
-import com.clinicmanager.repository.RepositoryManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -17,7 +16,6 @@ public class MedicalCardController {
     @FXML
     private ListView<String> recordsListView;
 
-    private final RepositoryManager repos = AppContext.getRepositories();
     private Patient patient;
     private boolean initialized = false;
 
@@ -53,7 +51,7 @@ public class MedicalCardController {
             recordsListView.setItems(FXCollections.observableArrayList());
             return;
         }
-        MedicalCard card = repos.cards.findById(patient.medicalCardId());
+        MedicalCard card = AppContext.getRepositories().cards.findById(patient.medicalCardId());
         if (card == null) {
             cardInfoLabel.setText("Brak karty medycznej dla pacjenta: " + patient.name());
             recordsListView.setItems(FXCollections.observableArrayList());

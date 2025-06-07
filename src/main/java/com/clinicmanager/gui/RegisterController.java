@@ -1,7 +1,6 @@
 package com.clinicmanager.gui;
 
 import com.clinicmanager.service.RegistrationService;
-import com.clinicmanager.model.enums.Role;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
