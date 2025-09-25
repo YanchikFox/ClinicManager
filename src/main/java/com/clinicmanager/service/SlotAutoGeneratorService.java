@@ -18,9 +18,7 @@ public class SlotAutoGeneratorService {
     private final SlotRepository slotRepository;
 
     public SlotAutoGeneratorService() {
-        AppContext.getInstance();
         this.doctorRepository = AppContext.getRepositories().doctors;
-        AppContext.getInstance();
         this.slotRepository = AppContext.getRepositories().slots;
     }
 
@@ -38,9 +36,10 @@ public class SlotAutoGeneratorService {
                                     virtualNowTime.getMinute() > 0 ? virtualNowTime.getHour() + 1
                                             : virtualNowTime.getHour())
                             : 9;
-                    if (startHour >= 17)
+                    if (startHour >= 17) {
                         continue;
-                    // Pobieramy tylko sloty dla tego scheduleId i date
+                    }
+                    // Fetch existing slots for this schedule and date
                     List<Slot> slotsForDay = slotRepository.findAll().stream()
                             .filter(s -> s.scheduleId() == scheduleId && s.date().equals(date))
                             .toList();

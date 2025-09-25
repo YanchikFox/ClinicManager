@@ -1,6 +1,5 @@
 package com.clinicmanager.model.entities;
 
-
 import com.clinicmanager.gui.AppContext;
 import com.clinicmanager.repository.MedicalCardRepository;
 import com.clinicmanager.repository.MedicalRecordRepository;
@@ -16,9 +15,7 @@ public class MedicalCard {
     public MedicalCard(int id, int patientId) {
         this.id = id;
         this.patientId = patientId;
-        AppContext.getInstance();
         this.medicalCardRepository = AppContext.getRepositories().cards;
-        AppContext.getInstance();
         this.medicalRecordRepository = AppContext.getRepositories().records;
     }
 
@@ -33,7 +30,6 @@ public class MedicalCard {
     public void addRecord(MedicalRecord medicalRecord) {
         medicalRecordRepository.save(medicalRecord);
     }
-
 
     public List<MedicalRecord> getRecords() {
         return medicalRecordRepository.findByMedicalCardId(id);

@@ -1,13 +1,5 @@
 package com.clinicmanager.model.actors;
 
-import com.clinicmanager.model.entities.Slot;
-import com.clinicmanager.model.entities.TimeRange;
-import com.clinicmanager.repository.PatientRepository;
-import com.clinicmanager.repository.SlotRepository;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import com.clinicmanager.gui.AppContext;
 import com.clinicmanager.model.entities.Slot;
 import com.clinicmanager.model.entities.TimeRange;
@@ -27,9 +19,7 @@ public class Doctor extends Person {
     public Doctor(int id, String name, String dateOfBirth, String phoneNumber, int scheduleId) {
         super(id, name, dateOfBirth, phoneNumber);
         this.scheduleId = scheduleId;
-        AppContext.getInstance();
         this.patientRepository = AppContext.getRepositories().patients;
-        AppContext.getInstance();
         this.slotRepository = AppContext.getRepositories().slots;
     }
 
@@ -37,9 +27,7 @@ public class Doctor extends Person {
         super(id, name, dateOfBirth, phoneNumber);
         this.scheduleId = scheduleId;
         this.patients = patients;
-        AppContext.getInstance();
         this.patientRepository = AppContext.getRepositories().patients;
-        AppContext.getInstance();
         this.slotRepository = AppContext.getRepositories().slots;
     }
 

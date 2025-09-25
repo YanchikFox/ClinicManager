@@ -94,19 +94,16 @@ public class Appointment {
 
     // Methods for retrieving related objects by id
     public Patient getPatient() {
-        AppContext.getInstance();
         PatientRepository repo = AppContext.getRepositories().patients;
         return repo.findById(patientId);
     }
 
     public Doctor getDoctor() {
-        AppContext.getInstance();
         DoctorRepository repo = AppContext.getRepositories().doctors;
         return repo.findById(doctorId);
     }
 
     public Slot getSlot() {
-        AppContext.getInstance();
         SlotRepository repo = AppContext.getRepositories().slots;
         return repo.findById(slotId);
     }

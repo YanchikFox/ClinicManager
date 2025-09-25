@@ -17,9 +17,7 @@ public class Schedule {
     public Schedule(int id, int doctorId) {
         this.id = id;
         this.doctorId = doctorId;
-        AppContext.getInstance();
         this.scheduleRepository = AppContext.getRepositories().schedules;
-        AppContext.getInstance();
         this.slotRepository = AppContext.getRepositories().slots;
     }
 

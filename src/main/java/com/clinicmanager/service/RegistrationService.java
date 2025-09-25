@@ -31,17 +31,11 @@ public class RegistrationService {
     private final ScheduleRepository scheduleRepository;
 
     public RegistrationService() {
-        AppContext.getInstance();
         this.accountRepository = AppContext.getRepositories().accounts;
-        AppContext.getInstance();
         this.doctorRepository = AppContext.getRepositories().doctors;
-        AppContext.getInstance();
         this.patientRepository = AppContext.getRepositories().patients;
-        AppContext.getInstance();
         this.slotRepository = AppContext.getRepositories().slots;
-        AppContext.getInstance();
         this.medicalCardRepository = AppContext.getRepositories().cards;
-        AppContext.getInstance();
         this.scheduleRepository = AppContext.getRepositories().schedules;
     }
 
@@ -60,7 +54,7 @@ public class RegistrationService {
         Doctor updatedDoctor = new Doctor(doctorId, name, dateOfBirth, phone, scheduleId);
         doctorRepository.update(updatedDoctor);
 
-        // --- Tworzymy sloty na 3 dni do przodu od aktualnego wirtualnego czasu ---
+        // --- Create slots for the next 3 days based on the current virtual time ---
         LocalDate today = TimeManager.getInstance().getCurrentTime().toLocalDate();
         for (int i = 0; i < 3; i++) {
             LocalDate date = today.plusDays(i);

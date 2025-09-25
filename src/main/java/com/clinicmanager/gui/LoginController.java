@@ -23,11 +23,11 @@ public class LoginController {
     private Label messageLabel;
 
     private final Clinic clinic;
+    private AccountRepository accountRepository;
 
     public LoginController() {
-        AppContext.getInstance();
         RepositoryManager repos = AppContext.getRepositories();
-        AccountRepository accountRepository = repos.accounts;
+        this.accountRepository = repos.accounts;
 
         AccountManager manager = new AccountManager(accountRepository, new TokenService());
         this.clinic = new Clinic(manager);

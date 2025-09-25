@@ -6,7 +6,7 @@ import com.clinicmanager.model.actors.Account;
 import com.clinicmanager.repository.RepositoryManager;
 
 public class DoctorControlPanel extends BaseControlPanel {
-    private final Doctor doctor;
+    private Doctor doctor;
 
     public DoctorControlPanel(String token, AccountManager accountManager) {
         super(token, accountManager);
