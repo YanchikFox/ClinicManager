@@ -27,11 +27,11 @@ public class Account {
     }
 
     public boolean validatePassword(String rawPassword) {
-        // Porównujemy hash wprowadzonego hasła z zapisanym hashem
+        // Compare the hash of the provided password with the stored hash
         return this.passwordHash.equals(HashUtil.sha256(rawPassword));
     }
 
-    // Gettery do pól
+    // Getters for the fields
     public int id() {
         return id;
     }

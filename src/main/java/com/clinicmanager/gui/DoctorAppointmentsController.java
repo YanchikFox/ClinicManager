@@ -54,13 +54,13 @@ public class DoctorAppointmentsController {
         closeBtn.setOnAction(e -> ((Stage) closeBtn.getScene().getWindow()).close());
         setupTable();
         loadAppointments();
-        // Obsługa przycisków
+        // Handle button actions
         viewDetailsBtn.setOnAction(e -> handleViewDetails());
         openCardBtn.setOnAction(e -> handleOpenCard());
         patientInfoBtn.setOnAction(e -> handlePatientInfo());
         addRecordBtn.setOnAction(e -> handleAddRecord());
         endAppointmentBtn.setOnAction(e -> handleEndAppointment());
-        // Słuchacz wyboru wiersza
+        // Row selection listener
         appointmentsTable.getSelectionModel().selectedIndexProperty().addListener((obs, old, idx) -> {
             if (idx != null && idx.intValue() >= 0 && idx.intValue() < myAppointments.size()) {
                 selectedAppointment = myAppointments.get(idx.intValue());
@@ -72,11 +72,11 @@ public class DoctorAppointmentsController {
         });
         setButtonsEnabled(false);
 
-        // Dodaj checkbox do filtrowania tylko gdy scena jest już ustawiona
+        // Add the checkbox for filtering only after the scene is set
         appointmentsTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 if (showActiveOnlyCheckBox == null) {
-                    showActiveOnlyCheckBox = new CheckBox("Pokaż tylko aktywne wizyty");
+                    showActiveOnlyCheckBox = new CheckBox("Show active appointments only");
                     showActiveOnlyCheckBox.setSelected(true);
                     BorderPane root = (BorderPane) newScene.getRoot();
                     HBox hbox = (HBox) root.getBottom();
@@ -86,7 +86,7 @@ public class DoctorAppointmentsController {
             }
         });
 
-        // --- Zapisujemy kontroler w właściwościach root do globalnego odświeżania ---
+        // --- Store the controller in the root properties for global refreshes ---
         javafx.application.Platform.runLater(() -> {
             if (appointmentsTable.getScene() != null && appointmentsTable.getScene().getRoot() != null) {
                 appointmentsTable.getScene().getRoot().getProperties().put("fx:controller", this);
@@ -94,7 +94,7 @@ public class DoctorAppointmentsController {
         });
     }
 
-    // --- Publiczna metoda do odświeżania listy wizyt ---
+    // --- Public method for refreshing the appointment list ---
     public void reloadAppointments() {
         loadAppointments();
     }
@@ -116,7 +116,7 @@ public class DoctorAppointmentsController {
             return;
         Patient patient = selectedAppointment.getPatient();
         Slot slot = selectedAppointment.getSlot();
-        String msg = String.format("Pacjent: %s\nData: %s\nGodzina: %s-%s\nStatus: %s\nOpis problemu: %s",
+        String msg = String.format("Patient: %s\nDate: %s\nTime: %s-%s\nStatus: %s\nProblem description: %s",
                 patient != null ? patient.name() : "?",
                 slot != null ? slot.date() : "?",
                 slot != null ? slot.timeRange().start() : "?",
@@ -124,7 +124,7 @@ public class DoctorAppointmentsController {
                 selectedAppointment.status().name(),
                 selectedAppointment.problemDescription() != null && !selectedAppointment.problemDescription().isBlank()
                         ? selectedAppointment.problemDescription()
-                        : "(brak opisu)");
+                        : "(no description)");
         new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK).showAndWait();
     }
 
@@ -139,10 +139,10 @@ public class DoctorAppointmentsController {
                     getClass().getResource("/gui/medical_card.fxml"));
             Parent root = loader.load();
             MedicalCardController controller = loader.getController();
-            controller.setPatient(patient); // Przekazujemy pacjenta jawnie
+            controller.setPatient(patient); // Pass the patient explicitly
             javafx.scene.Scene scene = new javafx.scene.Scene(root);
             javafx.stage.Stage stage = new javafx.stage.Stage();
-            stage.setTitle("Karta medyczna: " + patient.name());
+            stage.setTitle("Medical card: " + patient.name());
             stage.setScene(scene);
             stage.show();
         } catch (Exception ex) {
@@ -156,7 +156,7 @@ public class DoctorAppointmentsController {
         Patient patient = selectedAppointment.getPatient();
         if (patient == null)
             return;
-        String msg = String.format("Imię: %s\nData urodzenia: %s\nTelefon: %s",
+        String msg = String.format("Name: %s\nDate of birth: %s\nPhone: %s",
                 patient.name(), patient.dateOfBirth(), patient.phoneNumber());
         new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK).showAndWait();
     }
@@ -171,9 +171,9 @@ public class DoctorAppointmentsController {
         if (patient == null)
             return;
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Dodaj wpis do karty");
-        dialog.setHeaderText("Podaj opis wpisu do karty medycznej pacjenta");
-        dialog.setContentText("Opis:");
+        dialog.setTitle("Add record to card");
+        dialog.setHeaderText("Enter a description for the patient's medical record");
+        dialog.setContentText("Description:");
         dialog.showAndWait().ifPresent(desc -> {
             if (!desc.isBlank()) {
                 var repos = AppContext.getRepositories();
@@ -182,7 +182,7 @@ public class DoctorAppointmentsController {
                 var record = new com.clinicmanager.model.entities.MedicalRecord(-1, card.id(), ((Doctor) doctor).id(),
                         java.time.LocalDate.now(), desc);
                 repos.records.save(record);
-                new Alert(Alert.AlertType.INFORMATION, "Wpis dodany!", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Record added!", ButtonType.OK).showAndWait();
             }
         });
     }
@@ -195,7 +195,7 @@ public class DoctorAppointmentsController {
             return;
         selectedAppointment.end(AppContext.getRepositories().appointments);
         loadAppointments();
-        new Alert(Alert.AlertType.INFORMATION, "Wizyta zakończona!", ButtonType.OK).showAndWait();
+        new Alert(Alert.AlertType.INFORMATION, "Appointment completed!", ButtonType.OK).showAndWait();
     }
 
     private void setupTable() {

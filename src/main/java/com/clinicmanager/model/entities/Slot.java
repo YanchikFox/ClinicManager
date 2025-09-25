@@ -43,9 +43,9 @@ public class Slot {
         return timeRange;
     }
 
-    // Sprawdza, czy slot jest wolny (czy nie ma aktywnej wizyty na ten slot)
+    // Check whether the slot is free (no active appointment for this slot)
     public boolean isAvailable() {
-        // Slot zajęty, jeśli jest wizyta z tym slotId i status różny od CANCELLED
+        // The slot is occupied when an appointment with this slotId exists and is not CANCELLED
         return appointmentRepository.findAll().stream()
                 .noneMatch(a -> a.slotId() == id
                         && !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED));

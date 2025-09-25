@@ -11,9 +11,9 @@ public class PatientControlPanel extends BaseControlPanel {
 
     public PatientControlPanel(String token, AccountManager accountManager, NotificationManager notificationManager) {
         super(token, accountManager, notificationManager);
-        // Pobieramy konto na podstawie tokenu
+        // Retrieve the account based on the token
         Account acc = accountManager.getAccountByToken(token);
-        // Pobieramy pacjenta na podstawie ownerId
+        // Retrieve the patient using the ownerId
         RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         this.patient = repos.patients.findById(acc.ownerId());
     }
@@ -25,7 +25,7 @@ public class PatientControlPanel extends BaseControlPanel {
         return patient;
     }
 
-    // Przykładowa metoda chroniona: pobierz swoją kartę medyczną
+    // Example protected method: fetch the patient's medical card
     public com.clinicmanager.model.entities.MedicalCard viewMedicalCard() {
         requireValidToken();
         requirePatientRole();
@@ -33,7 +33,7 @@ public class PatientControlPanel extends BaseControlPanel {
         return repos.cards.findById(patient.medicalCardId());
     }
 
-    // Przykładowa metoda chroniona: pobierz listę swoich wizyt
+    // Example protected method: fetch the patient's appointments
     public java.util.List<com.clinicmanager.model.entities.Appointment> getMyAppointments() {
         requireValidToken();
         requirePatientRole();

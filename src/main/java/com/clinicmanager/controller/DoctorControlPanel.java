@@ -12,9 +12,9 @@ public class DoctorControlPanel extends BaseControlPanel {
 
     public DoctorControlPanel(String token, AccountManager accountManager, NotificationManager notificationManager) {
         super(token, accountManager, notificationManager);
-        // Pobieramy konto na podstawie tokenu
+        // Retrieve the account based on the token
         Account acc = accountManager.getAccountByToken(token);
-        // Pobieramy lekarza na podstawie ownerId
+        // Retrieve the doctor using the ownerId
         RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         this.doctor = repos.doctors.findById(acc.ownerId());
     }
@@ -33,21 +33,21 @@ public class DoctorControlPanel extends BaseControlPanel {
         return repos.schedules.findByDoctorId(doctor.id());
     }
 
-    // Przykładowa metoda chroniona: pobierz listę pacjentów
+    // Example protected method: fetch the list of patients
     public java.util.List<Integer> getPatientsList() {
         requireValidToken();
         requireDoctorRole();
         return doctor.getPatientsList();
     }
 
-    // Przykładowa metoda chroniona: dodaj slot
+    // Example protected method: add a slot
     public void addAvailableSlot(com.clinicmanager.model.entities.Slot slot) {
         requireValidToken();
         requireDoctorRole();
         doctor.addAvailableSlot(slot);
     }
 
-    // Przykładowa metoda chroniona: zakończ wizytę
+    // Example protected method: finish an appointment
     public void endAppointment(com.clinicmanager.model.entities.Appointment appointment) {
         requireValidToken();
         requireDoctorRole();
@@ -60,6 +60,6 @@ public class DoctorControlPanel extends BaseControlPanel {
         }
     }
 
-    // ...inne metody
+    // ...other methods
 }
 

@@ -28,12 +28,12 @@ public class NotificationWindow {
             // Always reload notifications from DB
             List<Notification> notifications = notificationManager.getAllNotificationsByPersonId(personId);
             listView.setItems(FXCollections.observableArrayList(
-                    notifications.stream().map(n -> (n.isRead() ? "" : "[NOWE] ") + n.timestamp().format(formatter) + ": " + n.message()).toList()
+                    notifications.stream().map(n -> (n.isRead() ? "" : "[NEW] ") + n.timestamp().format(formatter) + ": " + n.message()).toList()
             ));
         };
         refreshList.run();
 
-        Button markReadBtn = new Button("Oznacz jako przeczytane");
+        Button markReadBtn = new Button("Mark as read");
         markReadBtn.setOnAction(e -> {
             // Always reload notifications from DB before marking as read
             List<Notification> notifications = notificationManager.getAllNotificationsByPersonId(personId);
@@ -52,7 +52,7 @@ public class NotificationWindow {
         Stage dialog = new Stage();
         dialog.initOwner(owner);
         dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setTitle("Powiadomienia");
+        dialog.setTitle("Notifications");
         dialog.setScene(new Scene(vbox, 700, 300));
         dialog.showAndWait();
     }

@@ -106,7 +106,7 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
     }
 
     public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
-        // Sprawdzamy, czy pacjent ma już wizytę u tego lekarza w tym dniu
+        // Verify whether the patient already has an appointment with this doctor on the same day
         return findAll().stream().noneMatch(a -> a.patientId() == patientId &&
                 a.doctorId() == doctorId &&
                 getSlotDateSafe(a) != null &&

@@ -28,7 +28,7 @@ public class AccountRepository extends AbstractDatabaseManager<Account> {
             }
             throw new RuntimeException("No ID returned for account");
         } catch (SQLException e) {
-            // Dodajemy wyświetlanie oryginalnej wiadomości błędu SQL do diagnostyki
+            // Include the original SQL error message for diagnostics
             throw new RuntimeException("Failed to save account: " + e.getMessage(), e);
         }
     }
@@ -107,7 +107,7 @@ public class AccountRepository extends AbstractDatabaseManager<Account> {
                 rs.getString("password_hash"),
                 Role.valueOf(rs.getString("role")),
                 rs.getInt("owner_id"),
-                true // hasło już jest zahaszowane w bazie
+                true // the password is already hashed in the database
         );
     }
 }

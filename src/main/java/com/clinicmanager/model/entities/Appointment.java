@@ -27,7 +27,7 @@ public class Appointment {
         this.problemDescription = problemDescription;
     }
 
-    // Stary konstruktor dla kompatybilności wstecznej
+    // Legacy constructor maintained for backward compatibility
     public Appointment(int id, int patientId, int doctorId, int slotId, AppointmentStatus status) {
         this(id, patientId, doctorId, slotId, status, "");
     }
@@ -56,7 +56,7 @@ public class Appointment {
         return problemDescription;
     }
 
-    // Metody do zmiany statusu
+    // Methods for updating the status
     public void confirm() {
         this.status = AppointmentStatus.CONFIRMED;
     }
@@ -70,7 +70,7 @@ public class Appointment {
         this.status = AppointmentStatus.PENDING;
     }
 
-    // Metody do anulowania, przełożenia i potwierdzenia wizyty
+    // Methods to cancel, reschedule, and confirm the appointment
     public void cancel(AppointmentRepository repo) {
         this.status = AppointmentStatus.CANCELLED;
         repo.update(this);
@@ -92,7 +92,7 @@ public class Appointment {
         repo.update(this);
     }
 
-    // Metody do pobierania powiązanych obiektów (po id)
+    // Methods for retrieving related objects by id
     public Patient getPatient() {
         PatientRepository repo = AppContext.getInstance().getRepositories().patients;
         return repo.findById(patientId);

@@ -13,5 +13,5 @@ public interface Repository<T> {
 
     List<T> findAll();
 
-    T findByEmail(String email); // można zwrócić null, jeśli nie jest używane
+    T findByEmail(String email); // may return null if not applicable
 }

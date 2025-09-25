@@ -3,26 +3,26 @@
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinicmanager.gui.DoctorAppointmentsController">
     <top>
-        <Label text="Moje wizyty" style="-fx-font-size: 16; -fx-padding: 10;" />
+        <Label text="My appointments" style="-fx-font-size: 16; -fx-padding: 10;" />
     </top>
     <center>
         <TableView fx:id="appointmentsTable" prefHeight="250">
             <columns>
-                <TableColumn text="Pacjent" fx:id="patientCol" />
-                <TableColumn text="Data" fx:id="dateCol" />
-                <TableColumn text="Godzina" fx:id="timeCol" />
+                <TableColumn text="Patient" fx:id="patientCol" />
+                <TableColumn text="Date" fx:id="dateCol" />
+                <TableColumn text="Time" fx:id="timeCol" />
                 <TableColumn text="Status" fx:id="statusCol" />
             </columns>
         </TableView>
     </center>
     <bottom>
         <HBox spacing="10" alignment="center" style="-fx-padding: 10;">
-            <Button text="Pokaż szczegóły wizyty" fx:id="viewDetailsBtn" />
-            <Button text="Otwórz kartę pacjenta" fx:id="openCardBtn" />
-            <Button text="Dane pacjenta" fx:id="patientInfoBtn" />
-            <Button text="Dodaj wpis do karty" fx:id="addRecordBtn" />
-            <Button text="Zakończ przyjęcie" fx:id="endAppointmentBtn" />
-            <Button text="Zamknij okno" fx:id="closeBtn" />
+            <Button text="Show appointment details" fx:id="viewDetailsBtn" />
+            <Button text="Open patient card" fx:id="openCardBtn" />
+            <Button text="Patient details" fx:id="patientInfoBtn" />
+            <Button text="Add record to card" fx:id="addRecordBtn" />
+            <Button text="End appointment" fx:id="endAppointmentBtn" />
+            <Button text="Close window" fx:id="closeBtn" />
         </HBox>
     </bottom>
 </BorderPane>

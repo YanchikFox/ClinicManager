@@ -3,16 +3,16 @@
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinicmanager.gui.PatientAppointmentsController">
     <top>
-        <Label fx:id="infoLabel" text="Twoje aktywne wizyty:" style="-fx-padding: 10;" />
+        <Label fx:id="infoLabel" text="Your active appointments:" style="-fx-padding: 10;" />
     </top>
     <center>
         <ListView fx:id="appointmentsListView" prefHeight="300" prefWidth="500" />
     </center>
     <bottom>
         <HBox spacing="10" alignment="center" style="-fx-padding: 10;">
-            <Button fx:id="cancelBtn" text="Anuluj" disable="true" />
-            <Button fx:id="rescheduleBtn" text="Przełóż" disable="true" />
-            <Button fx:id="confirmBtn" text="Potwierdź" disable="true" />
+            <Button fx:id="cancelBtn" text="Cancel" disable="true" />
+            <Button fx:id="rescheduleBtn" text="Reschedule" disable="true" />
+            <Button fx:id="confirmBtn" text="Confirm" disable="true" />
         </HBox>
     </bottom>
 </BorderPane>

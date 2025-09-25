@@ -4,13 +4,13 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinicmanager.gui.MedicalCardController">
     <top>
         <VBox spacing="10" style="-fx-padding: 10;">
-            <Label text="Karta medyczna pacjenta" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+            <Label text="Patient medical card" style="-fx-font-size: 16; -fx-font-weight: bold;" />
             <Label fx:id="cardInfoLabel" />
         </VBox>
     </top>
     <center>
         <VBox spacing="10" style="-fx-padding: 10;">
-            <Label text="Wpisy w karcie:" />
+            <Label text="Card entries:" />
             <ListView fx:id="recordsListView" prefHeight="250" />
         </VBox>
     </center>

@@ -13,7 +13,7 @@ public class TimeManager {
     private final List<Consumer<LocalDateTime>> listeners = new ArrayList<>();
     private Timer timer;
     private boolean running = false;
-    private int speedSecondsPerTick = 10; // 1 minuta = 10 sekund
+    private int speedSecondsPerTick = 10; // 1 minute equals 10 seconds
 
     private TimeManager() {
         this.currentTime = LocalDateTime.now();
@@ -57,7 +57,7 @@ public class TimeManager {
             public void run() {
                 currentTime = currentTime.plusMinutes(1);
                 notifyListeners();
-                // --- Globalna obsługa czasu ---
+                // --- Global time handling ---
                 com.clinicmanager.time.TimeTickHandler.handleTimeTick(currentTime);
             }
         }, speedSecondsPerTick * 1000, speedSecondsPerTick * 1000);

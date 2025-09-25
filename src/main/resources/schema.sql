@@ -1,6 +1,6 @@
 // ...existing code...
     public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
-        // Sprawdzamy, czy pacjent ma już wizytę u tego lekarza w tym dniu
+        // Verify that the patient does not already have an appointment with this doctor on the same day
         return findAll().stream().noneMatch(a ->
                 a.patientId() == patientId &&
                 a.doctorId() == doctorId &&
@@ -11,7 +11,7 @@
     }
 // ...existing code...// ...existing code...
     public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
-        // Sprawdzamy, czy pacjent ma już wizytę u tego lekarza w tym dniu
+        // Verify that the patient does not already have an appointment with this doctor on the same day
         return findAll().stream().noneMatch(a ->
                 a.patientId() == patientId &&
                 a.doctorId() == doctorId &&

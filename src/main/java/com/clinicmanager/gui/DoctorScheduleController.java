@@ -68,12 +68,12 @@ public class DoctorScheduleController {
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
-    // --- Publiczna metoda do odświeżania slotów (dla globalnego odświeżania UI) ---
+    // --- Public method for refreshing slots (used for global UI refresh) ---
     public void loadSlots() {
         loadSlotsImpl();
     }
 
-    // Stara prywatna implementacja
+    // Legacy private implementation
     private void loadSlotsImpl() {
         var panel = AppContext.getPanel();
         if (!(panel instanceof DoctorControlPanel doctorPanel))
@@ -86,7 +86,7 @@ public class DoctorScheduleController {
         ObservableList<SlotTableRow> rows = FXCollections.observableArrayList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (var slot : allSlots) {
-            String status = slot.isAvailable() ? "wolny" : "zajęty";
+            String status = slot.isAvailable() ? "available" : "booked";
             rows.add(new SlotTableRow(
                     slot.date().format(fmt),
                     slot.timeRange().start().toString(),
@@ -112,11 +112,11 @@ public class DoctorScheduleController {
         }
         boolean hasRealAppointment = hasRealPatientAppointment(slot);
         boolean isClosedByDoctor = isClosedByDoctor(slot);
-        // Usuwanie możliwe tylko jeśli nie ma żadnych wizyt
+        // Removal is allowed only when there are no appointments
         removeSlotBtn.setDisable(hasRealAppointment || isClosedByDoctor);
-        // Zamknąć można tylko jeśli slot jest wolny, nie ma wizyt pacjenta i nie został zamknięty ręcznie
+        // Closing is allowed only when the slot is free, has no patient appointments, and has not been closed manually
         closeSlotBtn.setDisable(hasRealAppointment || isClosedByDoctor);
-        // Otworzyć można tylko jeśli slot został zamknięty ręcznie (jest ENDED appointment z patientId=-1)
+        // Opening is allowed only when the slot was closed manually (an ENDED appointment with patientId = -1 exists)
         openSlotBtn.setDisable(!isClosedByDoctor);
     }
 
@@ -139,7 +139,7 @@ public class DoctorScheduleController {
             return;
         if (hasRealPatientAppointment(slot) || isClosedByDoctor(slot))
             return;
-        // Zamykamy slot: tworzymy ENDED appointment z patientId = -1
+        // Close the slot by creating an ENDED appointment with patientId = -1
         var doctor = (Doctor) ((DoctorControlPanel) AppContext.getPanel()).currentPerson();
         var app = new com.clinicmanager.model.entities.Appointment(-1, -1, doctor.id(), slot.id(),
                 com.clinicmanager.model.enums.AppointmentStatus.ENDED);
@@ -154,7 +154,7 @@ public class DoctorScheduleController {
         var slot = findSlotByRow(selectedSlotRow);
         if (slot == null)
             return;
-        // Otwieramy slot: usuwamy ENDED appointment z patientId = -1
+        // Reopen the slot by removing the ENDED appointment with patientId = -1
         var repo = AppContext.getRepositories().appointments;
         var toDelete = repo.findAll().stream()
                 .filter(a -> a.slotId() == slot.id() && a.patientId() == -1 && a.status().name().equals("ENDED"))
@@ -186,14 +186,14 @@ public class DoctorScheduleController {
             return;
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
         Dialog<Slot> dialog = new Dialog<>();
-        dialog.setTitle("Dodaj slot");
+        dialog.setTitle("Add slot");
         DatePicker datePicker = new DatePicker();
         TextField startField = new TextField();
-        startField.setPromptText("Godzina od (np. 09:00)");
+        startField.setPromptText("Start time (e.g. 09:00)");
         TextField endField = new TextField();
-        endField.setPromptText("Godzina do (np. 10:00)");
-        VBox vbox = new VBox(10, new Label("Data:"), datePicker, new Label("Godzina od:"), startField,
-                new Label("Godzina do:"), endField);
+        endField.setPromptText("End time (e.g. 10:00)");
+        VBox vbox = new VBox(10, new Label("Date:"), datePicker, new Label("Start time:"), startField,
+                new Label("End time:"), endField);
         dialog.getDialogPane().setContent(vbox);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         dialog.setResultConverter(btn -> {
@@ -212,13 +212,13 @@ public class DoctorScheduleController {
         });
         dialog.showAndWait().ifPresent(slot -> {
             if (slot != null) {
-                // Sprawdzenie na nakładanie się czasu i daty
+                // Check for overlapping dates and times
                 RepositoryManager repos = AppContext.getRepositories();
                 boolean intersects = repos.slots.findAll().stream()
                         .filter(s -> s.scheduleId() == doctor.scheduleId() && s.date().equals(slot.date()))
                         .anyMatch(s -> timesOverlap(s.timeRange(), slot.timeRange()));
                 if (intersects) {
-                    new Alert(Alert.AlertType.ERROR, "Slot koliduje z istniejącym!", ButtonType.OK).showAndWait();
+                    new Alert(Alert.AlertType.ERROR, "The slot conflicts with an existing one!", ButtonType.OK).showAndWait();
                 } else {
                     repos.slots.save(slot);
                     loadSlots();

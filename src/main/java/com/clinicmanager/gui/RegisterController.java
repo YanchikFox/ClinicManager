@@ -45,9 +45,9 @@ public class RegisterController {
                         nameField.getText(), dobField.getText(),
                         phoneField.getText());
             }
-            messageLabel.setText("✅ Zarejestrowano pomyślnie!");
+            messageLabel.setText("✅ Registered successfully!");
         } catch (Exception e) {
-            messageLabel.setText("❌ Błąd: " + e.getMessage());
+            messageLabel.setText("❌ Error: " + e.getMessage());
         }
     }
 

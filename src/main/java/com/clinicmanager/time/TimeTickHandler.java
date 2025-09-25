@@ -17,7 +17,7 @@ public class TimeTickHandler {
         RepositoryManager repos = AppContext.getRepositories();
         NotificationManager notificationManager = new NotificationManager(repos.notifications);
 
-        // 1. Usuwanie starych slotów
+        // 1. Remove outdated slots
         List<Slot> slots = repos.slots.findAll();
         for (Slot slot : slots) {
             LocalDateTime slotEnd = LocalDateTime.of(slot.date(), slot.timeRange().end());
@@ -26,7 +26,7 @@ public class TimeTickHandler {
             }
         }
 
-        // 2. Zakończenie przeterminowanych wizyt (Appointment)
+        // 2. Finish overdue appointments
         List<Appointment> appointments = repos.appointments.findAll();
         for (Appointment app : appointments) {
             Slot slot = app.getSlot();
@@ -39,22 +39,22 @@ public class TimeTickHandler {
             }
         }
 
-        // 3. Powiadomienia na 10 minut przed wizytą (tylko CONFIRMED/PENDING)
+        // 3. Notifications ten minutes before an appointment (only CONFIRMED/PENDING)
         for (Appointment app : appointments) {
             Slot slot = app.getSlot();
             if (slot == null) continue;
             LocalDateTime slotStart = LocalDateTime.of(slot.date(), slot.timeRange().start());
             if (!app.status().equals(AppointmentStatus.ENDED) && !app.status().equals(AppointmentStatus.CANCELLED)) {
                 if (slotStart.minusMinutes(10).equals(now)) {
-                    // Powiadom lekarza i pacjenta
-                    notificationManager.createNotification(app.doctorId(), "Za 10 minut rozpocznie się przyjęcie.");
-                    notificationManager.createNotification(app.patientId(), "Za 10 minut rozpocznie się Twoja wizyta.");
+                    // Notify the doctor and the patient
+                    notificationManager.createNotification(app.doctorId(), "The appointment starts in 10 minutes.");
+                    notificationManager.createNotification(app.patientId(), "Your appointment starts in 10 minutes.");
                 }
             }
         }
 
-        // 4. Odśwież UI (wszystkie kontrolery muszą nasłuchiwać TimeManagera)
-        // Kontrolery są już podpięte do TimeManagera i same odświeżą UI
+        // 4. Refresh the UI (all controllers listen to the TimeManager)
+        // Controllers are already registered with the TimeManager and refresh themselves
     }
 }
 

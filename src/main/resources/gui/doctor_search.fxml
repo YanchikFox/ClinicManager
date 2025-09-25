@@ -4,18 +4,18 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinicmanager.gui.DoctorSearchController">
     <left>
         <VBox spacing="10" style="-fx-padding: 10;">
-            <Label text="Lista lekarzy:" />
+            <Label text="Doctor list:" />
             <ListView fx:id="doctorListView" prefWidth="200" />
         </VBox>
     </left>
     <center>
         <VBox spacing="10" style="-fx-padding: 10;">
-            <Label text="Dane lekarza:" />
+            <Label text="Doctor details:" />
             <Label fx:id="doctorInfoLabel" wrapText="true" />
-            <Label text="Grafik:" />
+            <Label text="Schedule:" />
             <ListView fx:id="scheduleListView" prefHeight="150" />
-            <Button fx:id="makeAppointmentBtn" text="Umów wizytę" disable="true" />
-            <Button fx:id="addFavoriteBtn" text="Dodaj do ulubionych" disable="true" />
+            <Button fx:id="makeAppointmentBtn" text="Book appointment" disable="true" />
+            <Button fx:id="addFavoriteBtn" text="Add to favorites" disable="true" />
         </VBox>
     </center>
 </BorderPane>

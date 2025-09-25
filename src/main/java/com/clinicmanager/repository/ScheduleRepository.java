@@ -89,7 +89,7 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
 
     public Schedule findByDoctorId(int doctorId) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM schedules WHERE doctor_id = ? LIMIT 1")) {  // LIMIT 1 dla pewności
+                "SELECT * FROM schedules WHERE doctor_id = ? LIMIT 1")) {  // LIMIT 1 for safety
             stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -98,7 +98,7 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null; // brak wyniku
+        return null; // no result
     }
 
 
@@ -113,7 +113,7 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
                 LocalTime startTime = rs.getTime("start_time").toLocalTime();
                 LocalTime endTime = rs.getTime("end_time").toLocalTime();
 
-                TimeRange timeRange = new TimeRange(startTime, endTime);  // zakładam taki konstruktor
+                TimeRange timeRange = new TimeRange(startTime, endTime);  // assuming this constructor exists
 
                 slots.add(new Slot(
                         rs.getInt("id"),

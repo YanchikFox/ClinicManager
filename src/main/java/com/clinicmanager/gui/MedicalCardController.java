@@ -34,14 +34,14 @@ public class MedicalCardController {
         if (patient != null) {
             loadCard();
         } else {
-            // Jeśli pacjent nie został przekazany jawnie, próbujemy pobrać z AppContext
+            // If the patient was not provided explicitly, attempt to retrieve it from AppContext
             Object person = AppContext.getPanel().currentPerson();
             if (person instanceof Patient p) {
                 patient = p;
                 loadCard();
             } else {
-                // Jeśli nie pacjent — nic nie robimy
-                cardInfoLabel.setText("Błąd: brak danych pacjenta");
+                // If no patient is available, leave the view empty
+                cardInfoLabel.setText("Error: missing patient data");
                 recordsListView.setItems(FXCollections.observableArrayList());
             }
         }
@@ -49,17 +49,17 @@ public class MedicalCardController {
 
     private void loadCard() {
         if (patient == null) {
-            cardInfoLabel.setText("Błąd: brak danych pacjenta");
+            cardInfoLabel.setText("Error: missing patient data");
             recordsListView.setItems(FXCollections.observableArrayList());
             return;
         }
         MedicalCard card = repos.cards.findById(patient.medicalCardId());
         if (card == null) {
-            cardInfoLabel.setText("Brak karty medycznej dla pacjenta: " + patient.name());
+            cardInfoLabel.setText("No medical card for patient: " + patient.name());
             recordsListView.setItems(FXCollections.observableArrayList());
             return;
         }
-        cardInfoLabel.setText("ID karty: " + card.id() + " | Pacjent: " + patient.name());
+        cardInfoLabel.setText("Card ID: " + card.id() + " | Patient: " + patient.name());
         List<MedicalRecord> records = card.getRecords();
         recordsListView.setItems(FXCollections.observableArrayList(
                 records.stream().map(r -> r.date() + ": " + r.description()).toList()));

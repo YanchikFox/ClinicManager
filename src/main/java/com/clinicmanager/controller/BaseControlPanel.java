@@ -27,7 +27,7 @@ public abstract class BaseControlPanel {
 
     public void demoAction() {
         requireValidToken();
-        System.out.println("Token jest ważny — dostęp do funkcji dozwolony.");
+        System.out.println("Token is valid — access to the function is permitted.");
     }
 
     public List<Notification> viewNotifications() {

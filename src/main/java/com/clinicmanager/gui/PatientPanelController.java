@@ -45,7 +45,7 @@ public class PatientPanelController {
                         getClass().getResource("/gui/doctor_search.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Wyszukiwanie lekarza");
+                stage.setTitle("Doctor search");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -59,7 +59,7 @@ public class PatientPanelController {
                         getClass().getResource("/gui/patient_appointments.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Moje wizyty");
+                stage.setTitle("My appointments");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -73,7 +73,7 @@ public class PatientPanelController {
                         getClass().getResource("/gui/medical_card.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Karta medyczna");
+                stage.setTitle("Medical card");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -83,7 +83,7 @@ public class PatientPanelController {
 
         logoutBtn.setOnAction(e -> {
             try {
-                // revoke token przy wylogowaniu
+                // Revoke the token when logging out
                 var panel = com.clinicmanager.gui.AppContext.getPanel();
                 if (panel != null) {
                     panel.revokeToken();
@@ -98,7 +98,7 @@ public class PatientPanelController {
             }
         });
 
-        // Powiadomienia
+        // Notifications
         javafx.application.Platform.runLater(this::updateNotificationsButtonStyle);
         notificationsBtn.setOnAction(e -> {
             var panel = com.clinicmanager.gui.AppContext.getPanel();
@@ -112,7 +112,7 @@ public class PatientPanelController {
             // update style after closing window
             javafx.application.Platform.runLater(this::updateNotificationsButtonStyle);
         });
-        // add listener to update style when window regains focus
+        // Add a listener to update the style when the window regains focus
         notificationsBtn.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.windowProperty().addListener((o, oldWin, newWin) -> {
@@ -144,7 +144,7 @@ public class PatientPanelController {
                 controller.setDoctors(doctors);
                 javafx.scene.Scene scene = new javafx.scene.Scene(root);
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Ulubieni lekarze");
+                stage.setTitle("Favorite doctors");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -152,7 +152,7 @@ public class PatientPanelController {
             }
         });
 
-        // Wirtualny czas
+        // Virtual time management
         updateTimeLabel(timeManager.getCurrentTime());
         timeManager.addListener(this::onTimeChanged);
         startTimeBtn.setOnAction(e -> timeManager.start());
@@ -166,9 +166,9 @@ public class PatientPanelController {
 
     private void onTimeChanged(LocalDateTime time) {
         updateTimeLabel(time);
-        // Automatycznie odśwież wszystkie otwarte okna pacjenta po zmianie czasu
+        // Automatically refresh all open patient windows after the time changes
         javafx.application.Platform.runLater(() -> {
-            // Odśwież okno wizyt pacjenta, jeśli jest otwarte
+            // Refresh the patient appointments window if it is open
             for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
                 if (window.isShowing() && window.getScene() != null
                         && window.getScene().getRoot() instanceof javafx.scene.Parent) {
@@ -184,15 +184,15 @@ public class PatientPanelController {
 
     private void handleSetTime() {
         TextInputDialog dialog = new TextInputDialog(dtf.format(timeManager.getCurrentTime()));
-        dialog.setTitle("Ustaw czas systemowy");
-        dialog.setHeaderText("Podaj nowy czas (yyyy-MM-dd HH:mm):");
-        dialog.setContentText("Czas:");
+        dialog.setTitle("Set system time");
+        dialog.setHeaderText("Enter the new time (yyyy-MM-dd HH:mm):");
+        dialog.setContentText("Time:");
         dialog.showAndWait().ifPresent(str -> {
             try {
                 LocalDateTime newTime = LocalDateTime.parse(str, dtf);
                 timeManager.setCurrentTime(newTime);
             } catch (Exception ex) {
-                new Alert(Alert.AlertType.ERROR, "Nieprawidłowy format czasu!", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Invalid time format!", ButtonType.OK).showAndWait();
             }
         });
     }

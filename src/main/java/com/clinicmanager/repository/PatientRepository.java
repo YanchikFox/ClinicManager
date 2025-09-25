@@ -96,7 +96,7 @@ public class PatientRepository extends AbstractDatabaseManager<Patient> {
 
     @Override
     public Patient findByEmail(String email) {
-        return null; // Nie używane
+        return null; // Not used
     }
 
     public List<Integer> getPatientIdsOfDoctor(int doctorId) {

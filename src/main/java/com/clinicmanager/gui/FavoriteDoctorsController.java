@@ -73,11 +73,11 @@ public class FavoriteDoctorsController {
                     getClass().getResource("/gui/doctor_search.fxml"));
             javafx.scene.Parent root = loader.load();
             DoctorSearchController controller = loader.getController();
-            // Przekazujemy wybranego lekarza do kontrolera wyszukiwania
+            // Pass the selected doctor to the search controller
             controller.selectDoctor(selectedDoctor);
             javafx.scene.Scene scene = new javafx.scene.Scene(root);
             javafx.stage.Stage stage = new javafx.stage.Stage();
-            stage.setTitle("Szczegóły lekarza");
+            stage.setTitle("Doctor details");
             stage.setScene(scene);
             stage.show();
         } catch (Exception ex) {

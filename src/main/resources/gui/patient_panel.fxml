@@ -9,20 +9,20 @@
       spacing="10" alignment="CENTER" style="-fx-padding: 20">
 
     <HBox spacing="10" alignment="CENTER">
-        <Label text="Czas systemowy:" />
+        <Label text="System time:" />
         <Label fx:id="virtualTimeLabel" style="-fx-font-weight: bold;" />
         <Button text="Start" fx:id="startTimeBtn" />
         <Button text="Stop" fx:id="stopTimeBtn" />
-        <Button text="Ustaw czas" fx:id="setTimeBtn" />
+        <Button text="Set time" fx:id="setTimeBtn" />
     </HBox>
 
-    <Label text="🧑‍💻 Panel pacjenta" style="-fx-font-size: 18"/>
+    <Label text="🧑‍💻 Patient panel" style="-fx-font-size: 18"/>
 
-    <Button text="Znajdź lekarza" fx:id="searchDoctorsBtn"/>
-    <Button text="Moje wizyty" fx:id="viewAppointmentsBtn"/>
-    <Button text="Karta medyczna" fx:id="viewMedicalCardBtn"/>
-    <Button text="Powiadomienia" fx:id="notificationsBtn" style="-fx-background-color: #cccccc;"/>
-    <Button text="Ulubieni lekarze" fx:id="favoriteDoctorsBtn"/>
-    <Button text="Wyloguj się" fx:id="logoutBtn"/>
+    <Button text="Find a doctor" fx:id="searchDoctorsBtn"/>
+    <Button text="My appointments" fx:id="viewAppointmentsBtn"/>
+    <Button text="Medical card" fx:id="viewMedicalCardBtn"/>
+    <Button text="Notifications" fx:id="notificationsBtn" style="-fx-background-color: #cccccc;"/>
+    <Button text="Favorite doctors" fx:id="favoriteDoctorsBtn"/>
+    <Button text="Log out" fx:id="logoutBtn"/>
 
 </VBox>

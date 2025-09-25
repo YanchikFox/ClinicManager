@@ -2,10 +2,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinicmanager.gui.FavoriteDoctorsController" spacing="10" alignment="CENTER" style="-fx-padding: 20">
-    <Label text="Ulubieni lekarze" style="-fx-font-size: 18"/>
+    <Label text="Favorite doctors" style="-fx-font-size: 18"/>
     <ListView fx:id="favoriteDoctorsListView" prefWidth="300" prefHeight="200"/>
-    <Button text="Pokaż szczegóły" fx:id="showDoctorBtn" disable="true"/>
-    <Button text="Usuń z ulubionych" fx:id="removeFavoriteBtn" disable="true"/>
-    <Button text="Zamknij" fx:id="closeBtn"/>
+    <Button text="Show details" fx:id="showDoctorBtn" disable="true"/>
+    <Button text="Remove from favorites" fx:id="removeFavoriteBtn" disable="true"/>
+    <Button text="Close" fx:id="closeBtn"/>
 </VBox>
 

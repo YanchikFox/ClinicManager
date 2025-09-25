@@ -8,10 +8,10 @@
       fx:controller="com.clinicmanager.gui.LoginController"
       spacing="10" alignment="CENTER" style="-fx-padding: 20">
 
-    <Label text="Logowanie"/>
+    <Label text="Log in"/>
     <TextField fx:id="emailField" promptText="Email"/>
-    <PasswordField fx:id="passwordField" promptText="Hasło"/>
-    <Button text="Zaloguj się" onAction="#handleLogin"/>
+    <PasswordField fx:id="passwordField" promptText="Password"/>
+    <Button text="Log in" onAction="#handleLogin"/>
     <Label fx:id="messageLabel" textFill="red"/>
-    <Button text="Wróć" onAction="#handleBack"/>
+    <Button text="Back" onAction="#handleBack"/>
 </VBox>

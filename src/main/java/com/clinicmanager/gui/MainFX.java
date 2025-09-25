@@ -8,8 +8,8 @@ import javafx.stage.Stage;
 public class MainFX extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        // Usuwanie przyszłych wolnych slotów przy starcie aplikacji zeby wyiliminować
-        // błędy
+        // Remove future free slots when the application starts to eliminate
+        // scheduling inconsistencies
         var slotRepo = com.clinicmanager.gui.AppContext.getRepositories().slots;
         var appointmentRepo = com.clinicmanager.gui.AppContext.getRepositories().appointments;
         java.time.LocalDateTime now = com.clinicmanager.time.TimeManager.getInstance().getCurrentTime();

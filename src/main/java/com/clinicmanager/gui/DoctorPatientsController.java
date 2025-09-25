@@ -52,7 +52,7 @@ public class DoctorPatientsController {
         if (!(panel instanceof DoctorControlPanel doctorPanel)) return;
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
         RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
-        // Пациенты, у которых есть ENDED appointment с этим doctorId
+        // Patients who have an ENDED appointment with this doctor
         List<Appointment> ended = repos.appointments.findAll().stream()
             .filter(a -> a.doctorId() == doctor.id() && a.status().name().equals("ENDED"))
             .toList();
@@ -61,7 +61,7 @@ public class DoctorPatientsController {
             .filter(p -> p != null)
             .distinct()
             .toList();
-        // Убираем null и дубликаты, не добавляем пустой список
+        // Remove null values and duplicates and fall back to an empty list
         if (treatedPatients.isEmpty()) {
             patientsTable.setItems(FXCollections.observableArrayList());
         } else {
@@ -78,7 +78,7 @@ public class DoctorPatientsController {
             controller.setPatient(selectedPatient);
             javafx.scene.Scene scene = new javafx.scene.Scene(root);
             javafx.stage.Stage stage = new javafx.stage.Stage();
-            stage.setTitle("Karta medyczna: " + selectedPatient.name());
+            stage.setTitle("Medical card: " + selectedPatient.name());
             stage.setScene(scene);
             stage.show();
         } catch (Exception ex) {
@@ -88,7 +88,7 @@ public class DoctorPatientsController {
 
     private void handlePatientInfo() {
         if (selectedPatient == null) return;
-        String msg = String.format("Imię: %s\nData уrodzenia: %s\nTelefon: %s",
+        String msg = String.format("Name: %s\nDate of birth: %s\nPhone: %s",
                 selectedPatient.name(), selectedPatient.dateOfBirth(), selectedPatient.phoneNumber());
         new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK).showAndWait();
     }

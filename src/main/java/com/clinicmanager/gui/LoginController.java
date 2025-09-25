@@ -48,7 +48,7 @@ public class LoginController {
             BaseControlPanel panel = clinic.login(email, pass);
             AppContext.setPanel(panel);
 
-            // --- Autogenerowanie slotów dla wszystkich lekarzy przy logowaniu ---
+            // --- Auto-generate slots for all doctors during login ---
             new SlotAutoGeneratorService().ensureFutureSlotsForAllDoctors();
 
             String fxml = (panel instanceof DoctorControlPanel)
@@ -59,7 +59,7 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
             stage.setScene(new Scene(loader.load()));
         } catch (Exception e) {
-            messageLabel.setText("Błąd: " + e.getMessage());
+            messageLabel.setText("Error: " + e.getMessage());
         }
     }
 

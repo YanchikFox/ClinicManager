@@ -35,14 +35,14 @@ public class DoctorPanelController {
 
     @FXML
     private void initialize() {
-        // Otwórz okno z grafikiem lekarza
+        // Open the doctor's schedule window
         viewScheduleBtn.setOnAction(e -> {
             try {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                         getClass().getResource("/gui/doctor_schedule.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Mój grafik");
+                stage.setTitle("My schedule");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -50,14 +50,14 @@ public class DoctorPanelController {
             }
         });
 
-        // Otwórz okno z wizytami lekarza
+        // Open the doctor's appointments window
         viewAppointmentsBtn.setOnAction(e -> {
             try {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                         getClass().getResource("/gui/doctor_appointments.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Moje wizyty");
+                stage.setTitle("My appointments");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -65,14 +65,14 @@ public class DoctorPanelController {
             }
         });
 
-        // Otwórz okno z listą pacjentów
+        // Open the patient list window
         viewMedicalCardBtn.setOnAction(e -> {
             try {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                         getClass().getResource("/gui/doctor_patients.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Moi pacjenci");
+                stage.setTitle("My patients");
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -80,7 +80,7 @@ public class DoctorPanelController {
             }
         });
 
-        // Wyloguj się
+        // Log out
         logoutBtn.setOnAction(e -> {
             try {
                 var panel = com.clinicmanager.gui.AppContext.getPanel();
@@ -97,7 +97,7 @@ public class DoctorPanelController {
             }
         });
 
-        // Wirtualny czas
+        // Virtual time handling
         updateTimeLabel(timeManager.getCurrentTime());
         timeManager.addListener(this::onTimeChanged);
         startTimeBtn.setOnAction(e -> timeManager.start());
@@ -111,7 +111,7 @@ public class DoctorPanelController {
 
     private void onTimeChanged(LocalDateTime time) {
         updateTimeLabel(time);
-        // Usuń wszystkie wolne sloty, które są całkowicie w przeszłości (koniec < teraz)
+        // Remove all free slots that are fully in the past (end < now)
         var slotRepo = com.clinicmanager.gui.AppContext.getRepositories().slots;
         var appointmentRepo = com.clinicmanager.gui.AppContext.getRepositories().appointments;
         slotRepo.findAll().forEach(slot -> {
@@ -123,7 +123,7 @@ public class DoctorPanelController {
                 slotRepo.delete(slot);
             }
         });
-        // --- Nowość: usuń wszystkie wolne sloty, które zaczynają się po aktualnym czasie (przyszłość) ---
+        // --- New: remove all free slots that start after the current time (future) ---
         slotRepo.findAll().forEach(slot -> {
             LocalDateTime slotStart = LocalDateTime.of(slot.date(), slot.timeRange().start());
             boolean isFuture = slotStart.isAfter(time);
@@ -133,9 +133,9 @@ public class DoctorPanelController {
                 slotRepo.delete(slot);
             }
         });
-        // --- Autogenerowanie slotów dla wszystkich lekarzy po zmianie czasu ---
+        // --- Auto-generate slots for all doctors after the time changes ---
         slotAutoGeneratorService.ensureFutureSlotsForAllDoctors();
-        // --- Odśwież wszystkie otwarte okna/kontrolery (np. listy wizyt, grafik) ---
+        // --- Refresh all open windows/controllers (e.g. appointment lists, schedules) ---
         javafx.application.Platform.runLater(() -> {
             for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
                 if (window.isShowing() && window.getScene() != null
@@ -151,20 +151,20 @@ public class DoctorPanelController {
                 }
             }
         });
-        // TODO: wysyłaj powiadomienia na 10 minut przed wizytą
+        // TODO: send notifications ten minutes before an appointment
     }
 
     private void handleSetTime() {
         TextInputDialog dialog = new TextInputDialog(dtf.format(timeManager.getCurrentTime()));
-        dialog.setTitle("Ustaw czas systemowy");
-        dialog.setHeaderText("Podaj nowy czas (yyyy-MM-dd HH:mm):");
-        dialog.setContentText("Czas:");
+        dialog.setTitle("Set system time");
+        dialog.setHeaderText("Enter the new time (yyyy-MM-dd HH:mm):");
+        dialog.setContentText("Time:");
         dialog.showAndWait().ifPresent(str -> {
             try {
                 LocalDateTime newTime = LocalDateTime.parse(str, dtf);
                 timeManager.setCurrentTime(newTime);
             } catch (Exception ex) {
-                new Alert(Alert.AlertType.ERROR, "Nieprawidłowy format czasu!", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Invalid time format!", ButtonType.OK).showAndWait();
             }
         });
     }
