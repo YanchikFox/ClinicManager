@@ -17,8 +17,10 @@ public class Schedule {
     public Schedule(int id, int doctorId) {
         this.id = id;
         this.doctorId = doctorId;
-        this.scheduleRepository = AppContext.getInstance().getRepositories().schedules;
-        this.slotRepository = AppContext.getInstance().getRepositories().slots;
+        AppContext.getInstance();
+        this.scheduleRepository = AppContext.getRepositories().schedules;
+        AppContext.getInstance();
+        this.slotRepository = AppContext.getRepositories().slots;
     }
 
     public int id() {

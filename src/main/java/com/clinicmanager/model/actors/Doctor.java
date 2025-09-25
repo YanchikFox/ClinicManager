@@ -27,16 +27,20 @@ public class Doctor extends Person {
     public Doctor(int id, String name, String dateOfBirth, String phoneNumber, int scheduleId) {
         super(id, name, dateOfBirth, phoneNumber);
         this.scheduleId = scheduleId;
-        this.patientRepository = AppContext.getInstance().getRepositories().patients;
-        this.slotRepository = AppContext.getInstance().getRepositories().slots;
+        AppContext.getInstance();
+        this.patientRepository = AppContext.getRepositories().patients;
+        AppContext.getInstance();
+        this.slotRepository = AppContext.getRepositories().slots;
     }
 
     public Doctor(int id, String name, String dateOfBirth, String phoneNumber, int scheduleId, List<Integer> patients) {
         super(id, name, dateOfBirth, phoneNumber);
         this.scheduleId = scheduleId;
         this.patients = patients;
-        this.patientRepository = AppContext.getInstance().getRepositories().patients;
-        this.slotRepository = AppContext.getInstance().getRepositories().slots;
+        AppContext.getInstance();
+        this.patientRepository = AppContext.getRepositories().patients;
+        AppContext.getInstance();
+        this.slotRepository = AppContext.getRepositories().slots;
     }
 
     public int scheduleId() {

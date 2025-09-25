@@ -19,8 +19,10 @@ public class Slot {
         this.scheduleId = scheduleId;
         this.date = date;
         this.timeRange = timeRange;
-        this.slotRepository = AppContext.getInstance().getRepositories().slots;
-        this.appointmentRepository = AppContext.getInstance().getRepositories().appointments;
+        AppContext.getInstance();
+        this.slotRepository = AppContext.getRepositories().slots;
+        AppContext.getInstance();
+        this.appointmentRepository = AppContext.getRepositories().appointments;
     }
 
     public Slot(int scheduleId, LocalDate date, TimeRange timeRange) {

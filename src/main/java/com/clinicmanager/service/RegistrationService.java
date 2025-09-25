@@ -31,12 +31,18 @@ public class RegistrationService {
     private final ScheduleRepository scheduleRepository;
 
     public RegistrationService() {
-        this.accountRepository = AppContext.getInstance().getRepositories().accounts;
-        this.doctorRepository = AppContext.getInstance().getRepositories().doctors;
-        this.patientRepository = AppContext.getInstance().getRepositories().patients;
-        this.slotRepository = AppContext.getInstance().getRepositories().slots;
-        this.medicalCardRepository = AppContext.getInstance().getRepositories().cards;
-        this.scheduleRepository = AppContext.getInstance().getRepositories().schedules;
+        AppContext.getInstance();
+        this.accountRepository = AppContext.getRepositories().accounts;
+        AppContext.getInstance();
+        this.doctorRepository = AppContext.getRepositories().doctors;
+        AppContext.getInstance();
+        this.patientRepository = AppContext.getRepositories().patients;
+        AppContext.getInstance();
+        this.slotRepository = AppContext.getRepositories().slots;
+        AppContext.getInstance();
+        this.medicalCardRepository = AppContext.getRepositories().cards;
+        AppContext.getInstance();
+        this.scheduleRepository = AppContext.getRepositories().schedules;
     }
 
     public void registerDoctor(String email, String rawPassword, String name, String dateOfBirth,

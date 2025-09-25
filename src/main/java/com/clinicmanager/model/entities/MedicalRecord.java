@@ -19,7 +19,8 @@ public class MedicalRecord {
         this.doctorId = doctorId;
         this.date = date;
         this.description = description;
-        this.medicalRecordRepository = AppContext.getInstance().getRepositories().records;
+        AppContext.getInstance();
+        this.medicalRecordRepository = AppContext.getRepositories().records;
     }
 
     public int id() {

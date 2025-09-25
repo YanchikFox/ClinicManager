@@ -18,8 +18,10 @@ public class SlotAutoGeneratorService {
     private final SlotRepository slotRepository;
 
     public SlotAutoGeneratorService() {
-        this.doctorRepository = AppContext.getInstance().getRepositories().doctors;
-        this.slotRepository = AppContext.getInstance().getRepositories().slots;
+        AppContext.getInstance();
+        this.doctorRepository = AppContext.getRepositories().doctors;
+        AppContext.getInstance();
+        this.slotRepository = AppContext.getRepositories().slots;
     }
 
     public void ensureFutureSlotsForAllDoctors() {

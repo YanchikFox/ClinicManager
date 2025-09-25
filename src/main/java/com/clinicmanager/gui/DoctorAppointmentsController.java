@@ -178,7 +178,7 @@ public class DoctorAppointmentsController {
             if (!desc.isBlank()) {
                 var repos = AppContext.getRepositories();
                 var card = repos.cards.findById(patient.medicalCardId());
-                var doctor = ((DoctorControlPanel) AppContext.getPanel()).currentPerson();
+                var doctor = AppContext.getPanel().currentPerson();
                 var record = new com.clinicmanager.model.entities.MedicalRecord(-1, card.id(), ((Doctor) doctor).id(),
                         java.time.LocalDate.now(), desc);
                 repos.records.save(record);

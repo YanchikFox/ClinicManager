@@ -140,7 +140,7 @@ public class DoctorScheduleController {
         if (hasRealPatientAppointment(slot) || isClosedByDoctor(slot))
             return;
         // Close the slot by creating an ENDED appointment with patientId = -1
-        var doctor = (Doctor) ((DoctorControlPanel) AppContext.getPanel()).currentPerson();
+        var doctor = (Doctor) AppContext.getPanel().currentPerson();
         var app = new com.clinicmanager.model.entities.Appointment(-1, -1, doctor.id(), slot.id(),
                 com.clinicmanager.model.enums.AppointmentStatus.ENDED);
         AppContext.getRepositories().appointments.save(app);

@@ -60,7 +60,7 @@ public class TimeManager {
                 // --- Global time handling ---
                 com.clinicmanager.time.TimeTickHandler.handleTimeTick(currentTime);
             }
-        }, speedSecondsPerTick * 1000, speedSecondsPerTick * 1000);
+        }, speedSecondsPerTick * 1000L, speedSecondsPerTick * 1000L);
     }
 
     public void stop() {

@@ -16,8 +16,10 @@ public class MedicalCard {
     public MedicalCard(int id, int patientId) {
         this.id = id;
         this.patientId = patientId;
-        this.medicalCardRepository = AppContext.getInstance().getRepositories().cards;
-        this.medicalRecordRepository = AppContext.getInstance().getRepositories().records;
+        AppContext.getInstance();
+        this.medicalCardRepository = AppContext.getRepositories().cards;
+        AppContext.getInstance();
+        this.medicalRecordRepository = AppContext.getRepositories().records;
     }
 
     public int id() {

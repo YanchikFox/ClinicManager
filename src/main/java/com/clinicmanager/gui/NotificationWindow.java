@@ -3,7 +3,6 @@ package com.clinicmanager.gui;
 import com.clinicmanager.model.entities.Notification;
 import com.clinicmanager.service.NotificationManager;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,12 +14,9 @@ import javafx.stage.Stage;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-
 public class NotificationWindow {
 
-
     public static void showNotifications(Stage owner, NotificationManager notificationManager, int personId) {
-
         ListView<String> listView = new ListView<>();
         Runnable refreshList = () -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -45,7 +41,6 @@ public class NotificationWindow {
             // After marking as read, reload notifications from DB again
             refreshList.run();
         });
-
 
         VBox vbox = new VBox(10, listView, markReadBtn);
         vbox.setPadding(new Insets(10));
