@@ -1,26 +1,4 @@
-// ...existing code...
-    public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
-        // Verify that the patient does not already have an appointment with this doctor on the same day
-        return findAll().stream().noneMatch(a ->
-                a.patientId() == patientId &&
-                a.doctorId() == doctorId &&
-                getSlotDateSafe(a) != null &&
-                getSlotDateSafe(a).equals(date) &&
-                !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED)
-        );
-    }
-// ...existing code...// ...existing code...
-    public boolean canPatientBookSlot(int patientId, int doctorId, java.time.LocalDate date) {
-        // Verify that the patient does not already have an appointment with this doctor on the same day
-        return findAll().stream().noneMatch(a ->
-                a.patientId() == patientId &&
-                a.doctorId() == doctorId &&
-                getSlotDateSafe(a) != null &&
-                getSlotDateSafe(a).equals(date) &&
-                !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED)
-        );
-    }
-// ...existing code...CREATE TABLE IF NOT EXISTS accounts (
+CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
@@ -54,7 +32,8 @@ CREATE TABLE IF NOT EXISTS medical_records (
     medical_card_id INTEGER NOT NULL,
     doctor_id INTEGER NOT NULL,
     date TEXT NOT NULL,
-    description TEXT
+    description TEXT,
+    appointment_id INTEGER UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS schedules (
@@ -91,6 +70,8 @@ CREATE TABLE IF NOT EXISTS favorite_doctors (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     patient_id INTEGER NOT NULL,
     doctor_id INTEGER NOT NULL,
-    UNIQUE(patient_id, doctor_id)
+    UNIQUE (patient_id, doctor_id)
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_medical_records_appointment
+ON medical_records(appointment_id);

@@ -36,6 +36,7 @@ public class RepositoryManager {
             cards.close();
             records.close();
             notifications.close();
+            favoriteDoctors.close();
         } catch (Exception e) {
             throw new RuntimeException("Error closing DB connections", e);
         }

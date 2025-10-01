@@ -29,18 +29,16 @@ public class Schedule {
         return doctorId;
     }
 
-    // TODO: Anton shis should not be hardcoded, but rather injected or passed as a
-    // parameter
+    // TODO: Anton this should not be hardcoded, but rather injected or passed as a parameter
     public List<Slot> getSlots(LocalDate date) {
-        return ScheduleRepository.getDoctorSlots(doctorId, date);
-        // slots.getSlots(doctorId, date);
+        return scheduleRepository.findSlotsByScheduleAndDate(id, date);
     }
 
     public void removeSlot(Slot slot) {
         slotRepository.delete(slot);
     }
 
-    // TODO: getUpgoningSlots should be implemented
+    // TODO: getUpcomingSlots should be implemented
     public void addSlot(Slot slot) {
         slotRepository.save(slot);
     }

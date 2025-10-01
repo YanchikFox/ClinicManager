@@ -86,10 +86,9 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
         return null;
     }
 
-
     public Schedule findByDoctorId(int doctorId) {
         try (PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM schedules WHERE doctor_id = ? LIMIT 1")) {  // LIMIT 1 for safety
+                "SELECT * FROM schedules WHERE doctor_id = ? LIMIT 1")) {
             stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -98,29 +97,25 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null; // no result
+        return null;
     }
 
-
-    public static List<Slot> getDoctorSlots(int doctorId, LocalDate date) {
+    public List<Slot> findSlotsByScheduleAndDate(int scheduleId, LocalDate date) {
         List<Slot> slots = new ArrayList<>();
-        String sql = "SELECT * FROM slots WHERE doctor_id = ? AND date = ?";
+        String sql = "SELECT * FROM slots WHERE schedule_id = ? AND date = ? ORDER BY start_time";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, doctorId);
-            stmt.setDate(2, java.sql.Date.valueOf(date));
+            stmt.setInt(1, scheduleId);
+            stmt.setString(2, date.toString());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                LocalTime startTime = rs.getTime("start_time").toLocalTime();
-                LocalTime endTime = rs.getTime("end_time").toLocalTime();
-
-                TimeRange timeRange = new TimeRange(startTime, endTime);  // assuming this constructor exists
-
                 slots.add(new Slot(
                         rs.getInt("id"),
-                        rs.getInt("doctor_id"),
-                        rs.getDate("date").toLocalDate(),
-                        timeRange
-                ));
+                        rs.getInt("schedule_id"),
+                        LocalDate.parse(rs.getString("date")),
+                        new TimeRange(
+                                LocalTime.parse(rs.getString("start_time")),
+                                LocalTime.parse(rs.getString("end_time"))
+                        )));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -128,31 +123,26 @@ public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
         return slots;
     }
 
-    public List<Slot> getOutgoingSchedule(int doctorId) {
+    public List<Slot> getOutgoingSchedule(int scheduleId) {
         List<Slot> slots = new ArrayList<>();
-        String sql = "SELECT * FROM slots WHERE doctor_id = ? AND date >= ? ORDER BY date, start_time";
-
+        String sql = "SELECT * FROM slots WHERE schedule_id = ? AND date >= ? ORDER BY date, start_time";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, doctorId);
-            stmt.setDate(2, java.sql.Date.valueOf(LocalDate.now()));
-
+            stmt.setInt(1, scheduleId);
+            stmt.setString(2, LocalDate.now().toString());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                LocalTime startTime = rs.getTime("start_time").toLocalTime();
-                LocalTime endTime = rs.getTime("end_time").toLocalTime();
-                TimeRange timeRange = new TimeRange(startTime, endTime);
-
                 slots.add(new Slot(
                         rs.getInt("id"),
-                        rs.getInt("doctor_id"),
-                        rs.getDate("date").toLocalDate(),
-                        timeRange
-                ));
+                        rs.getInt("schedule_id"),
+                        LocalDate.parse(rs.getString("date")),
+                        new TimeRange(
+                                LocalTime.parse(rs.getString("start_time")),
+                                LocalTime.parse(rs.getString("end_time"))
+                        )));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
         return slots;
     }
 }
