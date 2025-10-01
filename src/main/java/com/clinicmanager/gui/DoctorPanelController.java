@@ -5,11 +5,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.time.format.DateTimeFormatter;
 import com.clinicmanager.time.TimeManager;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DoctorPanelController {
     @FXML
@@ -28,6 +31,8 @@ public class DoctorPanelController {
     private Button stopTimeBtn;
     @FXML
     private Button setTimeBtn;
+    @FXML
+    private Button addRecordBtn;
 
     private final TimeManager timeManager = TimeManager.getInstance();
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -103,6 +108,8 @@ public class DoctorPanelController {
         startTimeBtn.setOnAction(e -> timeManager.start());
         stopTimeBtn.setOnAction(e -> timeManager.stop());
         setTimeBtn.setOnAction(e -> handleSetTime());
+
+        addRecordBtn.setOnAction(e -> handleAddRecord());
     }
 
     private void updateTimeLabel(LocalDateTime time) {
@@ -167,5 +174,95 @@ public class DoctorPanelController {
                 new Alert(Alert.AlertType.ERROR, "Invalid time format!", ButtonType.OK).showAndWait();
             }
         });
+    }
+
+    private void handleAddRecord() {
+        var panel = com.clinicmanager.gui.AppContext.getPanel();
+        if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Doctor doctor)) {
+            new Alert(Alert.AlertType.ERROR, "Unable to determine the current doctor.", ButtonType.OK).showAndWait();
+            return;
+        }
+        var repos = com.clinicmanager.gui.AppContext.getRepositories();
+        LocalDateTime now = timeManager.getCurrentTime();
+        List<com.clinicmanager.model.entities.Appointment> eligibleAppointments = repos.appointments.findAll().stream()
+                .filter(app -> app.doctorId() == doctor.id())
+                .filter(app -> !app.status().name().equals("CANCELLED"))
+                .filter(app -> !repos.records.existsForAppointment(app.id()))
+                .filter(app -> {
+                    var slot = app.getSlot();
+                    if (slot == null) {
+                        return false;
+                    }
+                    LocalDateTime start = LocalDateTime.of(slot.date(), slot.timeRange().start());
+                    return !now.isBefore(start);
+                })
+                .collect(Collectors.toList());
+
+        if (eligibleAppointments.isEmpty()) {
+            new Alert(Alert.AlertType.INFORMATION,
+                    "No appointments are eligible for adding a medical record right now.", ButtonType.OK).showAndWait();
+            return;
+        }
+
+        List<AppointmentOption> options = eligibleAppointments.stream()
+                .map(AppointmentOption::new)
+                .collect(Collectors.toList());
+        ChoiceDialog<AppointmentOption> dialog = new ChoiceDialog<>(options.get(0), options);
+        dialog.setTitle("Select appointment");
+        dialog.setHeaderText("Choose an appointment to add a medical record:");
+        dialog.setContentText("Appointment:");
+        dialog.showAndWait().ifPresent(choice -> {
+            var appointment = choice.appointment();
+            var patient = appointment.getPatient();
+            if (patient == null) {
+                new Alert(Alert.AlertType.ERROR, "Could not load patient data.", ButtonType.OK).showAndWait();
+                return;
+            }
+            if (repos.records.existsForAppointment(appointment.id())) {
+                new Alert(Alert.AlertType.WARNING, "A record has already been added for this appointment.",
+                        ButtonType.OK).showAndWait();
+                return;
+            }
+            TextInputDialog descDialog = new TextInputDialog();
+            descDialog.setTitle("Add record to card");
+            descDialog.setHeaderText("Enter a description for the patient's medical record");
+            descDialog.setContentText("Description:");
+            descDialog.showAndWait().ifPresent(desc -> {
+                if (desc.isBlank()) {
+                    new Alert(Alert.AlertType.WARNING, "Description cannot be empty.", ButtonType.OK).showAndWait();
+                    return;
+                }
+                var card = repos.cards.findById(patient.medicalCardId());
+                LocalDateTime currentTime = timeManager.getCurrentTime();
+                var record = new com.clinicmanager.model.entities.MedicalRecord(-1, card.id(), doctor.id(),
+                        currentTime.toLocalDate(), desc, appointment.id());
+                repos.records.save(record);
+                new Alert(Alert.AlertType.INFORMATION, "Record added!", ButtonType.OK).showAndWait();
+            });
+        });
+    }
+
+    private static class AppointmentOption {
+        private final com.clinicmanager.model.entities.Appointment appointment;
+
+        private AppointmentOption(com.clinicmanager.model.entities.Appointment appointment) {
+            this.appointment = appointment;
+        }
+
+        public com.clinicmanager.model.entities.Appointment appointment() {
+            return appointment;
+        }
+
+        @Override
+        public String toString() {
+            var patient = appointment.getPatient();
+            var slot = appointment.getSlot();
+            String patientName = patient != null ? patient.name() : "?";
+            String date = slot != null ? slot.date().toString() : "?";
+            String time = (slot != null)
+                    ? slot.timeRange().start() + "-" + slot.timeRange().end()
+                    : "?";
+            return patientName + " | " + date + " " + time + " | Status: " + appointment.status().name();
+        }
     }
 }

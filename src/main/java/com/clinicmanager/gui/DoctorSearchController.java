@@ -23,9 +23,12 @@ public class DoctorSearchController {
     private Button makeAppointmentBtn;
     @FXML
     private Button addFavoriteBtn;
+    @FXML
+    private Button removeFavoriteBtn;
 
     private Doctor selectedDoctor;
     private Slot selectedSlot;
+    private boolean showingCustomList = false;
 
     private final RepositoryManager repos = AppContext.getRepositories();
     private final DoctorRepository doctorRepo = repos.doctors;
@@ -35,6 +38,7 @@ public class DoctorSearchController {
     private void initialize() {
         List<Doctor> doctors = doctorRepo.findAll();
         doctorListView.setItems(FXCollections.observableArrayList(doctors));
+        showingCustomList = false;
         doctorListView.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Doctor item, boolean empty) {
@@ -51,6 +55,8 @@ public class DoctorSearchController {
         makeAppointmentBtn.setDisable(true);
         addFavoriteBtn.setDisable(true);
         addFavoriteBtn.setOnAction(e -> handleAddFavorite());
+        removeFavoriteBtn.setDisable(true);
+        removeFavoriteBtn.setOnAction(e -> handleRemoveFavorite());
         scheduleListView.getSelectionModel().selectedItemProperty().addListener((obs, old, val) -> {
             if (val != null && selectedDoctor != null) {
                 // Find the selected slot based on the rendered string
@@ -82,6 +88,7 @@ public class DoctorSearchController {
         boolean isFav = repos.favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id());
         addFavoriteBtn.setDisable(isFav);
         addFavoriteBtn.setText(isFav ? "Already in favorites" : "Add to favorites");
+        removeFavoriteBtn.setDisable(!isFav);
     }
 
     private void showDoctorInfo(Doctor doc) {
@@ -171,12 +178,14 @@ public class DoctorSearchController {
 
     // Allows setting any doctor list to display (e.g., favorites only)
     public void setDoctors(List<Doctor> doctors) {
+        showingCustomList = true;
         doctorListView.setItems(FXCollections.observableArrayList(doctors));
         doctorListView.getSelectionModel().clearSelection();
         doctorInfoLabel.setText("");
         scheduleListView.setItems(FXCollections.emptyObservableList());
         makeAppointmentBtn.setDisable(true);
         addFavoriteBtn.setDisable(true);
+        removeFavoriteBtn.setDisable(true);
     }
 
     // Allows removing the selected doctor from favorites (if applicable)
@@ -188,5 +197,34 @@ public class DoctorSearchController {
         }
         repos.favoriteDoctors.deleteByPatientAndDoctor(patient.id(), selectedDoctor.id());
         updateFavoriteBtn();
+    }
+
+    private void handleRemoveFavorite() {
+        var panel = AppContext.getPanel();
+        if (selectedDoctor == null || panel == null
+                || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
+            return;
+        }
+        if (!repos.favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id())) {
+            removeFavoriteBtn.setDisable(true);
+            addFavoriteBtn.setDisable(false);
+            addFavoriteBtn.setText("Add to favorites");
+            return;
+        }
+        repos.favoriteDoctors.deleteByPatientAndDoctor(patient.id(), selectedDoctor.id());
+        new Alert(Alert.AlertType.INFORMATION, "Doctor removed from favorites!", ButtonType.OK).showAndWait();
+        if (showingCustomList) {
+            doctorListView.getItems().remove(selectedDoctor);
+            selectedDoctor = null;
+            selectedSlot = null;
+            doctorInfoLabel.setText("");
+            scheduleListView.setItems(FXCollections.emptyObservableList());
+            makeAppointmentBtn.setDisable(true);
+            addFavoriteBtn.setDisable(true);
+            removeFavoriteBtn.setDisable(true);
+            doctorListView.getSelectionModel().clearSelection();
+        } else {
+            updateFavoriteBtn();
+        }
     }
 }

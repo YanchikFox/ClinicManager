@@ -16,6 +16,7 @@
             <ListView fx:id="scheduleListView" prefHeight="150" />
             <Button fx:id="makeAppointmentBtn" text="Book appointment" disable="true" />
             <Button fx:id="addFavoriteBtn" text="Add to favorites" disable="true" />
+            <Button fx:id="removeFavoriteBtn" text="Remove from favorites" disable="true" />
         </VBox>
     </center>
 </BorderPane>

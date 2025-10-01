@@ -16,9 +16,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import com.clinicmanager.gui.AppContext;
+import com.clinicmanager.time.TimeManager;
 
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DoctorAppointmentsController {
     @FXML
@@ -100,10 +103,11 @@ public class DoctorAppointmentsController {
     }
 
     private void setButtonsEnabled(boolean enabled) {
-        boolean canEnd = enabled && selectedAppointment != null &&
+        boolean hasAppointment = enabled && selectedAppointment != null;
+        boolean canEnd = hasAppointment &&
                 !(selectedAppointment.status().name().equals("ENDED")
                         || selectedAppointment.status().name().equals("CANCELLED"));
-        boolean canAddRecord = canEnd;
+        boolean canAddRecord = hasAppointment && isRecordAdditionAllowed(selectedAppointment);
         viewDetailsBtn.setDisable(!enabled);
         openCardBtn.setDisable(!enabled);
         patientInfoBtn.setDisable(!enabled);
@@ -164,12 +168,18 @@ public class DoctorAppointmentsController {
     private void handleAddRecord() {
         if (selectedAppointment == null)
             return;
-        if (selectedAppointment.status().name().equals("ENDED")
-                || selectedAppointment.status().name().equals("CANCELLED"))
+        if (selectedAppointment.status().name().equals("CANCELLED"))
             return;
         Patient patient = selectedAppointment.getPatient();
         if (patient == null)
             return;
+        if (!isRecordAdditionAllowed(selectedAppointment)) {
+            new Alert(Alert.AlertType.WARNING,
+                    "You can add a record only during or after the appointment, and only once per visit.",
+                    ButtonType.OK).showAndWait();
+            setButtonsEnabled(true);
+            return;
+        }
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add record to card");
         dialog.setHeaderText("Enter a description for the patient's medical record");
@@ -177,12 +187,20 @@ public class DoctorAppointmentsController {
         dialog.showAndWait().ifPresent(desc -> {
             if (!desc.isBlank()) {
                 var repos = AppContext.getRepositories();
+                if (repos.records.existsForAppointment(selectedAppointment.id())) {
+                    new Alert(Alert.AlertType.WARNING, "A record has already been added for this appointment.",
+                            ButtonType.OK).showAndWait();
+                    setButtonsEnabled(true);
+                    return;
+                }
                 var card = repos.cards.findById(patient.medicalCardId());
                 var doctor = AppContext.getPanel().currentPerson();
+                LocalDateTime now = TimeManager.getInstance().getCurrentTime();
                 var record = new com.clinicmanager.model.entities.MedicalRecord(-1, card.id(), ((Doctor) doctor).id(),
-                        java.time.LocalDate.now(), desc);
+                        now.toLocalDate(), desc, selectedAppointment.id());
                 repos.records.save(record);
                 new Alert(Alert.AlertType.INFORMATION, "Record added!", ButtonType.OK).showAndWait();
+                setButtonsEnabled(true);
             }
         });
     }
@@ -214,12 +232,12 @@ public class DoctorAppointmentsController {
         RepositoryManager repos = AppContext.getRepositories();
         List<Appointment> all = repos.appointments.findAll().stream()
                 .filter(a -> a.doctorId() == doctor.id())
-                .toList();
+                .collect(Collectors.toList());
         boolean onlyActive = showActiveOnlyCheckBox != null && showActiveOnlyCheckBox.isSelected();
         if (onlyActive) {
             myAppointments = all.stream()
                     .filter(a -> !(a.status().name().equals("ENDED") || a.status().name().equals("CANCELLED")))
-                    .toList();
+                    .collect(Collectors.toList());
         } else {
             myAppointments = all;
         }
@@ -237,6 +255,22 @@ public class DoctorAppointmentsController {
                     app.status().name()));
         }
         appointmentsTable.setItems(rows);
+    }
+
+    private boolean isRecordAdditionAllowed(Appointment appointment) {
+        if (appointment == null)
+            return false;
+        if (appointment.status().name().equals("CANCELLED"))
+            return false;
+        var repos = AppContext.getRepositories();
+        if (repos.records.existsForAppointment(appointment.id()))
+            return false;
+        Slot slot = appointment.getSlot();
+        if (slot == null)
+            return false;
+        LocalDateTime start = LocalDateTime.of(slot.date(), slot.timeRange().start());
+        LocalDateTime now = TimeManager.getInstance().getCurrentTime();
+        return !now.isBefore(start);
     }
 
     public static class AppointmentTableRow {
