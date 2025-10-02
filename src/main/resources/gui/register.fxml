@@ -3,37 +3,52 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane xmlns="http://javafx.com/javafx"
-          xmlns:fx="http://javafx.com/fxml"
-          fx:controller="com.clinicmanager.gui.RegisterController"
-          hgap="10" vgap="10" style="-fx-padding: 20">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.clinicmanager.gui.RegisterController">
+    <top>
+        <HBox alignment="CENTER_RIGHT" spacing="10" BorderPane.alignment="CENTER">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="englishButton" text="EN" onAction="#switchToEnglish"
+                    style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2c3e50;"/>
+            <Button fx:id="russianButton" text="RU" onAction="#switchToRussian"
+                    style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2c3e50;"/>
+            <Button fx:id="polishButton" text="PL" onAction="#switchToPolish"
+                    style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2c3e50;"/>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="15" alignment="CENTER" style="-fx-padding: 20">
+            <Label fx:id="titleLabel" style="-fx-font-size: 20;"/>
+            <GridPane hgap="10" vgap="10">
+                <Label fx:id="roleLabel" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <ChoiceBox fx:id="roleBox" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-    <Label text="Role:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-    <ChoiceBox fx:id="roleBox" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label fx:id="emailLabel" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="emailField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-    <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-    <TextField fx:id="emailField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label fx:id="passwordLabel" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <PasswordField fx:id="passwordField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-    <Label text="Password:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-    <PasswordField fx:id="passwordField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label fx:id="nameLabel" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <TextField fx:id="nameField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-    <Label text="Name:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-    <TextField fx:id="nameField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label fx:id="dobLabel" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <TextField fx:id="dobField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-    <Label text="Date of birth:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-    <TextField fx:id="dobField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                <Label fx:id="phoneLabel" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                <TextField fx:id="phoneField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-    <Label text="Phone:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-    <TextField fx:id="phoneField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                <Label fx:id="licenseLabel" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                <TextField fx:id="licenseField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-    <Label text="License (doctor only):" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-    <TextField fx:id="licenseField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-
-    <Button text="Register" onAction="#handleRegister"
-            GridPane.rowIndex="7" GridPane.columnIndex="1"/>
-    <Label fx:id="messageLabel" textFill="red"
-           GridPane.rowIndex="8" GridPane.columnIndex="1"/>
-    <Button text="Back" onAction="#handleBack"
-            GridPane.rowIndex="9" GridPane.columnIndex="1"/>
-
-</GridPane>
+                <Button fx:id="registerButton" onAction="#handleRegister"
+                        GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                <Label fx:id="messageLabel" textFill="red"
+                       GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                <Button fx:id="backButton" onAction="#handleBack"
+                        GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+            </GridPane>
+        </VBox>
+    </center>
+</BorderPane>

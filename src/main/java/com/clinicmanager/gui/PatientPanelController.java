@@ -1,5 +1,5 @@
 package com.clinicmanager.gui;
-
+import com.clinicmanager.gui.localization.LocalizationManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -28,24 +28,37 @@ public class PatientPanelController {
     @FXML
     private Label virtualTimeLabel;
     @FXML
+    private Label systemTimeLabel;
+    @FXML
+    private Label panelTitle;
+    @FXML
     private Button startTimeBtn;
     @FXML
     private Button stopTimeBtn;
     @FXML
     private Button setTimeBtn;
+    @FXML
+    private Button englishButton;
+    @FXML
+    private Button russianButton;
+    @FXML
+    private Button polishButton;
 
     private final TimeManager timeManager = TimeManager.getInstance();
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final LocalizationManager localization = LocalizationManager.getInstance();
 
     @FXML
     private void initialize() {
+        applyLocalization();
+        localization.localeProperty().addListener((obs, oldLocale, newLocale) -> applyLocalization());
         searchDoctorsBtn.setOnAction(e -> {
             try {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                         getClass().getResource("/gui/doctor_search.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Doctor search");
+                stage.setTitle(localization.get("patient.doctorSearch.title"));
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -59,7 +72,7 @@ public class PatientPanelController {
                         getClass().getResource("/gui/patient_appointments.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("My appointments");
+                stage.setTitle(localization.get("patient.appointments.title"));
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -73,7 +86,7 @@ public class PatientPanelController {
                         getClass().getResource("/gui/medical_card.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Medical card");
+                stage.setTitle(localization.get("patient.medicalCard.title"));
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -93,6 +106,7 @@ public class PatientPanelController {
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = (javafx.stage.Stage) logoutBtn.getScene().getWindow();
                 stage.setScene(scene);
+                stage.setTitle(localization.get("start.title"));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -144,7 +158,7 @@ public class PatientPanelController {
                 controller.setDoctors(doctors);
                 javafx.scene.Scene scene = new javafx.scene.Scene(root);
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("Favorite doctors");
+                stage.setTitle(localization.get("patient.favoriteDoctors.title"));
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -184,15 +198,15 @@ public class PatientPanelController {
 
     private void handleSetTime() {
         TextInputDialog dialog = new TextInputDialog(dtf.format(timeManager.getCurrentTime()));
-        dialog.setTitle("Set system time");
-        dialog.setHeaderText("Enter the new time (yyyy-MM-dd HH:mm):");
-        dialog.setContentText("Time:");
+        dialog.setTitle(localization.get("time.dialog.title"));
+        dialog.setHeaderText(localization.get("time.dialog.header"));
+        dialog.setContentText(localization.get("time.dialog.content"));
         dialog.showAndWait().ifPresent(str -> {
             try {
                 LocalDateTime newTime = LocalDateTime.parse(str, dtf);
                 timeManager.setCurrentTime(newTime);
             } catch (Exception ex) {
-                new Alert(Alert.AlertType.ERROR, "Invalid time format!", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.ERROR, localization.get("time.dialog.error"), ButtonType.OK).showAndWait();
             }
         });
     }
@@ -208,5 +222,46 @@ public class PatientPanelController {
         notificationsBtn.setStyle(hasUnread
                 ? "-fx-background-color: #ffcccc; -fx-border-color: red; -fx-border-width: 2px;"
                 : "-fx-background-color: #cccccc;");
+    }
+
+    @FXML
+    private void switchToEnglish() {
+        localization.setLocale(LocalizationManager.ENGLISH);
+    }
+
+    @FXML
+    private void switchToRussian() {
+        localization.setLocale(LocalizationManager.RUSSIAN);
+    }
+
+    @FXML
+    private void switchToPolish() {
+        localization.setLocale(LocalizationManager.POLISH);
+    }
+
+    private void applyLocalization() {
+        systemTimeLabel.setText(localization.get("common.systemTime"));
+        startTimeBtn.setText(localization.get("time.start"));
+        stopTimeBtn.setText(localization.get("time.stop"));
+        setTimeBtn.setText(localization.get("time.set"));
+        panelTitle.setText(localization.get("patient.title"));
+        searchDoctorsBtn.setText(localization.get("patient.searchDoctors"));
+        viewAppointmentsBtn.setText(localization.get("patient.viewAppointments"));
+        viewMedicalCardBtn.setText(localization.get("patient.medicalCard"));
+        notificationsBtn.setText(localization.get("patient.notifications"));
+        favoriteDoctorsBtn.setText(localization.get("patient.favoriteDoctors"));
+        logoutBtn.setText(localization.get("common.logout"));
+        var stage = MainFX.getPrimaryStage();
+        if (stage != null) {
+            stage.setTitle(localization.get("patient.title"));
+        }
+        updateLanguageButtons();
+    }
+
+    private void updateLanguageButtons() {
+        var current = localization.getLocale();
+        englishButton.setDisable(LocalizationManager.ENGLISH.equals(current));
+        russianButton.setDisable(LocalizationManager.RUSSIAN.equals(current));
+        polishButton.setDisable(LocalizationManager.POLISH.equals(current));
     }
 }

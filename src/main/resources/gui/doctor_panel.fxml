@@ -3,25 +3,37 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.clinicmanager.gui.DoctorPanelController"
-      spacing="10" alignment="CENTER" style="-fx-padding: 20">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.clinicmanager.gui.DoctorPanelController">
+    <top>
+        <HBox alignment="CENTER_RIGHT" spacing="10" BorderPane.alignment="CENTER">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="englishButton" text="EN" onAction="#switchToEnglish"
+                    style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2c3e50;"/>
+            <Button fx:id="russianButton" text="RU" onAction="#switchToRussian"
+                    style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2c3e50;"/>
+            <Button fx:id="polishButton" text="PL" onAction="#switchToPolish"
+                    style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: #2c3e50;"/>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20">
+            <HBox spacing="10" alignment="CENTER">
+                <Label fx:id="systemTimeLabel" />
+                <Label fx:id="virtualTimeLabel" style="-fx-font-weight: bold;" />
+                <Button fx:id="startTimeBtn" />
+                <Button fx:id="stopTimeBtn" />
+                <Button fx:id="setTimeBtn" />
+            </HBox>
 
-    <HBox spacing="10" alignment="CENTER">
-        <Label text="System time:" />
-        <Label fx:id="virtualTimeLabel" style="-fx-font-weight: bold;" />
-        <Button text="Start" fx:id="startTimeBtn" />
-        <Button text="Stop" fx:id="stopTimeBtn" />
-        <Button text="Set time" fx:id="setTimeBtn" />
-    </HBox>
+            <Label fx:id="panelTitle" style="-fx-font-size: 18"/>
 
-    <Label text="👨‍⚕️ Doctor panel" style="-fx-font-size: 18"/>
-
-    <Button text="My schedule" fx:id="viewScheduleBtn"/>
-    <Button text="My appointments" fx:id="viewAppointmentsBtn"/>
-    <Button text="Open patient card" fx:id="viewMedicalCardBtn"/>
-    <Button text="Add record to card" fx:id="addRecordBtn"/>
-    <Button text="Log out" fx:id="logoutBtn"/>
-
-</VBox>
+            <Button fx:id="viewScheduleBtn"/>
+            <Button fx:id="viewAppointmentsBtn"/>
+            <Button fx:id="viewMedicalCardBtn"/>
+            <Button fx:id="addRecordBtn"/>
+            <Button fx:id="logoutBtn"/>
+        </VBox>
+    </center>
+</BorderPane>

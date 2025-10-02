@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import com.clinicmanager.service.SlotAutoGeneratorService;
+import com.clinicmanager.gui.localization.LocalizationManager;
 
 public class LoginController {
     @FXML
@@ -21,9 +22,23 @@ public class LoginController {
     private PasswordField passwordField;
     @FXML
     private Label messageLabel;
+    @FXML
+    private Label titleLabel;
+    @FXML
+    private Button loginButton;
+    @FXML
+    private Button backButton;
+    @FXML
+    private Button englishButton;
+    @FXML
+    private Button russianButton;
+    @FXML
+    private Button polishButton;
+
 
     private final Clinic clinic;
     private AccountRepository accountRepository;
+    private final LocalizationManager localization = LocalizationManager.getInstance();
 
     public LoginController() {
         RepositoryManager repos = AppContext.getRepositories();
@@ -32,6 +47,12 @@ public class LoginController {
         AccountManager manager = new AccountManager(accountRepository, new TokenService());
         this.clinic = new Clinic(manager);
     }
+    @FXML
+    private void initialize() {
+        applyLocalization();
+        localization.localeProperty().addListener((obs, oldLocale, newLocale) -> applyLocalization());
+    }
+
 
     @FXML
     private void handleLogin() {
@@ -52,10 +73,16 @@ public class LoginController {
             Stage stage = MainFX.getPrimaryStage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
             stage.setScene(new Scene(loader.load()));
+            if (panel instanceof DoctorControlPanel) {
+                stage.setTitle(localization.get("doctor.title"));
+            } else {
+                stage.setTitle(localization.get("patient.title"));
+            }
         } catch (Exception e) {
-            messageLabel.setText("Error: " + e.getMessage());
+            messageLabel.setText(localization.format("login.error", e.getMessage()));
         }
     }
+
 
     @FXML
     private void handleBack() {
@@ -63,9 +90,45 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
             Stage stage = MainFX.getPrimaryStage();
             stage.setScene(new Scene(loader.load()));
+            stage.setTitle(localization.get("start.title"));
         } catch (Exception e) {
             e.printStackTrace();
 
         }
+    }
+
+    @FXML
+    private void switchToEnglish() {
+        localization.setLocale(LocalizationManager.ENGLISH);
+    }
+
+    @FXML
+    private void switchToRussian() {
+        localization.setLocale(LocalizationManager.RUSSIAN);
+    }
+
+    @FXML
+    private void switchToPolish() {
+        localization.setLocale(LocalizationManager.POLISH);
+    }
+
+    private void applyLocalization() {
+        titleLabel.setText(localization.get("login.title"));
+        emailField.setPromptText(localization.get("login.email"));
+        passwordField.setPromptText(localization.get("login.password"));
+        loginButton.setText(localization.get("login.submit"));
+        backButton.setText(localization.get("common.back"));
+        Stage stage = MainFX.getPrimaryStage();
+        if (stage != null) {
+            stage.setTitle(localization.get("login.title"));
+        }
+        updateLanguageButtons();
+    }
+
+    private void updateLanguageButtons() {
+        var current = localization.getLocale();
+        englishButton.setDisable(LocalizationManager.ENGLISH.equals(current));
+        russianButton.setDisable(LocalizationManager.RUSSIAN.equals(current));
+        polishButton.setDisable(LocalizationManager.POLISH.equals(current));
     }
 }

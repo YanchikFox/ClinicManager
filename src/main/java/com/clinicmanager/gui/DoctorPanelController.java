@@ -1,5 +1,6 @@
 package com.clinicmanager.gui;
-
+import com.clinicmanager.gui.localization.LocalizationManager;
+import com.clinicmanager.time.TimeManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -13,6 +14,7 @@ import com.clinicmanager.time.TimeManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.scene.control.*;
 
 public class DoctorPanelController {
     @FXML
@@ -22,9 +24,15 @@ public class DoctorPanelController {
     @FXML
     private Button viewMedicalCardBtn;
     @FXML
+    private Button addRecordBtn;
+    @FXML
     private Button logoutBtn;
     @FXML
     private Label virtualTimeLabel;
+    @FXML
+    private Label systemTimeLabel;
+    @FXML
+    private Label panelTitle;
     @FXML
     private Button startTimeBtn;
     @FXML
@@ -32,14 +40,22 @@ public class DoctorPanelController {
     @FXML
     private Button setTimeBtn;
     @FXML
-    private Button addRecordBtn;
+    private Button englishButton;
+    @FXML
+    private Button russianButton;
+    @FXML
+    private Button polishButton;
 
     private final TimeManager timeManager = TimeManager.getInstance();
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final com.clinicmanager.service.SlotAutoGeneratorService slotAutoGeneratorService = new com.clinicmanager.service.SlotAutoGeneratorService();
+    private final LocalizationManager localization = LocalizationManager.getInstance();
+
 
     @FXML
     private void initialize() {
+        applyLocalization();
+        localization.localeProperty().addListener((obs, oldLocale, newLocale) -> applyLocalization());
         // Open the doctor's schedule window
         viewScheduleBtn.setOnAction(e -> {
             try {
@@ -47,7 +63,7 @@ public class DoctorPanelController {
                         getClass().getResource("/gui/doctor_schedule.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("My schedule");
+                stage.setTitle(localization.get("doctor.schedule.title"));
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -62,7 +78,7 @@ public class DoctorPanelController {
                         getClass().getResource("/gui/doctor_appointments.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("My appointments");
+                stage.setTitle(localization.get("doctor.appointments.title"));
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -77,7 +93,7 @@ public class DoctorPanelController {
                         getClass().getResource("/gui/doctor_patients.fxml"));
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle("My patients");
+                stage.setTitle(localization.get("doctor.patients.title"));
                 stage.setScene(scene);
                 stage.show();
             } catch (Exception ex) {
@@ -97,6 +113,7 @@ public class DoctorPanelController {
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = (javafx.stage.Stage) logoutBtn.getScene().getWindow();
                 stage.setScene(scene);
+                stage.setTitle(localization.get("start.title"));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -108,8 +125,6 @@ public class DoctorPanelController {
         startTimeBtn.setOnAction(e -> timeManager.start());
         stopTimeBtn.setOnAction(e -> timeManager.stop());
         setTimeBtn.setOnAction(e -> handleSetTime());
-
-        addRecordBtn.setOnAction(e -> handleAddRecord());
     }
 
     private void updateTimeLabel(LocalDateTime time) {
@@ -163,106 +178,57 @@ public class DoctorPanelController {
 
     private void handleSetTime() {
         TextInputDialog dialog = new TextInputDialog(dtf.format(timeManager.getCurrentTime()));
-        dialog.setTitle("Set system time");
-        dialog.setHeaderText("Enter the new time (yyyy-MM-dd HH:mm):");
-        dialog.setContentText("Time:");
+        dialog.setTitle(localization.get("time.dialog.title"));
+        dialog.setHeaderText(localization.get("time.dialog.header"));
+        dialog.setContentText(localization.get("time.dialog.content"));
         dialog.showAndWait().ifPresent(str -> {
             try {
                 LocalDateTime newTime = LocalDateTime.parse(str, dtf);
                 timeManager.setCurrentTime(newTime);
             } catch (Exception ex) {
-                new Alert(Alert.AlertType.ERROR, "Invalid time format!", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.ERROR, localization.get("time.dialog.error"), ButtonType.OK).showAndWait();
             }
         });
     }
-
-    private void handleAddRecord() {
-        var panel = com.clinicmanager.gui.AppContext.getPanel();
-        if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Doctor doctor)) {
-            new Alert(Alert.AlertType.ERROR, "Unable to determine the current doctor.", ButtonType.OK).showAndWait();
-            return;
-        }
-        var repos = com.clinicmanager.gui.AppContext.getRepositories();
-        LocalDateTime now = timeManager.getCurrentTime();
-        List<com.clinicmanager.model.entities.Appointment> eligibleAppointments = repos.appointments.findAll().stream()
-                .filter(app -> app.doctorId() == doctor.id())
-                .filter(app -> !app.status().name().equals("CANCELLED"))
-                .filter(app -> !repos.records.existsForAppointment(app.id()))
-                .filter(app -> {
-                    var slot = app.getSlot();
-                    if (slot == null) {
-                        return false;
-                    }
-                    LocalDateTime start = LocalDateTime.of(slot.date(), slot.timeRange().start());
-                    return !now.isBefore(start);
-                })
-                .collect(Collectors.toList());
-
-        if (eligibleAppointments.isEmpty()) {
-            new Alert(Alert.AlertType.INFORMATION,
-                    "No appointments are eligible for adding a medical record right now.", ButtonType.OK).showAndWait();
-            return;
-        }
-
-        List<AppointmentOption> options = eligibleAppointments.stream()
-                .map(AppointmentOption::new)
-                .collect(Collectors.toList());
-        ChoiceDialog<AppointmentOption> dialog = new ChoiceDialog<>(options.get(0), options);
-        dialog.setTitle("Select appointment");
-        dialog.setHeaderText("Choose an appointment to add a medical record:");
-        dialog.setContentText("Appointment:");
-        dialog.showAndWait().ifPresent(choice -> {
-            var appointment = choice.appointment();
-            var patient = appointment.getPatient();
-            if (patient == null) {
-                new Alert(Alert.AlertType.ERROR, "Could not load patient data.", ButtonType.OK).showAndWait();
-                return;
-            }
-            if (repos.records.existsForAppointment(appointment.id())) {
-                new Alert(Alert.AlertType.WARNING, "A record has already been added for this appointment.",
-                        ButtonType.OK).showAndWait();
-                return;
-            }
-            TextInputDialog descDialog = new TextInputDialog();
-            descDialog.setTitle("Add record to card");
-            descDialog.setHeaderText("Enter a description for the patient's medical record");
-            descDialog.setContentText("Description:");
-            descDialog.showAndWait().ifPresent(desc -> {
-                if (desc.isBlank()) {
-                    new Alert(Alert.AlertType.WARNING, "Description cannot be empty.", ButtonType.OK).showAndWait();
-                    return;
-                }
-                var card = repos.cards.findById(patient.medicalCardId());
-                LocalDateTime currentTime = timeManager.getCurrentTime();
-                var record = new com.clinicmanager.model.entities.MedicalRecord(-1, card.id(), doctor.id(),
-                        currentTime.toLocalDate(), desc, appointment.id());
-                repos.records.save(record);
-                new Alert(Alert.AlertType.INFORMATION, "Record added!", ButtonType.OK).showAndWait();
-            });
-        });
+    @FXML
+    private void switchToEnglish() {
+        localization.setLocale(LocalizationManager.ENGLISH);
     }
 
-    private static class AppointmentOption {
-        private final com.clinicmanager.model.entities.Appointment appointment;
+    @FXML
+    private void switchToRussian() {
+        localization.setLocale(LocalizationManager.RUSSIAN);
+    }
 
-        private AppointmentOption(com.clinicmanager.model.entities.Appointment appointment) {
-            this.appointment = appointment;
-        }
+    @FXML
+    private void switchToPolish() {
+        localization.setLocale(LocalizationManager.POLISH);
+    }
 
-        public com.clinicmanager.model.entities.Appointment appointment() {
-            return appointment;
+    private void applyLocalization() {
+        systemTimeLabel.setText(localization.get("common.systemTime"));
+        startTimeBtn.setText(localization.get("time.start"));
+        stopTimeBtn.setText(localization.get("time.stop"));
+        setTimeBtn.setText(localization.get("time.set"));
+        panelTitle.setText(localization.get("doctor.title"));
+        viewScheduleBtn.setText(localization.get("doctor.viewSchedule"));
+        viewAppointmentsBtn.setText(localization.get("doctor.viewAppointments"));
+        viewMedicalCardBtn.setText(localization.get("doctor.openPatientCard"));
+        if (addRecordBtn != null) {
+            addRecordBtn.setText(localization.get("doctor.addRecord"));
         }
+        logoutBtn.setText(localization.get("common.logout"));
+        var stage = MainFX.getPrimaryStage();
+        if (stage != null) {
+            stage.setTitle(localization.get("doctor.title"));
+        }
+        updateLanguageButtons();
+    }
 
-        @Override
-        public String toString() {
-            var patient = appointment.getPatient();
-            var slot = appointment.getSlot();
-            String patientName = patient != null ? patient.name() : "?";
-            String date = slot != null ? slot.date().toString() : "?";
-            String time = (slot != null)
-                    ? slot.timeRange().start() + "-" + slot.timeRange().end()
-                    : "?";
-            return patientName + " | " + date + " " + time + " | Status: " + appointment.status().name();
-        }
+    private void updateLanguageButtons() {
+        var current = localization.getLocale();
+        englishButton.setDisable(LocalizationManager.ENGLISH.equals(current));
+        russianButton.setDisable(LocalizationManager.RUSSIAN.equals(current));
+        polishButton.setDisable(LocalizationManager.POLISH.equals(current));
     }
 }

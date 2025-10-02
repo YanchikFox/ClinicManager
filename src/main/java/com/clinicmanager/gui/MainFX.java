@@ -1,5 +1,5 @@
 package com.clinicmanager.gui;
-
+import com.clinicmanager.gui.localization.LocalizationManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -26,7 +26,7 @@ public class MainFX extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
         Scene scene = new Scene(loader.load());
         primaryStage = stage;
-        stage.setTitle("Clinic Manager");
+        stage.setTitle(LocalizationManager.getInstance().get("start.title"));
         stage.setScene(scene);
         stage.show();
     }
