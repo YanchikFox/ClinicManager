@@ -22,7 +22,7 @@ Desktop suite for running a modern medical practice. Clinic Manager bundles pati
 - **Two-role access** – patients and doctors receive dedicated dashboards tailored to their needs.
 - **Virtual time engine** – simulate busy clinic days in minutes; appointments, slots, and reminders react instantly.
 - **Automation-first design** – background jobs clean expired slots, auto-generate availability, and nudge patients before visits.
-- **Offline friendly** – ships with a local SQLite database and schema for quick demos or kiosk deployment.
+- **Offline friendly** – bootstrap a fresh SQLite database locally with one Gradle task; schema and seed data live in version control for reproducible demos.
 
 ## Feature tour
 | Area | What you get |
@@ -56,32 +56,39 @@ src/main/java/com/clinicmanager
 | --- | --- |
 | `accounts` | Authentication records with hashed passwords and role metadata. |
 | `doctors`, `patients` | Profile details, contact info, and role-specific flags. |
-| `doctor_schedules` & `schedule_slots` | Availability templates and generated visit slots. |
+| `schedules` & `slots` | Availability templates and generated visit slots. |
 | `appointments` | Booked visits with status tracking and timestamps. |
 | `medical_cards` & `medical_records` | Longitudinal patient history authored by doctors. |
 | `notifications` | User-facing alerts triggered by automation or manual actions. |
 | `favorite_doctors` | Patient shortcuts to frequently booked practitioners. |
 
-The repository ships with a `clinic.db` sample database and a matching `schema.sql` file for rebuilding from scratch.
+Schema migrations live in `src/main/resources/schema.sql`, while reproducible sample data is stored in `src/main/resources/data.sql`. No binary database is tracked in Git—each developer generates a local copy on demand.
 
 ## Quick start
 1. **Install dependencies**
    - JDK 17+
    - (Optional) A local Gradle install – the project bundles the Gradle Wrapper.
-2. **Run the desktop app**
+2. **Initialise the database** (creates `clinic.db` next to the project root)
+   ```bash
+   ./gradlew initDatabase
+   ```
+   Use a custom location with `./gradlew initDatabase -PdbPath=path/to/your.db` if desired.
+3. **Run the desktop app**
    ```bash
    ./gradlew run
    ```
-3. **Sign in or register** using the start menu. Sample credentials are stored in `clinic.db`; create fresh ones through the registration flow if needed.
+4. **Sign in or register** using the start menu. Sample credentials from `data.sql` include:
+   - Doctor: `doctor.stone@example.com` / `doctor123`
+   - Patient: `alice.johnson@example.com` / `patient123`
+   Feel free to create fresh ones through the registration flow.
 
 ### Database refresh
-Need a clean slate? Drop the bundled `clinic.db`, then recreate it:
+Need a clean slate? Remove the old file and re-run the init task:
 ```bash
-./gradlew clean
-cp src/main/resources/schema.sql schema.sql.backup
-sqlite3 clinic.db < src/main/resources/schema.sql
+rm -f clinic.db
+./gradlew initDatabase
 ```
-(Any SQLite shell works; feel free to import the schema into your own database instance.)
+The Gradle task reads `schema.sql` and `data.sql`, so edits to those files automatically flow into every fresh database.
 
 ## Daily workflows
 - **Front desk demo:** Register a patient and doctor, then jump into the patient dashboard to book a visit. Switch to the doctor panel to confirm the appointment and add a medical record.

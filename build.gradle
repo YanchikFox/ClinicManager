@@ -30,3 +30,11 @@ javafx {
     version = "21.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
+
+tasks.register('initDatabase', JavaExec) {
+    group = 'database'
+    description = 'Initializes the local SQLite database using schema and seed data.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set('com.clinicmanager.tools.DatabaseSetup')
+    args(project.findProperty('dbPath') ?: 'clinic.db')
+}
