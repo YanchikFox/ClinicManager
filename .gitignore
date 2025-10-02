@@ -58,3 +58,6 @@ $RECYCLE.BIN/
 *.idea/**/tasks.xml
 *.idea/**/dictionaries
 *.idea/**/shelf
+
+# Local dependency cache removed from VCS
+lib/

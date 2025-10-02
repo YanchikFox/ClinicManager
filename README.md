@@ -68,6 +68,8 @@ Schema migrations live in `src/main/resources/schema.sql`, while reproducible sa
 1. **Install dependencies**
    - JDK 17+
    - (Optional) A local Gradle install – the project bundles the Gradle Wrapper.
+   - No manual JAR download is required: Gradle pulls JavaFX (via the OpenJFX plugin), SQLite, SLF4J, and all supporting native
+     artifacts automatically during the build.
 2. **Initialise the database** (creates `clinic.db` next to the project root)
    ```bash
    ./gradlew initDatabase
@@ -102,6 +104,8 @@ The Gradle task reads `schema.sql` and `data.sql`, so edits to those files autom
   ./gradlew run         # launch JavaFX client
   ./gradlew jlinkZip    # produce a self-contained runtime image
   ```
+- Gradle resolves runtime dependencies (JavaFX, SQLite JDBC, SLF4J, etc.) on demand, so keep the `lib/` directory empty and out
+  of version control.
 - **Coding conventions**
   - Keep controller logic thin; push domain decisions into services.
   - Register new repositories with the central manager to reuse the shared connection.
