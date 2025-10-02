@@ -12,7 +12,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.MissingResourceException;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
@@ -24,8 +23,8 @@ public final class LocalizationManager {
 
     private static final String BASE_BUNDLE_NAME = "i18n.messages";
     private static final Locale DEFAULT_LOCALE = ENGLISH;
-    private static final LocalizationManager INSTANCE = new LocalizationManager();
     private static final ResourceBundle.Control UTF8_CONTROL = new Utf8Control();
+    private static final LocalizationManager INSTANCE = new LocalizationManager();
 
     private final ObjectProperty<Locale> localeProperty;
     private ResourceBundle bundle;
@@ -60,11 +59,36 @@ public final class LocalizationManager {
     }
 
     private ResourceBundle tryLoadBundle(Locale locale) {
-        try {
-            return ResourceBundle.getBundle(BASE_BUNDLE_NAME, locale, UTF8_CONTROL);
-        } catch (MissingResourceException ex) {
+        ClassLoader loader = resolveLoader();
+        String bundleName = UTF8_CONTROL.toBundleName(BASE_BUNDLE_NAME, locale);
+        String resourceName = UTF8_CONTROL.toResourceName(bundleName, "properties");
+        if (resourceName == null) {
             return null;
         }
+        try (InputStream stream = loader.getResourceAsStream(resourceName)) {
+            if (stream == null) {
+                return null;
+            }
+            try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                return new PropertyResourceBundle(reader);
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to load localization resource " + resourceName, ex);
+        }
+    }
+
+    private ClassLoader resolveLoader() {
+        ClassLoader loader = LocalizationManager.class.getClassLoader();
+        if (loader == null) {
+            loader = Thread.currentThread().getContextClassLoader();
+        }
+        if (loader == null) {
+            loader = ClassLoader.getSystemClassLoader();
+        }
+        if (loader == null) {
+            throw new IllegalStateException("Unable to resolve a class loader for localization resources");
+        }
+        return loader;
     }
     public void setLocale(Locale locale) {
         if (locale != null) {
