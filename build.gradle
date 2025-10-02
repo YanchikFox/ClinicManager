@@ -2,6 +2,7 @@ plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.14'
     id 'java'
+    id 'org.flywaydb.flyway' version '10.10.0'
 }
 
 group = 'com.clinicmanager'
@@ -15,6 +16,7 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.43.2.1'
     implementation 'org.slf4j:slf4j-api:2.0.13'
     runtimeOnly 'org.slf4j:slf4j-simple:2.0.13'
+    implementation 'org.flywaydb:flyway-core:10.10.0'
 }
 
 application {
@@ -31,9 +33,35 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
+def dbPathProperty = project.findProperty('dbPath') as String
+def resolvedDbUrl
+if (dbPathProperty) {
+    if (dbPathProperty.startsWith('jdbc:')) {
+        resolvedDbUrl = dbPathProperty
+    } else {
+        def dbFile = project.layout.projectDirectory.file(dbPathProperty).asFile
+        def parentDir = dbFile.parentFile
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs()
+        }
+        resolvedDbUrl = "jdbc:sqlite:${dbFile.absolutePath}"
+    }
+} else {
+    def defaultDbFile = project.layout.projectDirectory.file('clinic.db').asFile
+    resolvedDbUrl = "jdbc:sqlite:${defaultDbFile.absolutePath}"
+}
+
+flyway {
+    url = resolvedDbUrl
+    driver = 'org.sqlite.JDBC'
+    locations = ['filesystem:src/main/resources/db/migration']
+    configurations = ['runtimeClasspath']
+    cleanDisabled = true
+}
+
 tasks.register('initDatabase', JavaExec) {
     group = 'database'
-    description = 'Initializes the local SQLite database using schema and seed data.'
+    description = 'Initializes the local SQLite database using Flyway migrations.'
     classpath = sourceSets.main.runtimeClasspath
     mainClass.set('com.clinicmanager.tools.DatabaseSetup')
     args(project.findProperty('dbPath') ?: 'clinic.db')

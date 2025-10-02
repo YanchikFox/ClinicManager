@@ -22,7 +22,7 @@ Desktop suite for running a modern medical practice. Clinic Manager bundles pati
 - **Two-role access** – patients and doctors receive dedicated dashboards tailored to their needs.
 - **Virtual time engine** – simulate busy clinic days in minutes; appointments, slots, and reminders react instantly.
 - **Automation-first design** – background jobs clean expired slots, auto-generate availability, and nudge patients before visits.
-- **Offline friendly** – bootstrap a fresh SQLite database locally with one Gradle task; schema and seed data live in version control for reproducible demos.
+- **Offline friendly** – bootstrap a fresh SQLite database locally with one Gradle task; Flyway migrations and demo seed data live in version control for reproducible demos.
 
 ## Feature tour
 | Area | What you get |
@@ -62,7 +62,7 @@ src/main/java/com/clinicmanager
 | `notifications` | User-facing alerts triggered by automation or manual actions. |
 | `favorite_doctors` | Patient shortcuts to frequently booked practitioners. |
 
-Schema migrations live in `src/main/resources/schema.sql`, while reproducible sample data is stored in `src/main/resources/data.sql`. No binary database is tracked in Git—each developer generates a local copy on demand.
+Schema migrations live in `src/main/resources/db/migration/` and are executed with Flyway. No binary database is tracked in Git—each developer generates a local copy on demand.
 
 ## Quick start
 1. **Install dependencies**
@@ -72,25 +72,25 @@ Schema migrations live in `src/main/resources/schema.sql`, while reproducible sa
      artifacts automatically during the build.
 2. **Initialise the database** (creates `clinic.db` next to the project root)
    ```bash
-   ./gradlew initDatabase
+   ./gradlew flywayMigrate
    ```
-   Use a custom location with `./gradlew initDatabase -PdbPath=path/to/your.db` if desired.
+   Supply a custom location with `./gradlew flywayMigrate -PdbPath=path/to/your.db`, or simply start the app—migrations run automatically on launch.
 3. **Run the desktop app**
    ```bash
    ./gradlew run
    ```
-4. **Sign in or register** using the start menu. Sample credentials from `data.sql` include:
+4. **Sign in or register** using the start menu. Sample credentials from the demo seed migration include:
    - Doctor: `doctor.stone@example.com` / `doctor123`
    - Patient: `alice.johnson@example.com` / `patient123`
    Feel free to create fresh ones through the registration flow.
 
 ### Database refresh
-Need a clean slate? Remove the old file and re-run the init task:
+Need a clean slate? Remove the old file and re-run the migrations:
 ```bash
 rm -f clinic.db
-./gradlew initDatabase
+./gradlew flywayMigrate
 ```
-The Gradle task reads `schema.sql` and `data.sql`, so edits to those files automatically flow into every fresh database.
+Flyway picks up any migration files under `src/main/resources/db/migration/`, so new scripts run automatically for every developer.
 
 ## Daily workflows
 - **Front desk demo:** Register a patient and doctor, then jump into the patient dashboard to book a visit. Switch to the doctor panel to confirm the appointment and add a medical record.
