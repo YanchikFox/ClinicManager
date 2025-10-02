@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.MissingResourceException;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
@@ -21,6 +22,8 @@ public final class LocalizationManager {
     public static final Locale RUSSIAN = new Locale("ru");
     public static final Locale POLISH = new Locale("pl");
 
+    private static final String BASE_BUNDLE_NAME = "i18n.messages";
+    private static final Locale DEFAULT_LOCALE = ENGLISH;
     private static final LocalizationManager INSTANCE = new LocalizationManager();
     private static final ResourceBundle.Control UTF8_CONTROL = new Utf8Control();
 
@@ -28,17 +31,41 @@ public final class LocalizationManager {
     private ResourceBundle bundle;
 
     private LocalizationManager() {
-        Locale defaultLocale = ENGLISH;
-        this.bundle = ResourceBundle.getBundle("i18n.messages", defaultLocale, UTF8_CONTROL);
-        this.localeProperty = new SimpleObjectProperty<>(defaultLocale);
+        this.localeProperty = new SimpleObjectProperty<>(DEFAULT_LOCALE);
+        this.bundle = loadBundle(DEFAULT_LOCALE);
         this.localeProperty.addListener((obs, oldLocale, newLocale) ->
-                bundle = ResourceBundle.getBundle("i18n.messages", newLocale, UTF8_CONTROL));
+                bundle = loadBundle(newLocale));
     }
 
     public static LocalizationManager getInstance() {
         return INSTANCE;
     }
+    private ResourceBundle loadBundle(Locale locale) {
+        Locale target = locale != null ? locale : DEFAULT_LOCALE;
+        ResourceBundle resource = tryLoadBundle(target);
+        if (resource != null) {
+            return resource;
+        }
+        if (!DEFAULT_LOCALE.equals(target)) {
+            resource = tryLoadBundle(DEFAULT_LOCALE);
+            if (resource != null) {
+                return resource;
+            }
+        }
+        resource = tryLoadBundle(Locale.ROOT);
+        if (resource != null) {
+            return resource;
+        }
+        throw new IllegalStateException("Missing localization resources for " + BASE_BUNDLE_NAME);
+    }
 
+    private ResourceBundle tryLoadBundle(Locale locale) {
+        try {
+            return ResourceBundle.getBundle(BASE_BUNDLE_NAME, locale, UTF8_CONTROL);
+        } catch (MissingResourceException ex) {
+            return null;
+        }
+    }
     public void setLocale(Locale locale) {
         if (locale != null) {
             localeProperty.set(locale);
