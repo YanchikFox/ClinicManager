@@ -1,7 +1,7 @@
 package com.clinicmanager.gui;
 
 import com.clinicmanager.model.entities.Notification;
-import com.clinicmanager.service.NotificationManager;
+import com.clinicmanager.service.NotificationService;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public class NotificationWindow {
 
-    public static void showNotifications(Stage owner, NotificationManager notificationManager, int personId) {
+    public static void showNotifications(Stage owner, NotificationService notificationManager, int personId) {
         ListView<String> listView = new ListView<>();
         Runnable refreshList = () -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

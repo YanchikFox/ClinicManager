@@ -1,18 +1,16 @@
 package com.clinicmanager.gui;
 
-import com.clinicmanager.app.Clinic;
+import com.clinicmanager.app.ClinicFacade;
+import com.clinicmanager.app.PanelManager;
+import com.clinicmanager.app.ViewLoader;
 import com.clinicmanager.controller.BaseControlPanel;
 import com.clinicmanager.controller.DoctorControlPanel;
-import com.clinicmanager.repository.AccountRepository;
-import com.clinicmanager.repository.RepositoryManager;
-import com.clinicmanager.security.TokenService;
-import com.clinicmanager.service.AccountManager;
+import com.clinicmanager.service.SlotGenerationService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import com.clinicmanager.service.SlotAutoGeneratorService;
 import com.clinicmanager.gui.localization.LocalizationManager;
 
 public class LoginController {
@@ -36,16 +34,20 @@ public class LoginController {
     private Button polishButton;
 
 
-    private final Clinic clinic;
-    private AccountRepository accountRepository;
+    private final ClinicFacade clinic;
+    private final PanelManager panelManager;
+    private final SlotGenerationService slotGenerationService;
+    private final ViewLoader viewLoader;
     private final LocalizationManager localization = LocalizationManager.getInstance();
 
-    public LoginController() {
-        RepositoryManager repos = AppContext.getRepositories();
-        this.accountRepository = repos.accounts;
-
-        AccountManager manager = new AccountManager(accountRepository, new TokenService());
-        this.clinic = new Clinic(manager);
+    public LoginController(ClinicFacade clinic,
+            PanelManager panelManager,
+            SlotGenerationService slotGenerationService,
+            ViewLoader viewLoader) {
+        this.clinic = clinic;
+        this.panelManager = panelManager;
+        this.slotGenerationService = slotGenerationService;
+        this.viewLoader = viewLoader;
     }
     @FXML
     private void initialize() {
@@ -61,17 +63,17 @@ public class LoginController {
             String pass = passwordField.getText();
 
             BaseControlPanel panel = clinic.login(email, pass);
-            AppContext.setPanel(panel);
+            panelManager.setCurrentPanel(panel);
 
             // --- Auto-generate slots for all doctors during login ---
-            new SlotAutoGeneratorService().ensureFutureSlotsForAllDoctors();
+            slotGenerationService.ensureFutureSlotsForAllDoctors();
 
             String fxml = (panel instanceof DoctorControlPanel)
                     ? "/gui/doctor_panel.fxml"
                     : "/gui/patient_panel.fxml";
 
             Stage stage = MainFX.getPrimaryStage();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            FXMLLoader loader = viewLoader.loader(fxml);
             stage.setScene(new Scene(loader.load()));
             if (panel instanceof DoctorControlPanel) {
                 stage.setTitle(localization.get("doctor.title"));
@@ -87,7 +89,7 @@ public class LoginController {
     @FXML
     private void handleBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
+            FXMLLoader loader = viewLoader.loader("/gui/start_menu.fxml");
             Stage stage = MainFX.getPrimaryStage();
             stage.setScene(new Scene(loader.load()));
             stage.setTitle(localization.get("start.title"));

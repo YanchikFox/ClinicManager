@@ -1,8 +1,10 @@
 package com.clinicmanager.gui;
+
+import com.clinicmanager.app.ViewLoader;
 import com.clinicmanager.gui.localization.LocalizationManager;
-import javafx.util.StringConverter;
-import com.clinicmanager.service.RegistrationService;
 import com.clinicmanager.model.enums.Role;
+import com.clinicmanager.service.RegistrationUseCase;
+import javafx.util.StringConverter;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -54,10 +56,12 @@ public class RegisterController {
     @FXML
     private Button polishButton;
 
-    private final RegistrationService regService;
+    private final RegistrationUseCase regService;
+    private final ViewLoader viewLoader;
 
-    public RegisterController() {
-        this.regService = AppContext.getRegistrationService();
+    public RegisterController(RegistrationUseCase regService, ViewLoader viewLoader) {
+        this.regService = regService;
+        this.viewLoader = viewLoader;
     }
     private final LocalizationManager localization = LocalizationManager.getInstance();
 
@@ -93,7 +97,7 @@ public class RegisterController {
     @FXML
     private void handleBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/start_menu.fxml"));
+            FXMLLoader loader = viewLoader.loader("/gui/start_menu.fxml");
             Stage stage = MainFX.getPrimaryStage();
             stage.setScene(new Scene(loader.load()));
             stage.setTitle(localization.get("start.title"));

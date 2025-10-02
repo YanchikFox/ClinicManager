@@ -1,54 +1,66 @@
 package com.clinicmanager.time;
 
-import com.clinicmanager.gui.AppContext;
 import com.clinicmanager.model.entities.Appointment;
 import com.clinicmanager.model.entities.Slot;
 import com.clinicmanager.model.enums.AppointmentStatus;
-import com.clinicmanager.repository.RepositoryManager;
-import com.clinicmanager.service.NotificationManager;
+import com.clinicmanager.repository.AppointmentRepository;
+import com.clinicmanager.repository.SlotRepository;
+import com.clinicmanager.service.NotificationService;
 
-import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-public class TimeTickHandler {
-    public static void handleTimeTick(LocalDateTime now) {
-        RepositoryManager repos = AppContext.getRepositories();
-        NotificationManager notificationManager = new NotificationManager(repos.notifications);
+public class TimeTickHandler implements TimeTickListener {
+    private final SlotRepository slotRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final NotificationService notificationService;
 
+    public TimeTickHandler(SlotRepository slotRepository,
+            AppointmentRepository appointmentRepository,
+            NotificationService notificationService) {
+        this.slotRepository = slotRepository;
+        this.appointmentRepository = appointmentRepository;
+        this.notificationService = notificationService;
+    }
+
+    @Override
+    public void onTick(LocalDateTime now) {
         // 1. Remove outdated slots
-        List<Slot> slots = repos.slots.findAll();
+        List<Slot> slots = slotRepository.findAll();
         for (Slot slot : slots) {
             LocalDateTime slotEnd = LocalDateTime.of(slot.date(), slot.timeRange().end());
             if (slotEnd.isBefore(now)) {
-                repos.slots.delete(slot);
+                slotRepository.delete(slot);
             }
         }
 
         // 2. Finish overdue appointments
-        List<Appointment> appointments = repos.appointments.findAll();
+        List<Appointment> appointments = appointmentRepository.findAll();
         for (Appointment app : appointments) {
-            Slot slot = app.getSlot();
-            if (slot == null) continue;
+            Slot slot = app.getSlot(slotRepository);
+            if (slot == null)
+                continue;
             LocalDateTime slotEnd = LocalDateTime.of(slot.date(), slot.timeRange().end());
             if (!app.status().equals(AppointmentStatus.ENDED) && !app.status().equals(AppointmentStatus.CANCELLED)) {
                 if (slotEnd.isBefore(now)) {
-                    app.end(repos.appointments);
+                    app.end(appointmentRepository);
                 }
             }
         }
 
         // 3. Notifications ten minutes before an appointment (only CONFIRMED/PENDING)
         for (Appointment app : appointments) {
-            Slot slot = app.getSlot();
-            if (slot == null) continue;
+            Slot slot = app.getSlot(slotRepository);
+            if (slot == null)
+                continue;
             LocalDateTime slotStart = LocalDateTime.of(slot.date(), slot.timeRange().start());
             if (!app.status().equals(AppointmentStatus.ENDED) && !app.status().equals(AppointmentStatus.CANCELLED)) {
                 if (slotStart.minusMinutes(10).equals(now)) {
                     // Notify the doctor and the patient
-                    notificationManager.createNotification(app.doctorId(), "The appointment starts in 10 minutes.");
-                    notificationManager.createNotification(app.patientId(), "Your appointment starts in 10 minutes.");
+                    notificationService.createNotification(app.doctorId(), "The appointment starts in 10 minutes.");
+                    notificationService.createNotification(app.patientId(), "Your appointment starts in 10 minutes.");
                 }
             }
         }

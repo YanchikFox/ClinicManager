@@ -1,12 +1,13 @@
 package com.clinicmanager.controller;
 
 import com.clinicmanager.exception.InvalidTokenException;
-import com.clinicmanager.service.AccountManager;
+import com.clinicmanager.service.AccountService;
 
 public abstract class BaseControlPanel {
     protected final String token;
-    protected final AccountManager accountManager;
-    protected BaseControlPanel(String token, AccountManager accountManager) {
+    protected final AccountService accountManager;
+
+    protected BaseControlPanel(String token, AccountService accountManager) {
         this.token = token;
         this.accountManager = accountManager;
     }

@@ -1,6 +1,5 @@
 package com.clinicmanager.service;
 
-import com.clinicmanager.gui.AppContext;
 import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.entities.Slot;
 import com.clinicmanager.model.entities.TimeRange;
@@ -13,15 +12,16 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-public class SlotAutoGeneratorService {
+public class SlotAutoGeneratorService implements SlotGenerationService {
     private final DoctorRepository doctorRepository;
     private final SlotRepository slotRepository;
 
-    public SlotAutoGeneratorService() {
-        this.doctorRepository = AppContext.getRepositories().doctors;
-        this.slotRepository = AppContext.getRepositories().slots;
+    public SlotAutoGeneratorService(DoctorRepository doctorRepository, SlotRepository slotRepository) {
+        this.doctorRepository = doctorRepository;
+        this.slotRepository = slotRepository;
     }
 
+    @Override
     public void ensureFutureSlotsForAllDoctors() {
         LocalDate virtualToday = TimeManager.getInstance().getCurrentTime().toLocalDate();
         LocalTime virtualNowTime = TimeManager.getInstance().getCurrentTime().toLocalTime();

@@ -1,10 +1,10 @@
 package com.clinicmanager.gui;
 
+import com.clinicmanager.app.PanelManager;
 import com.clinicmanager.model.actors.Doctor;
+import com.clinicmanager.model.entities.FavoriteDoctor;
 import com.clinicmanager.model.entities.Slot;
-import com.clinicmanager.repository.DoctorRepository;
-import com.clinicmanager.repository.RepositoryManager;
-import com.clinicmanager.repository.ScheduleRepository;
+import com.clinicmanager.repository.Repositories;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -29,14 +29,17 @@ public class DoctorSearchController {
     private Doctor selectedDoctor;
     private Slot selectedSlot;
     private List<Slot> currentDoctorSlots = List.of();
+    private final PanelManager panelManager;
+    private final Repositories repositories;
 
-    private final RepositoryManager repos = AppContext.getRepositories();
-    private final DoctorRepository doctorRepo = repos.doctors;
-    private final ScheduleRepository scheduleRepo = repos.schedules;
+    public DoctorSearchController(PanelManager panelManager, Repositories repositories) {
+        this.panelManager = panelManager;
+        this.repositories = repositories;
+    }
 
     @FXML
     private void initialize() {
-        List<Doctor> doctors = doctorRepo.findAll();
+        List<Doctor> doctors = repositories.doctors().findAll();
         doctorListView.setItems(FXCollections.observableArrayList(doctors));
         doctorListView.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -70,14 +73,14 @@ public class DoctorSearchController {
 
 
     private void updateFavoriteBtn() {
-        var panel = AppContext.getPanel();
+        var panel = panelManager.getCurrentPanel();
         if (selectedDoctor == null || panel == null
                 || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
             addFavoriteBtn.setDisable(true);
             addFavoriteBtn.setText("Add to favorites");
             return;
         }
-        boolean isFav = repos.favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id());
+        boolean isFav = repositories.favoriteDoctors().isFavorite(patient.id(), selectedDoctor.id());
         addFavoriteBtn.setDisable(false);
         addFavoriteBtn.setText(isFav ? "Remove from favorites" : "Add to favorites");
     }
@@ -92,8 +95,9 @@ public class DoctorSearchController {
         }
         doctorInfoLabel.setText("Name: " + doc.name() + "\nPhone: " + doc.phoneNumber());
         // Fetch the schedule (only free slots)
-        List<Slot> slots = repos.slots.findAll();
-        List<Slot> doctorSlots = slots.stream().filter(s -> s.scheduleId() == doc.scheduleId() && s.isAvailable())
+        List<Slot> slots = repositories.slots().findAll();
+        List<Slot> doctorSlots = slots.stream()
+                .filter(s -> s.scheduleId() == doc.scheduleId() && s.isAvailable(repositories.appointments()))
                 .toList();
         currentDoctorSlots = doctorSlots;
         DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -110,13 +114,13 @@ public class DoctorSearchController {
         if (selectedDoctor == null || selectedSlot == null)
             return;
         // Pobierz aktualnego pacjenta
-        var panel = AppContext.getPanel();
+        var panel = panelManager.getCurrentPanel();
         if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
             new Alert(Alert.AlertType.ERROR, "Error: current patient not found", ButtonType.OK).showAndWait();
             return;
         }
         // Validation: a patient cannot book the same doctor more than once per day
-        if (!repos.appointments.canPatientBookSlot(patient.id(), selectedDoctor.id(), selectedSlot.date())) {
+        if (!repositories.appointments().canPatientBookSlot(patient.id(), selectedDoctor.id(), selectedSlot.date())) {
             new Alert(Alert.AlertType.WARNING, "You are already booked with this doctor for the selected day!", ButtonType.OK)
                     .showAndWait();
             return;
@@ -140,25 +144,25 @@ public class DoctorSearchController {
                 selectedSlot.id(),
                 com.clinicmanager.model.enums.AppointmentStatus.PENDING,
                 problemDescription);
-        repos.appointments.save(appointment);
+        repositories.appointments().save(appointment);
         // Refresh the slot list
         showDoctorInfo(selectedDoctor);
         new Alert(Alert.AlertType.INFORMATION, "Appointment booked!", ButtonType.OK).showAndWait();
     }
 
     private void handleToggleFavorite() {
-        var panel = AppContext.getPanel();
+        var panel = panelManager.getCurrentPanel();
         if (selectedDoctor == null || panel == null
                 || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient)) {
             return;
         }
-        boolean isFav = repos.favoriteDoctors.isFavorite(patient.id(), selectedDoctor.id());
+        boolean isFav = repositories.favoriteDoctors().isFavorite(patient.id(), selectedDoctor.id());
         if (isFav) {
-            repos.favoriteDoctors.deleteByPatientAndDoctor(patient.id(), selectedDoctor.id());
+            repositories.favoriteDoctors().deleteByPatientAndDoctor(patient.id(), selectedDoctor.id());
             new Alert(Alert.AlertType.INFORMATION, "Doctor removed from favorites!", ButtonType.OK).showAndWait();
         } else {
-            repos.favoriteDoctors
-                    .save(new com.clinicmanager.model.entities.FavoriteDoctor(-1, patient.id(), selectedDoctor.id()));
+            repositories.favoriteDoctors()
+                    .save(new FavoriteDoctor(-1, patient.id(), selectedDoctor.id()));
             new Alert(Alert.AlertType.INFORMATION, "Doctor added to favorites!", ButtonType.OK).showAndWait();
         }
         updateFavoriteBtn();

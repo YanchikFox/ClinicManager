@@ -2,9 +2,6 @@ package com.clinicmanager.model.entities;
 
 import java.time.LocalDate;
 
-import com.clinicmanager.gui.AppContext;
-import com.clinicmanager.repository.MedicalRecordRepository;
-
 public class MedicalRecord {
     private final int id;
     private final int medicalCardId;
@@ -12,7 +9,6 @@ public class MedicalRecord {
     private final LocalDate date;
     private final String description;
     private final Integer appointmentId;
-    private final MedicalRecordRepository medicalRecordRepository;
 
     public MedicalRecord(int id, int medicalCardId, int doctorId, LocalDate date, String description,
             Integer appointmentId) {
@@ -22,7 +18,6 @@ public class MedicalRecord {
         this.date = date;
         this.description = description;
         this.appointmentId = appointmentId;
-        this.medicalRecordRepository = AppContext.getRepositories().records;
     }
 
     public MedicalRecord(int id, int medicalCardId, int doctorId, LocalDate date, String description) {

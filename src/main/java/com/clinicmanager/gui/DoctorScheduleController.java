@@ -1,9 +1,10 @@
 package com.clinicmanager.gui;
 
+import com.clinicmanager.app.PanelManager;
 import com.clinicmanager.controller.DoctorControlPanel;
 import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.entities.Slot;
-import com.clinicmanager.repository.RepositoryManager;
+import com.clinicmanager.repository.Repositories;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import com.clinicmanager.gui.AppContext;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,6 +41,13 @@ public class DoctorScheduleController {
     private Button closeBtn;
 
     private SlotTableRow selectedSlotRow;
+    private final PanelManager panelManager;
+    private final Repositories repositories;
+
+    public DoctorScheduleController(PanelManager panelManager, Repositories repositories) {
+        this.panelManager = panelManager;
+        this.repositories = repositories;
+    }
 
     @FXML
     private void initialize() {
@@ -75,18 +82,17 @@ public class DoctorScheduleController {
 
     // Legacy private implementation
     private void loadSlotsImpl() {
-        var panel = AppContext.getPanel();
+        var panel = panelManager.getCurrentPanel();
         if (!(panel instanceof DoctorControlPanel doctorPanel))
             return;
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
-        RepositoryManager repos = AppContext.getRepositories();
-        List<com.clinicmanager.model.entities.Slot> allSlots = repos.slots.findAll().stream()
+        List<com.clinicmanager.model.entities.Slot> allSlots = repositories.slots().findAll().stream()
                 .filter(s -> s.scheduleId() == doctor.scheduleId())
                 .toList();
         ObservableList<SlotTableRow> rows = FXCollections.observableArrayList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (var slot : allSlots) {
-            String status = slot.isAvailable() ? "available" : "booked";
+            String status = slot.isAvailable(repositories.appointments()) ? "available" : "booked";
             rows.add(new SlotTableRow(
                     slot.date().format(fmt),
                     slot.timeRange().start().toString(),
@@ -121,13 +127,13 @@ public class DoctorScheduleController {
     }
 
     private boolean hasRealPatientAppointment(Slot slot) {
-        return AppContext.getRepositories().appointments.findAll().stream()
+        return repositories.appointments().findAll().stream()
                 .anyMatch(
                         a -> a.slotId() == slot.id() && a.patientId() != -1 && !a.status().name().equals("CANCELLED"));
     }
 
     private boolean isClosedByDoctor(Slot slot) {
-        return AppContext.getRepositories().appointments.findAll().stream()
+        return repositories.appointments().findAll().stream()
                 .anyMatch(a -> a.slotId() == slot.id() && a.patientId() == -1 && a.status().name().equals("ENDED"));
     }
 
@@ -140,10 +146,10 @@ public class DoctorScheduleController {
         if (hasRealPatientAppointment(slot) || isClosedByDoctor(slot))
             return;
         // Close the slot by creating an ENDED appointment with patientId = -1
-        var doctor = (Doctor) AppContext.getPanel().currentPerson();
+        var doctor = (Doctor) panelManager.getCurrentPanel().currentPerson();
         var app = new com.clinicmanager.model.entities.Appointment(-1, -1, doctor.id(), slot.id(),
                 com.clinicmanager.model.enums.AppointmentStatus.ENDED);
-        AppContext.getRepositories().appointments.save(app);
+        repositories.appointments().save(app);
         loadSlots();
         updateSlotButtons();
     }
@@ -155,7 +161,7 @@ public class DoctorScheduleController {
         if (slot == null)
             return;
         // Reopen the slot by removing the ENDED appointment with patientId = -1
-        var repo = AppContext.getRepositories().appointments;
+        var repo = repositories.appointments();
         var toDelete = repo.findAll().stream()
                 .filter(a -> a.slotId() == slot.id() && a.patientId() == -1 && a.status().name().equals("ENDED"))
                 .findFirst().orElse(null);
@@ -167,12 +173,11 @@ public class DoctorScheduleController {
     }
 
     private Slot findSlotByRow(SlotTableRow row) {
-        var panel = AppContext.getPanel();
+        var panel = panelManager.getCurrentPanel();
         if (!(panel instanceof DoctorControlPanel doctorPanel))
             return null;
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
-        RepositoryManager repos = AppContext.getRepositories();
-        return repos.slots.findAll().stream()
+        return repositories.slots().findAll().stream()
                 .filter(s -> s.scheduleId() == doctor.scheduleId()
                         && s.date().toString().equals(row.getDate())
                         && s.timeRange().start().toString().equals(row.getStartTime())
@@ -181,7 +186,7 @@ public class DoctorScheduleController {
     }
 
     private void handleAddSlot() {
-        var panel = AppContext.getPanel();
+        var panel = panelManager.getCurrentPanel();
         if (!(panel instanceof DoctorControlPanel doctorPanel))
             return;
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
@@ -212,14 +217,13 @@ public class DoctorScheduleController {
         });
         dialog.showAndWait().ifPresent(slot -> {
             // Check for overlapping dates and times
-            RepositoryManager repos = AppContext.getRepositories();
-            boolean intersects = repos.slots.findAll().stream()
+            boolean intersects = repositories.slots().findAll().stream()
                     .filter(s -> s.scheduleId() == doctor.scheduleId() && s.date().equals(slot.date()))
                     .anyMatch(s -> timesOverlap(s.timeRange(), slot.timeRange()));
             if (intersects) {
                 new Alert(Alert.AlertType.ERROR, "The slot conflicts with an existing one!", ButtonType.OK).showAndWait();
             } else {
-                repos.slots.save(slot);
+                repositories.slots().save(slot);
                 loadSlots();
             }
         });
@@ -234,8 +238,8 @@ public class DoctorScheduleController {
         if (selectedSlotRow == null)
             return;
         var slot = findSlotByRow(selectedSlotRow);
-        if (slot != null && slot.isAvailable()) {
-            AppContext.getRepositories().slots.delete(slot);
+        if (slot != null && slot.isAvailable(repositories.appointments())) {
+            repositories.slots().delete(slot);
             loadSlots();
         }
     }

@@ -1,6 +1,5 @@
 package com.clinicmanager.model.entities;
 
-import com.clinicmanager.gui.AppContext;
 import com.clinicmanager.repository.ScheduleRepository;
 import com.clinicmanager.repository.SlotRepository;
 
@@ -10,15 +9,10 @@ import java.util.List;
 public class Schedule {
     private final int id;
     private final int doctorId;
-    private final ScheduleRepository scheduleRepository;
-
-    private final SlotRepository slotRepository;
 
     public Schedule(int id, int doctorId) {
         this.id = id;
         this.doctorId = doctorId;
-        this.scheduleRepository = AppContext.getRepositories().schedules;
-        this.slotRepository = AppContext.getRepositories().slots;
     }
 
     public int id() {
@@ -30,16 +24,16 @@ public class Schedule {
     }
 
     // TODO: Anton this should not be hardcoded, but rather injected or passed as a parameter
-    public List<Slot> getSlots(LocalDate date) {
+    public List<Slot> getSlots(LocalDate date, ScheduleRepository scheduleRepository) {
         return scheduleRepository.findSlotsByScheduleAndDate(id, date);
     }
 
-    public void removeSlot(Slot slot) {
+    public void removeSlot(Slot slot, SlotRepository slotRepository) {
         slotRepository.delete(slot);
     }
 
     // TODO: getUpcomingSlots should be implemented
-    public void addSlot(Slot slot) {
+    public void addSlot(Slot slot, SlotRepository slotRepository) {
         slotRepository.save(slot);
     }
 }

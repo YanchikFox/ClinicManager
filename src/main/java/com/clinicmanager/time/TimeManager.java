@@ -14,6 +14,7 @@ public class TimeManager {
     private Timer timer;
     private boolean running = false;
     private int speedSecondsPerTick = 10; // 1 minute equals 10 seconds
+    private TimeTickListener tickListener;
 
     private TimeManager() {
         this.currentTime = LocalDateTime.now();
@@ -42,6 +43,10 @@ public class TimeManager {
         listeners.remove(listener);
     }
 
+    public void setTickListener(TimeTickListener tickListener) {
+        this.tickListener = tickListener;
+    }
+
     private void notifyListeners() {
         for (var l : listeners)
             l.accept(currentTime);
@@ -57,8 +62,9 @@ public class TimeManager {
             public void run() {
                 currentTime = currentTime.plusMinutes(1);
                 notifyListeners();
-                // --- Global time handling ---
-                com.clinicmanager.time.TimeTickHandler.handleTimeTick(currentTime);
+                if (tickListener != null) {
+                    tickListener.onTick(currentTime);
+                }
             }
         }, speedSecondsPerTick * 1000L, speedSecondsPerTick * 1000L);
     }

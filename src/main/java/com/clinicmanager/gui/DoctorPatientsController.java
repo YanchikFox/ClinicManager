@@ -1,10 +1,12 @@
 package com.clinicmanager.gui;
 
+import com.clinicmanager.app.PanelManager;
+import com.clinicmanager.app.ViewLoader;
 import com.clinicmanager.controller.DoctorControlPanel;
 import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.Appointment;
-import com.clinicmanager.repository.RepositoryManager;
+import com.clinicmanager.repository.Repositories;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -24,6 +26,15 @@ public class DoctorPatientsController {
 
     private List<Patient> treatedPatients;
     private Patient selectedPatient;
+    private final PanelManager panelManager;
+    private final Repositories repositories;
+    private final ViewLoader viewLoader;
+
+    public DoctorPatientsController(PanelManager panelManager, Repositories repositories, ViewLoader viewLoader) {
+        this.panelManager = panelManager;
+        this.repositories = repositories;
+        this.viewLoader = viewLoader;
+    }
 
     @FXML
     private void initialize() {
@@ -48,16 +59,15 @@ public class DoctorPatientsController {
     }
 
     private void loadPatients() {
-        var panel = com.clinicmanager.gui.AppContext.getPanel();
+        var panel = panelManager.getCurrentPanel();
         if (!(panel instanceof DoctorControlPanel doctorPanel)) return;
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
-        RepositoryManager repos = com.clinicmanager.gui.AppContext.getRepositories();
         // Patients who have an ENDED appointment with this doctor
-        List<Appointment> ended = repos.appointments.findAll().stream()
+        List<Appointment> ended = repositories.appointments().findAll().stream()
             .filter(a -> a.doctorId() == doctor.id() && a.status().name().equals("ENDED"))
             .toList();
         treatedPatients = ended.stream()
-            .map(a -> repos.patients.findById(a.patientId()))
+            .map(a -> repositories.patients().findById(a.patientId()))
             .filter(p -> p != null)
             .distinct()
             .toList();
@@ -72,7 +82,7 @@ public class DoctorPatientsController {
     private void handleViewCard() {
         if (selectedPatient == null) return;
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/medical_card.fxml"));
+            javafx.fxml.FXMLLoader loader = viewLoader.loader("/gui/medical_card.fxml");
             javafx.scene.Parent root = loader.load();
             com.clinicmanager.gui.MedicalCardController controller = loader.getController();
             controller.setPatient(selectedPatient);

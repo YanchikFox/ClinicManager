@@ -1,25 +1,28 @@
 package com.clinicmanager.gui;
 
+import com.clinicmanager.app.PanelManager;
+import com.clinicmanager.app.ViewLoader;
 import com.clinicmanager.controller.DoctorControlPanel;
+import com.clinicmanager.gui.MedicalCardController;
 import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.Appointment;
+import com.clinicmanager.model.entities.MedicalRecord;
 import com.clinicmanager.model.entities.Slot;
-import com.clinicmanager.repository.RepositoryManager;
+import com.clinicmanager.repository.Repositories;
+import com.clinicmanager.time.TimeManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import com.clinicmanager.gui.AppContext;
-import com.clinicmanager.time.TimeManager;
 
-import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +54,15 @@ public class DoctorAppointmentsController {
 
     private List<Appointment> myAppointments;
     private Appointment selectedAppointment;
+    private final PanelManager panelManager;
+    private final Repositories repositories;
+    private final ViewLoader viewLoader;
+
+    public DoctorAppointmentsController(PanelManager panelManager, Repositories repositories, ViewLoader viewLoader) {
+        this.panelManager = panelManager;
+        this.repositories = repositories;
+        this.viewLoader = viewLoader;
+    }
 
     @FXML
     private void initialize() {
@@ -118,8 +130,8 @@ public class DoctorAppointmentsController {
     private void handleViewDetails() {
         if (selectedAppointment == null)
             return;
-        Patient patient = selectedAppointment.getPatient();
-        Slot slot = selectedAppointment.getSlot();
+        Patient patient = selectedAppointment.getPatient(repositories.patients());
+        Slot slot = selectedAppointment.getSlot(repositories.slots());
         String msg = String.format("Patient: %s\nDate: %s\nTime: %s-%s\nStatus: %s\nProblem description: %s",
                 patient != null ? patient.name() : "?",
                 slot != null ? slot.date() : "?",
@@ -135,12 +147,11 @@ public class DoctorAppointmentsController {
     private void handleOpenCard() {
         if (selectedAppointment == null)
             return;
-        Patient patient = selectedAppointment.getPatient();
+        Patient patient = selectedAppointment.getPatient(repositories.patients());
         if (patient == null)
             return;
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/gui/medical_card.fxml"));
+            javafx.fxml.FXMLLoader loader = viewLoader.loader("/gui/medical_card.fxml");
             Parent root = loader.load();
             MedicalCardController controller = loader.getController();
             controller.setPatient(patient); // Pass the patient explicitly
@@ -157,7 +168,7 @@ public class DoctorAppointmentsController {
     private void handlePatientInfo() {
         if (selectedAppointment == null)
             return;
-        Patient patient = selectedAppointment.getPatient();
+        Patient patient = selectedAppointment.getPatient(repositories.patients());
         if (patient == null)
             return;
         String msg = String.format("Name: %s\nDate of birth: %s\nPhone: %s",
@@ -170,7 +181,7 @@ public class DoctorAppointmentsController {
             return;
         if (selectedAppointment.status().name().equals("CANCELLED"))
             return;
-        Patient patient = selectedAppointment.getPatient();
+        Patient patient = selectedAppointment.getPatient(repositories.patients());
         if (patient == null)
             return;
         if (!isRecordAdditionAllowed(selectedAppointment)) {
@@ -186,19 +197,18 @@ public class DoctorAppointmentsController {
         dialog.setContentText("Description:");
         dialog.showAndWait().ifPresent(desc -> {
             if (!desc.isBlank()) {
-                var repos = AppContext.getRepositories();
-                if (repos.records.existsForAppointment(selectedAppointment.id())) {
+                if (repositories.medicalRecords().existsForAppointment(selectedAppointment.id())) {
                     new Alert(Alert.AlertType.WARNING, "A record has already been added for this appointment.",
                             ButtonType.OK).showAndWait();
                     setButtonsEnabled(true);
                     return;
                 }
-                var card = repos.cards.findById(patient.medicalCardId());
-                var doctor = AppContext.getPanel().currentPerson();
+                var card = repositories.medicalCards().findById(patient.medicalCardId());
+                var doctor = panelManager.getCurrentPanel().currentPerson();
                 LocalDateTime now = TimeManager.getInstance().getCurrentTime();
-                var record = new com.clinicmanager.model.entities.MedicalRecord(-1, card.id(), ((Doctor) doctor).id(),
+                MedicalRecord record = new MedicalRecord(-1, card.id(), ((Doctor) doctor).id(),
                         now.toLocalDate(), desc, selectedAppointment.id());
-                repos.records.save(record);
+                repositories.medicalRecords().save(record);
                 new Alert(Alert.AlertType.INFORMATION, "Record added!", ButtonType.OK).showAndWait();
                 setButtonsEnabled(true);
             }
@@ -211,7 +221,7 @@ public class DoctorAppointmentsController {
         if (selectedAppointment.status().name().equals("ENDED")
                 || selectedAppointment.status().name().equals("CANCELLED"))
             return;
-        selectedAppointment.end(AppContext.getRepositories().appointments);
+        selectedAppointment.end(repositories.appointments());
         loadAppointments();
         new Alert(Alert.AlertType.INFORMATION, "Appointment completed!", ButtonType.OK).showAndWait();
     }
@@ -225,12 +235,11 @@ public class DoctorAppointmentsController {
     }
 
     private void loadAppointments() {
-        var panel = AppContext.getPanel();
+        var panel = panelManager.getCurrentPanel();
         if (!(panel instanceof DoctorControlPanel doctorPanel))
             return;
         Doctor doctor = (Doctor) doctorPanel.currentPerson();
-        RepositoryManager repos = AppContext.getRepositories();
-        List<Appointment> all = repos.appointments.findAll().stream()
+        List<Appointment> all = repositories.appointments().findAll().stream()
                 .filter(a -> a.doctorId() == doctor.id())
                 .collect(Collectors.toList());
         boolean onlyActive = showActiveOnlyCheckBox != null && showActiveOnlyCheckBox.isSelected();
@@ -244,8 +253,8 @@ public class DoctorAppointmentsController {
         ObservableList<AppointmentTableRow> rows = FXCollections.observableArrayList();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (var app : myAppointments) {
-            Patient patient = app.getPatient();
-            Slot slot = app.getSlot();
+            Patient patient = app.getPatient(repositories.patients());
+            Slot slot = app.getSlot(repositories.slots());
             String date = slot != null ? slot.date().format(fmt) : "";
             String time = slot != null ? slot.timeRange().start() + "-" + slot.timeRange().end() : "";
             rows.add(new AppointmentTableRow(
@@ -262,10 +271,9 @@ public class DoctorAppointmentsController {
             return false;
         if (appointment.status().name().equals("CANCELLED"))
             return false;
-        var repos = AppContext.getRepositories();
-        if (repos.records.existsForAppointment(appointment.id()))
+        if (repositories.medicalRecords().existsForAppointment(appointment.id()))
             return false;
-        Slot slot = appointment.getSlot();
+        Slot slot = appointment.getSlot(repositories.slots());
         if (slot == null)
             return false;
         LocalDateTime start = LocalDateTime.of(slot.date(), slot.timeRange().start());

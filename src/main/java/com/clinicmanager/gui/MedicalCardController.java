@@ -1,9 +1,10 @@
 package com.clinicmanager.gui;
 
+import com.clinicmanager.app.PanelManager;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.MedicalCard;
 import com.clinicmanager.model.entities.MedicalRecord;
-import com.clinicmanager.repository.RepositoryManager;
+import com.clinicmanager.repository.Repositories;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -17,9 +18,15 @@ public class MedicalCardController {
     @FXML
     private ListView<String> recordsListView;
 
-    private final RepositoryManager repos = AppContext.getRepositories();
+    private final PanelManager panelManager;
+    private final Repositories repositories;
     private Patient patient;
     private boolean initialized = false;
+
+    public MedicalCardController(PanelManager panelManager, Repositories repositories) {
+        this.panelManager = panelManager;
+        this.repositories = repositories;
+    }
 
     public void setPatient(Patient patient) {
         this.patient = patient;
@@ -34,8 +41,8 @@ public class MedicalCardController {
         if (patient != null) {
             loadCard();
         } else {
-            // If the patient was not provided explicitly, attempt to retrieve it from AppContext
-            Object person = AppContext.getPanel().currentPerson();
+            // If the patient was not provided explicitly, attempt to retrieve it from the current panel
+            Object person = panelManager.getCurrentPanel().currentPerson();
             if (person instanceof Patient p) {
                 patient = p;
                 loadCard();
@@ -53,14 +60,14 @@ public class MedicalCardController {
             recordsListView.setItems(FXCollections.observableArrayList());
             return;
         }
-        MedicalCard card = repos.cards.findById(patient.medicalCardId());
+        MedicalCard card = repositories.medicalCards().findById(patient.medicalCardId());
         if (card == null) {
             cardInfoLabel.setText("No medical card for patient: " + patient.name());
             recordsListView.setItems(FXCollections.observableArrayList());
             return;
         }
         cardInfoLabel.setText("Card ID: " + card.id() + " | Patient: " + patient.name());
-        List<MedicalRecord> records = card.getRecords();
+        List<MedicalRecord> records = card.getRecords(repositories.medicalRecords());
         recordsListView.setItems(FXCollections.observableArrayList(
                 records.stream().map(r -> r.date() + ": " + r.description()).toList()));
     }

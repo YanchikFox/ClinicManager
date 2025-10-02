@@ -3,11 +3,10 @@ package com.clinicmanager.model.entities;
 import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.enums.AppointmentStatus;
-import com.clinicmanager.gui.AppContext;
+import com.clinicmanager.repository.AppointmentRepository;
 import com.clinicmanager.repository.DoctorRepository;
 import com.clinicmanager.repository.PatientRepository;
 import com.clinicmanager.repository.SlotRepository;
-import com.clinicmanager.repository.AppointmentRepository;
 
 public class Appointment {
     private final int id;
@@ -93,18 +92,15 @@ public class Appointment {
     }
 
     // Methods for retrieving related objects by id
-    public Patient getPatient() {
-        PatientRepository repo = AppContext.getRepositories().patients;
+    public Patient getPatient(PatientRepository repo) {
         return repo.findById(patientId);
     }
 
-    public Doctor getDoctor() {
-        DoctorRepository repo = AppContext.getRepositories().doctors;
+    public Doctor getDoctor(DoctorRepository repo) {
         return repo.findById(doctorId);
     }
 
-    public Slot getSlot() {
-        SlotRepository repo = AppContext.getRepositories().slots;
+    public Slot getSlot(SlotRepository repo) {
         return repo.findById(slotId);
     }
 }

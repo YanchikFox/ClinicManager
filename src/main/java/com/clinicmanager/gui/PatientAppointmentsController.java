@@ -1,16 +1,16 @@
 package com.clinicmanager.gui;
 
+import com.clinicmanager.app.PanelManager;
+import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
 import com.clinicmanager.model.entities.Appointment;
-import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.entities.Slot;
-import com.clinicmanager.repository.RepositoryManager;
+import com.clinicmanager.repository.Repositories;
+import com.clinicmanager.service.NotificationService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
-import javafx.scene.Scene;
 
 import java.util.List;
 
@@ -26,20 +26,23 @@ public class PatientAppointmentsController {
     @FXML
     private Button confirmBtn;
 
-    private final RepositoryManager repos = AppContext.getRepositories();
-    private final com.clinicmanager.service.NotificationManager notificationManager =
-            new com.clinicmanager.service.NotificationManager(AppContext.getRepositories().notifications);
+    private final PanelManager panelManager;
+    private final Repositories repositories;
+    private final NotificationService notificationManager;
     private List<Appointment> myAppointments;
     private Appointment selectedAppointment;
 
+    public PatientAppointmentsController(PanelManager panelManager,
+            Repositories repositories,
+            NotificationService notificationManager) {
+        this.panelManager = panelManager;
+        this.repositories = repositories;
+        this.notificationManager = notificationManager;
+    }
+
     @FXML
     private void initialize() {
-        Patient patient = (Patient) AppContext.getPanel().currentPerson();
-        List<Appointment> all = repos.appointments.findAll();
-        myAppointments = all.stream()
-                .filter(a -> a.patientId() == patient.id() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
-                .toList();
-        updateList();
+        reloadAppointments();
         appointmentsListView.getSelectionModel().selectedIndexProperty().addListener((obs, old, idx) -> {
             if (idx != null && idx.intValue() >= 0 && idx.intValue() < myAppointments.size()) {
                 selectedAppointment = myAppointments.get(idx.intValue());
@@ -59,7 +62,6 @@ public class PatientAppointmentsController {
         cancelBtn.setDisable(true);
         rescheduleBtn.setDisable(true);
         confirmBtn.setDisable(true);
-        // --- Store the controller in the root properties for global updates ---
         javafx.application.Platform.runLater(() -> {
             if (appointmentsListView.getScene() != null && appointmentsListView.getScene().getRoot() != null) {
                 appointmentsListView.getScene().getRoot().getProperties().put("fx:controller", this);
@@ -67,20 +69,20 @@ public class PatientAppointmentsController {
         });
     }
 
-    // --- Public method for updating the appointment list ---
     public void reloadAppointments() {
-        Patient patient = (Patient) AppContext.getPanel().currentPerson();
-        List<Appointment> all = repos.appointments.findAll();
+        Patient patient = (Patient) panelManager.getCurrentPanel().currentPerson();
+        List<Appointment> all = repositories.appointments().findAll();
         myAppointments = all.stream()
-                .filter(a -> a.patientId() == patient.id() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
+                .filter(a -> a.patientId() == patient.id()
+                        && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
                 .toList();
         updateList();
     }
 
     private void updateList() {
         List<String> display = myAppointments.stream().map(a -> {
-            Doctor doc = a.getDoctor();
-            Slot slot = a.getSlot();
+            Doctor doc = a.getDoctor(repositories.doctors());
+            Slot slot = a.getSlot(repositories.slots());
             String doctorName = (doc != null) ? doc.name() : "?";
             String date = (slot != null) ? slot.date().toString() : "?";
             String timeStart = (slot != null) ? slot.timeRange().start().toString() : "?";
@@ -98,21 +100,18 @@ public class PatientAppointmentsController {
 
     private void handleCancel() {
         if (selectedAppointment != null) {
-            selectedAppointment.cancel(repos.appointments);
+            selectedAppointment.cancel(repositories.appointments());
             notificationManager.createNotification(selectedAppointment.patientId(),
                     "Your appointment has been cancelled by the user.");
-            myAppointments = repos.appointments.findAll().stream()
-                    .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
-                    .toList();
-            updateList();
+            reloadAppointments();
         }
     }
 
     private void handleReschedule() {
         if (selectedAppointment != null) {
-            List<Slot> slots = repos.slots.findAll();
-            List<Slot> freeSlots = slots.stream()
-                    .filter(s -> s.scheduleId() == selectedAppointment.getDoctor().scheduleId() && s.isAvailable())
+            List<Slot> freeSlots = repositories.slots().findAll().stream()
+                    .filter(s -> s.scheduleId() == selectedAppointment.getDoctor(repositories.doctors()).scheduleId()
+                            && s.isAvailable(repositories.appointments()))
                     .toList();
             if (freeSlots.isEmpty()) {
                 new Alert(Alert.AlertType.WARNING, "No available slots to reschedule.", ButtonType.OK).showAndWait();
@@ -123,8 +122,6 @@ public class PatientAppointmentsController {
             dialog.setHeaderText("Select a new slot to reschedule:");
             dialog.setContentText("Slot:");
             dialog.setGraphic(null);
-            dialog.getDialogPane().setPrefWidth(350);
-            dialog.getDialogPane().setPrefHeight(200);
             ListView<Slot> slotListView = new ListView<>();
             slotListView.getItems().addAll(freeSlots);
             slotListView.setCellFactory(lv -> new ListCell<>() {
@@ -137,35 +134,25 @@ public class PatientAppointmentsController {
             slotListView.getSelectionModel().selectFirst();
             VBox vbox = new VBox(new Label("Choose a slot to reschedule the appointment."), slotListView);
             dialog.getDialogPane().setContent(vbox);
-            dialog.setResultConverter(buttonType -> {
-                if (buttonType == ButtonType.OK) {
-                    return slotListView.getSelectionModel().getSelectedItem();
-                }
-                return null;
-            });
+            dialog.setResultConverter(buttonType -> buttonType == ButtonType.OK
+                    ? slotListView.getSelectionModel().getSelectedItem()
+                    : null);
             dialog.showAndWait().ifPresent(newSlot -> {
-                selectedAppointment.reschedule(newSlot.id(), repos.appointments);
+                selectedAppointment.reschedule(newSlot.id(), repositories.appointments());
                 notificationManager.createNotification(selectedAppointment.patientId(),
-                        "Your appointment has been rescheduled to: " + newSlot.date() + " " + newSlot.timeRange().start() + "-" + newSlot.timeRange().end());
-                myAppointments = repos.appointments.findAll().stream()
-                        .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
-                        .toList();
-                updateList();
+                        "Your appointment has been rescheduled to: " + newSlot.date() + " " + newSlot.timeRange().start() + "-"
+                                + newSlot.timeRange().end());
+                reloadAppointments();
             });
         }
     }
 
     private void handleConfirm() {
-        if (selectedAppointment != null) {
-            if (!selectedAppointment.status().name().equals("CONFIRMED")) {
-                selectedAppointment.confirm(repos.appointments);
-                notificationManager.createNotification(selectedAppointment.patientId(),
-                        "Your appointment has been confirmed.");
-                myAppointments = repos.appointments.findAll().stream()
-                        .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
-                        .toList();
-                updateList();
-            }
+        if (selectedAppointment != null && !selectedAppointment.status().name().equals("CONFIRMED")) {
+            selectedAppointment.confirm(repositories.appointments());
+            notificationManager.createNotification(selectedAppointment.patientId(),
+                    "Your appointment has been confirmed.");
+            reloadAppointments();
         }
     }
 }

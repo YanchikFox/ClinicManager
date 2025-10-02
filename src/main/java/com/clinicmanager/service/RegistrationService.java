@@ -1,6 +1,6 @@
 package com.clinicmanager.service;
 
-import com.clinicmanager.gui.AppContext;
+import com.clinicmanager.exception.RegistrationException;
 import com.clinicmanager.model.actors.Account;
 import com.clinicmanager.model.actors.Doctor;
 import com.clinicmanager.model.actors.Patient;
@@ -9,9 +9,13 @@ import com.clinicmanager.model.entities.Schedule;
 import com.clinicmanager.model.entities.Slot;
 import com.clinicmanager.model.entities.TimeRange;
 import com.clinicmanager.model.enums.Role;
-import com.clinicmanager.repository.*;
+import com.clinicmanager.repository.AccountRepository;
+import com.clinicmanager.repository.DoctorRepository;
+import com.clinicmanager.repository.MedicalCardRepository;
+import com.clinicmanager.repository.PatientRepository;
+import com.clinicmanager.repository.ScheduleRepository;
+import com.clinicmanager.repository.SlotRepository;
 import com.clinicmanager.security.HashUtil;
-import com.clinicmanager.exception.RegistrationException;
 import com.clinicmanager.time.TimeManager;
 
 import java.time.DayOfWeek;
@@ -20,7 +24,7 @@ import java.time.LocalTime;
 import java.util.Set;
 import java.util.List;
 
-public class RegistrationService {
+public class RegistrationService implements RegistrationUseCase {
     private static final Set<String> VALID_LICENSES = Set.of("DOC123", "DOC456", "SURG2025");
 
     private final AccountRepository accountRepository;
@@ -30,15 +34,21 @@ public class RegistrationService {
     private final MedicalCardRepository medicalCardRepository;
     private final ScheduleRepository scheduleRepository;
 
-    public RegistrationService() {
-        this.accountRepository = AppContext.getRepositories().accounts;
-        this.doctorRepository = AppContext.getRepositories().doctors;
-        this.patientRepository = AppContext.getRepositories().patients;
-        this.slotRepository = AppContext.getRepositories().slots;
-        this.medicalCardRepository = AppContext.getRepositories().cards;
-        this.scheduleRepository = AppContext.getRepositories().schedules;
+    public RegistrationService(AccountRepository accountRepository,
+            DoctorRepository doctorRepository,
+            PatientRepository patientRepository,
+            SlotRepository slotRepository,
+            MedicalCardRepository medicalCardRepository,
+            ScheduleRepository scheduleRepository) {
+        this.accountRepository = accountRepository;
+        this.doctorRepository = doctorRepository;
+        this.patientRepository = patientRepository;
+        this.slotRepository = slotRepository;
+        this.medicalCardRepository = medicalCardRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
+    @Override
     public void registerDoctor(String email, String rawPassword, String name, String dateOfBirth,
             String phone, String licenseCode) {
         if (!VALID_LICENSES.contains(licenseCode)) {
@@ -71,6 +81,7 @@ public class RegistrationService {
         accountRepository.save(acc);
     }
 
+    @Override
     public void registerPatient(String email, String rawPassword, String name, String dateOfBirth, String phone) {
         Patient patient = new Patient(-1, name, dateOfBirth, phone, -1);
         int patientId = patientRepository.save(patient);

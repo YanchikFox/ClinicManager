@@ -1,15 +1,20 @@
 package com.clinicmanager.gui;
+
+import com.clinicmanager.app.PanelManager;
+import com.clinicmanager.app.ViewLoader;
 import com.clinicmanager.gui.localization.LocalizationManager;
+import com.clinicmanager.model.actors.Patient;
+import com.clinicmanager.repository.Repositories;
+import com.clinicmanager.service.NotificationService;
+import com.clinicmanager.time.TimeManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import com.clinicmanager.time.TimeManager;
-import java.time.format.DateTimeFormatter;
+import javafx.scene.Parent;
+import javafx.scene.control.*;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class PatientPanelController {
 
@@ -47,62 +52,38 @@ public class PatientPanelController {
     private final TimeManager timeManager = TimeManager.getInstance();
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final LocalizationManager localization = LocalizationManager.getInstance();
+    private final PanelManager panelManager;
+    private final Repositories repositories;
+    private final NotificationService notificationService;
+    private final ViewLoader viewLoader;
+
+    public PatientPanelController(PanelManager panelManager,
+            Repositories repositories,
+            NotificationService notificationService,
+            ViewLoader viewLoader) {
+        this.panelManager = panelManager;
+        this.repositories = repositories;
+        this.notificationService = notificationService;
+        this.viewLoader = viewLoader;
+    }
 
     @FXML
     private void initialize() {
         applyLocalization();
         localization.localeProperty().addListener((obs, oldLocale, newLocale) -> applyLocalization());
-        searchDoctorsBtn.setOnAction(e -> {
-            try {
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                        getClass().getResource("/gui/doctor_search.fxml"));
-                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
-                javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle(localization.get("patient.doctorSearch.title"));
-                stage.setScene(scene);
-                stage.show();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-
-        viewAppointmentsBtn.setOnAction(e -> {
-            try {
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                        getClass().getResource("/gui/patient_appointments.fxml"));
-                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
-                javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle(localization.get("patient.appointments.title"));
-                stage.setScene(scene);
-                stage.show();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-
-        viewMedicalCardBtn.setOnAction(e -> {
-            try {
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                        getClass().getResource("/gui/medical_card.fxml"));
-                javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
-                javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle(localization.get("patient.medicalCard.title"));
-                stage.setScene(scene);
-                stage.show();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+        searchDoctorsBtn.setOnAction(e -> openWindow("/gui/doctor_search.fxml",
+                localization.get("patient.doctorSearch.title")));
+        viewAppointmentsBtn.setOnAction(e -> openWindow("/gui/patient_appointments.fxml",
+                localization.get("patient.appointments.title")));
+        viewMedicalCardBtn.setOnAction(e -> openWindow("/gui/medical_card.fxml",
+                localization.get("patient.medicalCard.title")));
 
         logoutBtn.setOnAction(e -> {
             try {
-                // Revoke the token when logging out
-                var panel = com.clinicmanager.gui.AppContext.getPanel();
-                if (panel != null) {
-                    panel.revokeToken();
-                }
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                        getClass().getResource("/gui/start_menu.fxml"));
+                var panel = panelManager.getCurrentPanel();
+                panel.revokeToken();
+                panelManager.clear();
+                javafx.fxml.FXMLLoader loader = viewLoader.loader("/gui/start_menu.fxml");
                 javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
                 javafx.stage.Stage stage = (javafx.stage.Stage) logoutBtn.getScene().getWindow();
                 stage.setScene(scene);
@@ -112,66 +93,76 @@ public class PatientPanelController {
             }
         });
 
-        // Notifications
-        javafx.application.Platform.runLater(this::updateNotificationsButtonStyle);
+        Platform.runLater(this::updateNotificationsButtonStyle);
         notificationsBtn.setOnAction(e -> {
-            var panel = com.clinicmanager.gui.AppContext.getPanel();
-            if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient))
+            var panel = panelManager.getCurrentPanel();
+            if (!(panel.currentPerson() instanceof Patient patient)) {
                 return;
-            var notificationManager = com.clinicmanager.gui.AppContext.getRepositories().notifications;
-            var service = new com.clinicmanager.service.NotificationManager(notificationManager);
-            // force reload notifications from DB each time
-            NotificationWindow.showNotifications((javafx.stage.Stage) notificationsBtn.getScene().getWindow(), service,
+            }
+            NotificationWindow.showNotifications((javafx.stage.Stage) notificationsBtn.getScene().getWindow(),
+                    notificationService,
                     patient.id());
-            // update style after closing window
-            javafx.application.Platform.runLater(this::updateNotificationsButtonStyle);
+            Platform.runLater(this::updateNotificationsButtonStyle);
         });
-        // Add a listener to update the style when the window regains focus
         notificationsBtn.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.windowProperty().addListener((o, oldWin, newWin) -> {
                     if (newWin != null) {
                         newWin.focusedProperty().addListener((of, was, isNow) -> {
-                            if (isNow)
-                                javafx.application.Platform.runLater(this::updateNotificationsButtonStyle);
+                            if (isNow) {
+                                Platform.runLater(this::updateNotificationsButtonStyle);
+                            }
                         });
                     }
                 });
             }
         });
 
-        favoriteDoctorsBtn.setOnAction(e -> {
-            try {
-                var panel = com.clinicmanager.gui.AppContext.getPanel();
-                if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient))
-                    return;
-                var repos = com.clinicmanager.gui.AppContext.getRepositories();
-                var favs = repos.favoriteDoctors.findByPatientId(patient.id());
-                java.util.List<com.clinicmanager.model.actors.Doctor> doctors = favs.stream()
-                        .map(fav -> repos.doctors.findById(fav.doctorId()))
-                        .filter(d -> d != null)
-                        .toList();
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                        getClass().getResource("/gui/doctor_search.fxml"));
-                javafx.scene.Parent root = loader.load();
-                com.clinicmanager.gui.DoctorSearchController controller = loader.getController();
-                controller.setDoctors(doctors);
-                javafx.scene.Scene scene = new javafx.scene.Scene(root);
-                javafx.stage.Stage stage = new javafx.stage.Stage();
-                stage.setTitle(localization.get("patient.favoriteDoctors.title"));
-                stage.setScene(scene);
-                stage.show();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+        favoriteDoctorsBtn.setOnAction(e -> showFavoriteDoctors());
 
-        // Virtual time management
         updateTimeLabel(timeManager.getCurrentTime());
         timeManager.addListener(this::onTimeChanged);
         startTimeBtn.setOnAction(e -> timeManager.start());
         stopTimeBtn.setOnAction(e -> timeManager.stop());
         setTimeBtn.setOnAction(e -> handleSetTime());
+    }
+
+    private void showFavoriteDoctors() {
+        try {
+            var panel = panelManager.getCurrentPanel();
+            if (!(panel.currentPerson() instanceof Patient patient)) {
+                return;
+            }
+            var favs = repositories.favoriteDoctors().findByPatientId(patient.id());
+            List<com.clinicmanager.model.actors.Doctor> doctors = favs.stream()
+                    .map(fav -> repositories.doctors().findById(fav.doctorId()))
+                    .filter(d -> d != null)
+                    .toList();
+            javafx.fxml.FXMLLoader loader = viewLoader.loader("/gui/doctor_search.fxml");
+            Parent root = loader.load();
+            DoctorSearchController controller = loader.getController();
+            controller.setDoctors(doctors);
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle(localization.get("patient.favoriteDoctors.title"));
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void openWindow(String fxml, String title) {
+        try {
+            javafx.fxml.FXMLLoader loader = viewLoader.loader(fxml);
+            javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle(title);
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void updateTimeLabel(LocalDateTime time) {
@@ -180,16 +171,14 @@ public class PatientPanelController {
 
     private void onTimeChanged(LocalDateTime time) {
         updateTimeLabel(time);
-        // Automatically refresh all open patient windows after the time changes
-        javafx.application.Platform.runLater(() -> {
-            // Refresh the patient appointments window if it is open
+        Platform.runLater(() -> {
             for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
                 if (window.isShowing() && window.getScene() != null
                         && window.getScene().getRoot() != null) {
-                    javafx.scene.Parent root = window.getScene().getRoot();
+                    Parent root = window.getScene().getRoot();
                     Object controller = root.getProperties().get("fx:controller");
-                    if (controller instanceof PatientAppointmentsController) {
-                        ((PatientAppointmentsController) controller).reloadAppointments();
+                    if (controller instanceof PatientAppointmentsController appointmentsController) {
+                        appointmentsController.reloadAppointments();
                     }
                 }
             }
@@ -212,13 +201,11 @@ public class PatientPanelController {
     }
 
     private void updateNotificationsButtonStyle() {
-        var panel = com.clinicmanager.gui.AppContext.getPanel();
-        if (panel == null || !(panel.currentPerson() instanceof com.clinicmanager.model.actors.Patient patient))
+        var panel = panelManager.getCurrentPanel();
+        if (!(panel.currentPerson() instanceof Patient patient)) {
             return;
-        var notificationManager = com.clinicmanager.gui.AppContext.getRepositories().notifications;
-        var service = new com.clinicmanager.service.NotificationManager(notificationManager);
-        // always reload from DB
-        boolean hasUnread = !service.getUnreadNotificationsByPersonId(patient.id()).isEmpty();
+        }
+        boolean hasUnread = !notificationService.getUnreadNotificationsByPersonId(patient.id()).isEmpty();
         notificationsBtn.setStyle(hasUnread
                 ? "-fx-background-color: #ffcccc; -fx-border-color: red; -fx-border-width: 2px;"
                 : "-fx-background-color: #cccccc;");

@@ -1,4 +1,6 @@
 package com.clinicmanager.gui;
+
+import com.clinicmanager.app.ViewLoader;
 import com.clinicmanager.gui.localization.LocalizationManager;
 
 import javafx.fxml.FXML;
@@ -24,6 +26,11 @@ public class StartMenuController {
     private Button polishButton;
 
     private final LocalizationManager localization = LocalizationManager.getInstance();
+    private final ViewLoader viewLoader;
+
+    public StartMenuController(ViewLoader viewLoader) {
+        this.viewLoader = viewLoader;
+    }
 
     @FXML
     private void initialize() {
@@ -59,7 +66,7 @@ public class StartMenuController {
     private void switchScene(String fxml, String title) {
         try {
             Stage stage = MainFX.getPrimaryStage();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            FXMLLoader loader = viewLoader.loader(fxml);
             stage.setScene(new Scene(loader.load()));
             stage.setTitle(title);
         } catch (Exception e) {

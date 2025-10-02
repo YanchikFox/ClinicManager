@@ -1,7 +1,9 @@
 package com.clinicmanager.repository;
 
 import com.clinicmanager.model.entities.Appointment;
+import com.clinicmanager.model.entities.Slot;
 import com.clinicmanager.model.enums.AppointmentStatus;
+import com.clinicmanager.repository.SlotRepository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,8 +11,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class AppointmentRepository extends AbstractDatabaseManager<Appointment> {
-    public AppointmentRepository(String dbUrl) {
+    private final SlotRepository slotRepository;
+
+    public AppointmentRepository(String dbUrl, SlotRepository slotRepository) {
         super(dbUrl);
+        this.slotRepository = slotRepository;
     }
 
     @Override
@@ -116,7 +121,7 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
     }
 
     private java.time.LocalDate getSlotDateSafe(com.clinicmanager.model.entities.Appointment a) {
-        var slot = a.getSlot();
+        Slot slot = slotRepository.findById(a.slotId());
         return slot != null ? slot.date() : null;
     }
 }
