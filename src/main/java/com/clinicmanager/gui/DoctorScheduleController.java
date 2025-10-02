@@ -211,18 +211,16 @@ public class DoctorScheduleController {
             return null;
         });
         dialog.showAndWait().ifPresent(slot -> {
-            if (slot != null) {
-                // Check for overlapping dates and times
-                RepositoryManager repos = AppContext.getRepositories();
-                boolean intersects = repos.slots.findAll().stream()
-                        .filter(s -> s.scheduleId() == doctor.scheduleId() && s.date().equals(slot.date()))
-                        .anyMatch(s -> timesOverlap(s.timeRange(), slot.timeRange()));
-                if (intersects) {
-                    new Alert(Alert.AlertType.ERROR, "The slot conflicts with an existing one!", ButtonType.OK).showAndWait();
-                } else {
-                    repos.slots.save(slot);
-                    loadSlots();
-                }
+            // Check for overlapping dates and times
+            RepositoryManager repos = AppContext.getRepositories();
+            boolean intersects = repos.slots.findAll().stream()
+                    .filter(s -> s.scheduleId() == doctor.scheduleId() && s.date().equals(slot.date()))
+                    .anyMatch(s -> timesOverlap(s.timeRange(), slot.timeRange()));
+            if (intersects) {
+                new Alert(Alert.AlertType.ERROR, "The slot conflicts with an existing one!", ButtonType.OK).showAndWait();
+            } else {
+                repos.slots.save(slot);
+                loadSlots();
             }
         });
     }

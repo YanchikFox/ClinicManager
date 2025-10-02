@@ -6,6 +6,7 @@ import com.clinicmanager.model.enums.AppointmentStatus;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AppointmentRepository extends AbstractDatabaseManager<Appointment> {
     public AppointmentRepository(String dbUrl) {
@@ -110,7 +111,7 @@ public class AppointmentRepository extends AbstractDatabaseManager<Appointment> 
         return findAll().stream().noneMatch(a -> a.patientId() == patientId &&
                 a.doctorId() == doctorId &&
                 getSlotDateSafe(a) != null &&
-                getSlotDateSafe(a).equals(date) &&
+                Objects.equals(getSlotDateSafe(a), date) &&
                 !a.status().equals(com.clinicmanager.model.enums.AppointmentStatus.CANCELLED));
     }
 

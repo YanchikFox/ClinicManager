@@ -144,15 +144,13 @@ public class PatientAppointmentsController {
                 return null;
             });
             dialog.showAndWait().ifPresent(newSlot -> {
-                if (newSlot != null) {
-                    selectedAppointment.reschedule(newSlot.id(), repos.appointments);
-                    notificationManager.createNotification(selectedAppointment.patientId(),
-                            "Your appointment has been rescheduled to: " + newSlot.date() + " " + newSlot.timeRange().start() + "-" + newSlot.timeRange().end());
-                    myAppointments = repos.appointments.findAll().stream()
-                            .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
-                            .toList();
-                    updateList();
-                }
+                selectedAppointment.reschedule(newSlot.id(), repos.appointments);
+                notificationManager.createNotification(selectedAppointment.patientId(),
+                        "Your appointment has been rescheduled to: " + newSlot.date() + " " + newSlot.timeRange().start() + "-" + newSlot.timeRange().end());
+                myAppointments = repos.appointments.findAll().stream()
+                        .filter(a -> a.patientId() == selectedAppointment.patientId() && (a.status().name().equals("CONFIRMED") || a.status().name().equals("PENDING")))
+                        .toList();
+                updateList();
             });
         }
     }

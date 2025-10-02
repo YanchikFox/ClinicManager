@@ -161,7 +161,7 @@ public class DoctorPanelController {
         javafx.application.Platform.runLater(() -> {
             for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
                 if (window.isShowing() && window.getScene() != null
-                        && window.getScene().getRoot() instanceof javafx.scene.Parent) {
+                        && window.getScene().getRoot() != null) {
                     javafx.scene.Parent root = window.getScene().getRoot();
                     Object controller = root.getProperties().get("fx:controller");
                     if (controller instanceof com.clinicmanager.gui.DoctorAppointmentsController) {
