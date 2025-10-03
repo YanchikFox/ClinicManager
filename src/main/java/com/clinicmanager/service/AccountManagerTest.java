@@ -1,22 +1,22 @@
-//package com.clinicmanager.service;
+// package com.clinicmanager.service;
 //
-//import com.clinicmanager.exception.AuthenticationException;
-//import com.clinicmanager.model.actors.Account;
-//import com.clinicmanager.model.enums.Role;
-//import com.clinicmanager.repository.AccountRepository;
-//import com.clinicmanager.security.HashUtil;
-//import com.clinicmanager.security.TokenService;
-//import org.junit.jupiter.api.Test;
+// import com.clinicmanager.exception.AuthenticationException;
+// import com.clinicmanager.model.actors.Account;
+// import com.clinicmanager.model.enums.Role;
+// import com.clinicmanager.repository.AccountRepository;
+// import com.clinicmanager.security.HashUtil;
+// import com.clinicmanager.security.TokenService;
+// import org.junit.jupiter.api.Test;
 //
-//import java.nio.charset.StandardCharsets;
-//import java.security.MessageDigest;
-//import java.security.NoSuchAlgorithmException;
-//import java.util.ArrayList;
-//import java.util.List;
+// import java.nio.charset.StandardCharsets;
+// import java.security.MessageDigest;
+// import java.security.NoSuchAlgorithmException;
+// import java.util.ArrayList;
+// import java.util.List;
 //
-//import static org.junit.jupiter.api.Assertions.*;
+// import static org.junit.jupiter.api.Assertions.*;
 //
-//class AccountManagerTest {
+// class AccountManagerTest {
 //
 //    @Test
 //    void loginShouldUpgradeLegacyPasswordHash() {
@@ -38,11 +38,13 @@
 //
 //    @Test
 //    void loginWithInvalidCredentialsThrowsException() {
-//        Account legacyAccount = new Account(1, "user@example.com", legacySha256("secret"), Role.PATIENT, 1, true);
+//        Account legacyAccount = new Account(1, "user@example.com", legacySha256("secret"),
+// Role.PATIENT, 1, true);
 //        InMemoryAccountRepository repository = new InMemoryAccountRepository(legacyAccount);
 //        AccountManager manager = new AccountManager(repository, new TokenService());
 //
-//        assertThrows(AuthenticationException.class, () -> manager.login("user@example.com", "wrong"));
+//        assertThrows(AuthenticationException.class, () -> manager.login("user@example.com",
+// "wrong"));
 //    }
 //
 //    private static String legacySha256(String input) {
@@ -106,4 +108,4 @@
 //            return account;
 //        }
 //    }
-//}
+// }

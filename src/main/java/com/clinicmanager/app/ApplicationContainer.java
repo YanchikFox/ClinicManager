@@ -9,26 +9,26 @@ import com.clinicmanager.time.TimeTickListener;
 import javafx.util.Callback;
 
 public interface ApplicationContainer extends AutoCloseable {
-    Repositories repositories();
+  Repositories repositories();
 
-    AccountService accountService();
+  AccountService accountService();
 
-    RegistrationUseCase registrationUseCase();
+  RegistrationUseCase registrationUseCase();
 
-    SlotGenerationService slotGenerationService();
+  SlotGenerationService slotGenerationService();
 
-    NotificationService notificationService();
+  NotificationService notificationService();
 
-    PanelManager panelManager();
+  PanelManager panelManager();
 
-    ClinicFacade clinic();
+  ClinicFacade clinic();
 
-    TimeTickListener timeTickListener();
+  TimeTickListener timeTickListener();
 
-    ViewLoader viewLoader();
+  ViewLoader viewLoader();
 
-    Callback<Class<?>, Object> controllerFactory();
+  Callback<Class<?>, Object> controllerFactory();
 
-    @Override
-    void close();
+  @Override
+  void close();
 }

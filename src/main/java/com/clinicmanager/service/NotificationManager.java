@@ -3,43 +3,43 @@ package com.clinicmanager.service;
 import com.clinicmanager.model.entities.Notification;
 import com.clinicmanager.repository.NotificationRepository;
 import com.clinicmanager.time.TimeManager;
-
 import java.util.List;
 
 public class NotificationManager implements NotificationService {
-    private final NotificationRepository notificationRepository;
-    private final TimeManager timeManager;
+  private final NotificationRepository notificationRepository;
+  private final TimeManager timeManager;
 
-    public NotificationManager(NotificationRepository notificationRepository, TimeManager timeManager) {
-        this.notificationRepository = notificationRepository;
-        this.timeManager = timeManager;
-    }
+  public NotificationManager(
+      NotificationRepository notificationRepository, TimeManager timeManager) {
+    this.notificationRepository = notificationRepository;
+    this.timeManager = timeManager;
+  }
 
-    @Override
-    public Notification createNotification(int personId, String message) {
-        Notification n = new Notification(
-                0, // autoincrement id
-                personId,
-                message,
-                timeManager.getCurrentTime(),
-                false);
-        notificationRepository.save(n);
-        return n;
-    }
+  @Override
+  public void createNotification(int personId, String message) {
+    Notification notification =
+        new Notification(
+            0, // autoincrement id
+            personId,
+            message,
+            timeManager.getCurrentTime(),
+            false);
+    notificationRepository.save(notification);
+  }
 
-    @Override
-    public void markAsRead(Notification n) {
-        n.markAsRead();
-        notificationRepository.update(n);
-    }
+  @Override
+  public void markAsRead(Notification n) {
+    n.markAsRead();
+    notificationRepository.update(n);
+  }
 
-    @Override
-    public List<Notification> getAllNotificationsByPersonId(int personId) {
-        return notificationRepository.findByPersonId(personId);
-    }
+  @Override
+  public List<Notification> getAllNotificationsByPersonId(int personId) {
+    return notificationRepository.findByPersonId(personId);
+  }
 
-    @Override
-    public List<Notification> getUnreadNotificationsByPersonId(int personId) {
-        return notificationRepository.findUnreadByPersonId(personId);
-    }
+  @Override
+  public List<Notification> getUnreadNotificationsByPersonId(int personId) {
+    return notificationRepository.findUnreadByPersonId(personId);
+  }
 }

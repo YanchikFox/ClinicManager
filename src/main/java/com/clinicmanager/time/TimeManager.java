@@ -8,78 +8,77 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 
 public class TimeManager {
-    private static TimeManager instance;
-    private LocalDateTime currentTime;
-    private final List<Consumer<LocalDateTime>> listeners = new ArrayList<>();
-    private Timer timer;
-    private boolean running = false;
-    private int speedSecondsPerTick = 10; // 1 minute equals 10 seconds
-    private TimeTickListener tickListener;
+  private static TimeManager instance;
+  private LocalDateTime currentTime;
+  private final List<Consumer<LocalDateTime>> listeners = new ArrayList<>();
+  private Timer timer;
+  private boolean running = false;
+  private int speedSecondsPerTick = 10; // 1 minute equals 10 seconds
+  private TimeTickListener tickListener;
 
-    private TimeManager() {
-        this.currentTime = LocalDateTime.now();
-    }
+  private TimeManager() {
+    this.currentTime = LocalDateTime.now();
+  }
 
-    public static TimeManager getInstance() {
-        if (instance == null)
-            instance = new TimeManager();
-        return instance;
-    }
+  public static TimeManager getInstance() {
+    if (instance == null) instance = new TimeManager();
+    return instance;
+  }
 
-    public LocalDateTime getCurrentTime() {
-        return currentTime;
-    }
+  public LocalDateTime getCurrentTime() {
+    return currentTime;
+  }
 
-    public void setCurrentTime(LocalDateTime time) {
-        this.currentTime = time;
-        notifyListeners();
-    }
+  public void setCurrentTime(LocalDateTime time) {
+    this.currentTime = time;
+    notifyListeners();
+  }
 
-    public void addListener(Consumer<LocalDateTime> listener) {
-        listeners.add(listener);
-    }
+  public void addListener(Consumer<LocalDateTime> listener) {
+    listeners.add(listener);
+  }
 
-    public void removeListener(Consumer<LocalDateTime> listener) {
-        listeners.remove(listener);
-    }
+  public void removeListener(Consumer<LocalDateTime> listener) {
+    listeners.remove(listener);
+  }
 
-    public void setTickListener(TimeTickListener tickListener) {
-        this.tickListener = tickListener;
-    }
+  public void setTickListener(TimeTickListener tickListener) {
+    this.tickListener = tickListener;
+  }
 
-    private void notifyListeners() {
-        for (var l : listeners)
-            l.accept(currentTime);
-    }
+  private void notifyListeners() {
+    for (var l : listeners) l.accept(currentTime);
+  }
 
-    public void start() {
-        if (running)
-            return;
-        running = true;
-        timer = new Timer(true);
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                currentTime = currentTime.plusMinutes(1);
-                notifyListeners();
-                if (tickListener != null) {
-                    tickListener.onTick(currentTime);
-                }
+  public void start() {
+    if (running) return;
+    running = true;
+    timer = new Timer(true);
+    timer.scheduleAtFixedRate(
+        new TimerTask() {
+          @Override
+          public void run() {
+            currentTime = currentTime.plusMinutes(1);
+            notifyListeners();
+            if (tickListener != null) {
+              tickListener.onTick(currentTime);
             }
-        }, speedSecondsPerTick * 1000L, speedSecondsPerTick * 1000L);
-    }
+          }
+        },
+        speedSecondsPerTick * 1000L,
+        speedSecondsPerTick * 1000L);
+  }
 
-    public void stop() {
-        if (timer != null)
-            timer.cancel();
-        running = false;
-    }
+  public void stop() {
+    if (timer != null) timer.cancel();
+    running = false;
+  }
 
-    public void setSpeedSecondsPerTick(int seconds) {
-        this.speedSecondsPerTick = seconds;
-        if (running) {
-            stop();
-            start();
-        }
+  public void setSpeedSecondsPerTick(int seconds) {
+    this.speedSecondsPerTick = seconds;
+    if (running) {
+      stop();
+      start();
     }
+  }
 }

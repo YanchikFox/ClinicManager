@@ -1,14 +1,14 @@
-//package com.clinicmanager.security;
+// package com.clinicmanager.security;
 //
-//import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.Test;
 //
-//import java.nio.charset.StandardCharsets;
-//import java.security.MessageDigest;
-//import java.security.NoSuchAlgorithmException;
+// import java.nio.charset.StandardCharsets;
+// import java.security.MessageDigest;
+// import java.security.NoSuchAlgorithmException;
 //
-//import static org.junit.jupiter.api.Assertions.*;
+// import static org.junit.jupiter.api.Assertions.*;
 //
-//class HashUtilTest {
+// class HashUtilTest {
 //
 //    @Test
 //    void hashShouldVerifyWithCorrectPassword() {
@@ -51,4 +51,4 @@
 //            throw new IllegalStateException(e);
 //        }
 //    }
-//}
+// }

@@ -1,14 +1,15 @@
-//package com.clinicmanager.architecture;
+// package com.clinicmanager.architecture;
 //
-//import com.tngtech.archunit.core.importer.ImportOption;
-//import com.tngtech.archunit.junit.AnalyzeClasses;
-//import com.tngtech.archunit.junit.ArchTest;
-//import com.tngtech.archunit.lang.ArchRule;
+// import com.tngtech.archunit.core.importer.ImportOption;
+// import com.tngtech.archunit.junit.AnalyzeClasses;
+// import com.tngtech.archunit.junit.ArchTest;
+// import com.tngtech.archunit.lang.ArchRule;
 //
-//import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+// import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 //
-//@AnalyzeClasses(packages = "com.clinicmanager", importOptions = ImportOption.DoNotIncludeTests.class)
-//class LayerDependencyTest {
+// @AnalyzeClasses(packages = "com.clinicmanager", importOptions =
+// ImportOption.DoNotIncludeTests.class)
+// class LayerDependencyTest {
 //
 //    private static final String GUI_PACKAGE = "com.clinicmanager.gui..";
 //
@@ -26,4 +27,4 @@
 //    static final ArchRule timeLayerShouldNotDependOnGui = noClasses()
 //            .that().resideInAPackage("com.clinicmanager.time..")
 //            .should().dependOnClassesThat().resideInAnyPackage(GUI_PACKAGE);
-//}
+// }

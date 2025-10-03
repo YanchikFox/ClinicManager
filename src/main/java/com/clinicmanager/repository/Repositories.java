@@ -1,23 +1,23 @@
 package com.clinicmanager.repository;
 
 public interface Repositories {
-    AccountRepository accounts();
+  AccountRepository accounts();
 
-    DoctorRepository doctors();
+  DoctorRepository doctors();
 
-    PatientRepository patients();
+  PatientRepository patients();
 
-    AppointmentRepository appointments();
+  AppointmentRepository appointments();
 
-    ScheduleRepository schedules();
+  ScheduleRepository schedules();
 
-    SlotRepository slots();
+  SlotRepository slots();
 
-    MedicalCardRepository medicalCards();
+  MedicalCardRepository medicalCards();
 
-    MedicalRecordRepository medicalRecords();
+  MedicalRecordRepository medicalRecords();
 
-    NotificationRepository notifications();
+  NotificationRepository notifications();
 
-    FavoriteDoctorRepository favoriteDoctors();
+  FavoriteDoctorRepository favoriteDoctors();
 }

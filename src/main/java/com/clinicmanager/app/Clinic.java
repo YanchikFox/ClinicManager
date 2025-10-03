@@ -9,27 +9,27 @@ import com.clinicmanager.repository.PatientRepository;
 import com.clinicmanager.service.AccountService;
 
 public class Clinic implements ClinicFacade {
-    private final AccountService accountService;
-    private final DoctorRepository doctorRepository;
-    private final PatientRepository patientRepository;
+  private final AccountService accountService;
+  private final DoctorRepository doctorRepository;
+  private final PatientRepository patientRepository;
 
-    public Clinic(AccountService accountService,
-            DoctorRepository doctorRepository,
-            PatientRepository patientRepository) {
-        this.accountService = accountService;
-        this.doctorRepository = doctorRepository;
-        this.patientRepository = patientRepository;
-    }
+  public Clinic(
+      AccountService accountService,
+      DoctorRepository doctorRepository,
+      PatientRepository patientRepository) {
+    this.accountService = accountService;
+    this.doctorRepository = doctorRepository;
+    this.patientRepository = patientRepository;
+  }
 
-    @Override
-    public BaseControlPanel login(String email, String password) {
-        String token = accountService.login(email, password);
-        Account acc = accountService.getAccountByToken(token);
+  @Override
+  public BaseControlPanel login(String email, String password) {
+    String token = accountService.login(email, password);
+    Account acc = accountService.getAccountByToken(token);
 
-        return switch (acc.role()) {
-            case DOCTOR -> new DoctorControlPanel(token, accountService, doctorRepository);
-            case PATIENT -> new PatientControlPanel(token, accountService, patientRepository);
-        };
-    }
-
+    return switch (acc.role()) {
+      case DOCTOR -> new DoctorControlPanel(token, accountService, doctorRepository);
+      case PATIENT -> new PatientControlPanel(token, accountService, patientRepository);
+    };
+  }
 }

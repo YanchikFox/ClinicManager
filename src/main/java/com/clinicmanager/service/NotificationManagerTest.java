@@ -1,19 +1,19 @@
-//package com.clinicmanager.service;
+// package com.clinicmanager.service;
 //
-//import com.clinicmanager.model.entities.Notification;
-//import com.clinicmanager.repository.NotificationRepository;
-//import com.clinicmanager.time.TimeManager;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
+// import com.clinicmanager.model.entities.Notification;
+// import com.clinicmanager.repository.NotificationRepository;
+// import com.clinicmanager.time.TimeManager;
+// import org.junit.jupiter.api.AfterEach;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
 //
-//import java.time.LocalDateTime;
-//import java.util.Collections;
-//import java.util.List;
+// import java.time.LocalDateTime;
+// import java.util.Collections;
+// import java.util.List;
 //
-//import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
 //
-//class NotificationManagerTest {
+// class NotificationManagerTest {
 //
 //    private final TimeManager timeManager = TimeManager.getInstance();
 //    private LocalDateTime previousTime;
@@ -33,7 +33,8 @@
 //        LocalDateTime virtualTime = LocalDateTime.of(2024, 1, 1, 12, 0);
 //        timeManager.setCurrentTime(virtualTime);
 //        InMemoryNotificationRepository repository = new InMemoryNotificationRepository();
-//        NotificationManager notificationManager = new NotificationManager(repository, timeManager);
+//        NotificationManager notificationManager = new NotificationManager(repository,
+// timeManager);
 //
 //        Notification notification = notificationManager.createNotification(1, "Test message");
 //
@@ -75,4 +76,4 @@
 //            return Collections.emptyList();
 //        }
 //    }
-//}
+// }
