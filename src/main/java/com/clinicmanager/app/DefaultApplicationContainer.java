@@ -49,7 +49,8 @@ public class DefaultApplicationContainer implements ApplicationContainer {
                 repositoryManager.schedules());
         this.slotGenerationService = new SlotAutoGeneratorService(
                 repositoryManager.doctors(), repositoryManager.slots());
-        this.notificationService = new NotificationManager(repositoryManager.notifications());
+        TimeManager timeManager = TimeManager.getInstance();
+        this.notificationService = new NotificationManager(repositoryManager.notifications(), timeManager);
         this.panelManager = new DefaultPanelManager();
         this.clinic = new Clinic(accountService,
                 repositoryManager.doctors(),
@@ -58,7 +59,7 @@ public class DefaultApplicationContainer implements ApplicationContainer {
                 repositoryManager.slots(),
                 repositoryManager.appointments(),
                 notificationService);
-        TimeManager.getInstance().setTickListener(timeTickHandler);
+        timeManager.setTickListener(timeTickHandler);
 
         AtomicReference<ViewLoader> viewLoaderRef = new AtomicReference<>();
 

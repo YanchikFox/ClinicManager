@@ -2,15 +2,17 @@ package com.clinicmanager.service;
 
 import com.clinicmanager.model.entities.Notification;
 import com.clinicmanager.repository.NotificationRepository;
+import com.clinicmanager.time.TimeManager;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class NotificationManager implements NotificationService {
     private final NotificationRepository notificationRepository;
+    private final TimeManager timeManager;
 
-    public NotificationManager(NotificationRepository notificationRepository) {
+    public NotificationManager(NotificationRepository notificationRepository, TimeManager timeManager) {
         this.notificationRepository = notificationRepository;
+        this.timeManager = timeManager;
     }
 
     @Override
@@ -19,7 +21,7 @@ public class NotificationManager implements NotificationService {
                 0, // autoincrement id
                 personId,
                 message,
-                LocalDateTime.now(),
+                timeManager.getCurrentTime(),
                 false);
         notificationRepository.save(n);
         return n;
