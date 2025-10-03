@@ -28,9 +28,9 @@ Desktop suite for running a modern medical practice. Clinic Manager bundles pati
 | Area | What you get |
 | --- | --- |
 | **Authentication & onboarding** | Email/password login, guided registration for patients and licensed doctors, automatic provisioning of medical cards and initial time slots. |
-| **Patient cockpit** | Search doctors by specialty, maintain favourites, book or reschedule visits, review medical history, and read notifications in one window. |
+| **Patient cockpit** | Browse the doctor list, book or reschedule visits, save favourites, review medical history, and read notifications in one window. |
 | **Doctor cockpit** | Monitor the live schedule, manage availability slots, review upcoming appointments, and record visit outcomes without leaving the panel. |
-| **Virtual time controls** | Shared play/pause/step controls for doctors and patients with granular listeners that trigger automation on every tick. |
+| **Virtual time controls** | Shared start/stop/set time controls for doctors and patients with granular listeners that trigger automation on every tick. |
 | **Notifications** | Real-time reminders for upcoming visits, status changes, and administrative actions delivered straight into the patient UI. |
 
 > 💡 **Tip:** Launch the virtual clock before a demo to showcase automated slot clean-up and visit completion.
@@ -47,7 +47,7 @@ src/main/java/com/clinicmanager
 ├── time/           ─► Virtual clock, tick handler, automation hooks
 └── security/       ─► Password hashing and token utilities
 ```
-- **AppContext** initialises the SQLite connection, repository manager, and reusable services for dependency injection across controllers.
+- **DefaultApplicationContainer** initialises the SQLite connection, repository manager, and reusable services for dependency injection across controllers.
 - **RepositoryManager** exposes typed repositories (accounts, doctors, patients, schedules, slots, appointments, notifications) that share one lifecycle-managed connection.
 - **TimeManager** and **TimeTickHandler** coordinate the virtual clock, dispatching events to update schedules, finalise overdue visits, and push reminders.
 
@@ -127,6 +127,6 @@ Flyway picks up any migration files under `src/main/resources/db/migration/`, so
 | JavaFX runtime error on startup | Ensure `--module-path` isn’t overridden in your IDE; prefer running via the Gradle `run` task. |
 | SQLite database locked | Close lingering app instances or IDE database explorers, then relaunch the app. |
 | No notifications appear | Confirm the virtual clock is running and that appointments fall within the reminder window. |
-| Time controls disabled | Log in as a doctor or patient; admins have read-only access to the virtual clock. |
+| Time controls disabled | Log in as a doctor or patient; only authenticated users can adjust the virtual clock. |
 
 Enjoy building a clinic experience that feels alive! 🚀
