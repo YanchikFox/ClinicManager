@@ -8,8 +8,8 @@ import java.util.List;
 
 public class DoctorRepository extends AbstractDatabaseManager<Doctor> {
 
-    public DoctorRepository(String dbUrl) {
-        super(dbUrl);
+    public DoctorRepository(Connection connection) {
+        super(connection);
     }
 
     @Override

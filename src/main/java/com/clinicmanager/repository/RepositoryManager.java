@@ -1,6 +1,14 @@
 package com.clinicmanager.repository;
 
-public class RepositoryManager implements Repositories {
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Objects;
+
+public class RepositoryManager implements Repositories, AutoCloseable {
+    private final Connection connection;
+    private final boolean ownsConnection;
     private final AccountRepository accounts;
     private final DoctorRepository doctors;
     private final PatientRepository patients;
@@ -13,16 +21,27 @@ public class RepositoryManager implements Repositories {
     private final FavoriteDoctorRepository favoriteDoctors;
 
     public RepositoryManager(String dbUrl) {
-        this.patients = new PatientRepository(dbUrl);
-        this.accounts = new AccountRepository(dbUrl);
-        this.slots = new SlotRepository(dbUrl);
-        this.doctors = new DoctorRepository(dbUrl);
-        this.appointments = new AppointmentRepository(dbUrl, this.slots);
-        this.schedules = new ScheduleRepository(dbUrl);
-        this.cards = new MedicalCardRepository(dbUrl);
-        this.records = new MedicalRecordRepository(dbUrl);
-        this.notifications = new NotificationRepository(dbUrl);
-        this.favoriteDoctors = new FavoriteDoctorRepository(dbUrl);
+        this(openConnection(dbUrl), true);
+    }
+
+    public RepositoryManager(Connection connection) {
+        this(connection, false);
+    }
+
+    private RepositoryManager(Connection connection, boolean ownsConnection) {
+        this.connection = Objects.requireNonNull(connection, "connection must not be null");
+        this.ownsConnection = ownsConnection;
+        enableForeignKeys(this.connection);
+        this.patients = new PatientRepository(this.connection);
+        this.accounts = new AccountRepository(this.connection);
+        this.slots = new SlotRepository(this.connection);
+        this.doctors = new DoctorRepository(this.connection);
+        this.appointments = new AppointmentRepository(this.connection, this.slots);
+        this.schedules = new ScheduleRepository(this.connection);
+        this.cards = new MedicalCardRepository(this.connection);
+        this.records = new MedicalRecordRepository(this.connection);
+        this.notifications = new NotificationRepository(this.connection);
+        this.favoriteDoctors = new FavoriteDoctorRepository(this.connection);
     }
 
     @Override
@@ -75,7 +94,12 @@ public class RepositoryManager implements Repositories {
         return favoriteDoctors;
     }
 
+    public Connection connection() {
+        return connection;
+    }
+
     public void closeAll() {
+        RuntimeException repositoryCloseError = null;
         try {
             accounts.close();
             doctors.close();
@@ -88,7 +112,47 @@ public class RepositoryManager implements Repositories {
             notifications.close();
             favoriteDoctors.close();
         } catch (Exception e) {
-            throw new RuntimeException("Error closing DB connections", e);
+            repositoryCloseError = new RuntimeException("Error closing repository resources", e);
+        } finally {
+            if (ownsConnection) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    if (repositoryCloseError == null) {
+                        repositoryCloseError = new RuntimeException("Error closing DB connection", e);
+                    } else {
+                        repositoryCloseError.addSuppressed(e);
+                    }
+                }
+            }
         }
+
+        if (repositoryCloseError != null) {
+            throw repositoryCloseError;
+        }
+    }
+
+    private static Connection openConnection(String dbUrl) {
+        if (dbUrl == null || dbUrl.isBlank()) {
+            throw new IllegalArgumentException("Database URL must not be null or blank");
+        }
+        try {
+            return DriverManager.getConnection(dbUrl);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to connect to DB", e);
+        }
+    }
+
+    private static void enableForeignKeys(Connection connection) {
+        try (Statement pragma = connection.createStatement()) {
+            pragma.execute("PRAGMA foreign_keys = ON");
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to enable foreign keys", e);
+        }
+    }
+
+    @Override
+    public void close() {
+        closeAll();
     }
 }

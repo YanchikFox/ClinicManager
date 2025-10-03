@@ -110,6 +110,13 @@ Flyway picks up any migration files under `src/main/resources/db/migration/`, so
   - Keep controller logic thin; push domain decisions into services.
   - Register new repositories with the central manager to reuse the shared connection.
   - Extend the virtual time automation through `TimeTickHandler` to keep behaviour consistent.
+- **Database access**
+  - `RepositoryManager` owns a single JDBC connection and passes it to every repository.
+    Use try-with-resources (`new RepositoryManager(url)`) or call `closeAll()` during
+    shutdown to dispose of the shared handle.
+  - For multi-step workflows, temporarily disable auto-commit on the connection retrieved
+    from the manager, execute repository calls, then `commit()`/`rollback()` to wrap the
+    operations in one transaction.
 - **UI tweaks**
   - FXML layouts live under `src/main/resources/gui`.
   - CSS themes are bundled alongside FXML for quick styling iterations.

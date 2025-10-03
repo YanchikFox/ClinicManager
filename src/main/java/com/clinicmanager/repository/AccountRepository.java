@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountRepository extends AbstractDatabaseManager<Account> {
-    public AccountRepository(String dbUrl) {
-        super(dbUrl);
+    public AccountRepository(Connection connection) {
+        super(connection);
     }
 
     @Override

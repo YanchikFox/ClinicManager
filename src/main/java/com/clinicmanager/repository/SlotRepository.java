@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SlotRepository extends AbstractDatabaseManager<Slot> {
-    public SlotRepository(String dbUrl) {
-        super(dbUrl);
+    public SlotRepository(Connection connection) {
+        super(connection);
     }
 
     @Override

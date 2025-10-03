@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MedicalRecordRepository extends AbstractDatabaseManager<MedicalRecord> {
-    public MedicalRecordRepository(String dbUrl) {
-        super(dbUrl);
+    public MedicalRecordRepository(Connection connection) {
+        super(connection);
     }
 
     @Override

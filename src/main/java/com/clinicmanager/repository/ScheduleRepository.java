@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleRepository extends AbstractDatabaseManager<Schedule> {
-    public ScheduleRepository(String dbUrl) {
-        super(dbUrl);
+    public ScheduleRepository(Connection connection) {
+        super(connection);
     }
 
     @Override

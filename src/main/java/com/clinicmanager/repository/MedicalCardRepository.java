@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MedicalCardRepository extends AbstractDatabaseManager<MedicalCard> {
-    public MedicalCardRepository(String dbUrl) {
-        super(dbUrl);
+    public MedicalCardRepository(Connection connection) {
+        super(connection);
     }
 
     @Override

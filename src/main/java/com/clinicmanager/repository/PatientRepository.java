@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PatientRepository extends AbstractDatabaseManager<Patient> {
-    public PatientRepository(String dbUrl) {
-        super(dbUrl);
+    public PatientRepository(Connection connection) {
+        super(connection);
     }
 
     @Override

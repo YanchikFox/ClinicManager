@@ -15,7 +15,6 @@ import com.clinicmanager.repository.MedicalCardRepository;
 import com.clinicmanager.repository.PatientRepository;
 import com.clinicmanager.repository.ScheduleRepository;
 import com.clinicmanager.repository.SlotRepository;
-import com.clinicmanager.security.HashUtil;
 import com.clinicmanager.time.TimeManager;
 
 import java.time.DayOfWeek;
@@ -77,7 +76,7 @@ public class RegistrationService implements RegistrationUseCase {
             }
         }
 
-        Account acc = new Account(-1, email, HashUtil.sha256(rawPassword), Role.DOCTOR, doctorId, true);
+        Account acc = new Account(-1, email, rawPassword, Role.DOCTOR, doctorId);
         accountRepository.save(acc);
     }
 
@@ -92,7 +91,7 @@ public class RegistrationService implements RegistrationUseCase {
         Patient updatedPatient = new Patient(patientId, name, dateOfBirth, phone, cardId);
         patientRepository.update(updatedPatient);
 
-        Account acc = new Account(-1, email, HashUtil.sha256(rawPassword), Role.PATIENT, patientId, true);
+        Account acc = new Account(-1, email, rawPassword, Role.PATIENT, patientId);
         accountRepository.save(acc);
     }
 

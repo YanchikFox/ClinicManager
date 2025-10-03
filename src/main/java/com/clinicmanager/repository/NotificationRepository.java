@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationRepository extends AbstractDatabaseManager<Notification> {
-    public NotificationRepository(String dbUrl) {
-        super(dbUrl);
+    public NotificationRepository(Connection connection) {
+        super(connection);
     }
 
     @Override
