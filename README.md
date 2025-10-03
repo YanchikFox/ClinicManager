@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏥 Clinic Manager
+# 🏥 Clinic Manager ![Gradle CI](https://github.com/YanchikFox/ClinicManager/actions/workflows/gradle-ci.yml/badge.svg)
 
 Desktop suite for running a modern medical practice. Clinic Manager bundles patient onboarding, doctor scheduling, visit management, and notification automation into a single JavaFX experience backed by SQLite.
 
