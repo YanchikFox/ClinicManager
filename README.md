@@ -72,9 +72,12 @@ Schema migrations live in `src/main/resources/db/migration/` and are executed wi
      artifacts automatically during the build.
 2. **Initialise the database** (creates `clinic.db` next to the project root)
    ```bash
-   ./gradlew flywayMigrate
+   ./gradlew initDatabase
    ```
-   Supply a custom location with `./gradlew flywayMigrate -PdbPath=path/to/your.db`, or simply start the app—migrations run automatically on launch.
+   The helper task wraps the `DatabaseSetup` tool and will also accept a custom location via
+   `./gradlew initDatabase -PdbPath=path/to/your.db`. If you prefer to interact with Flyway
+   directly you can still invoke `./gradlew flywayMigrate`. Skipping this step is fine as well
+   – the application triggers the same migrations when it boots.
 3. **Run the desktop app**
    ```bash
    ./gradlew run
